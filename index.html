@@ -195,6 +195,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-u
  background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:11px;font-size:13px;font-weight:600;z-index:70;
  opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ---- משפחה ---- */
+.code{font-size:30px;font-weight:800;letter-spacing:.14em;font-variant-numeric:tabular-nums;text-align:center;padding:12px;
+ background:var(--pn2);border-radius:11px;margin:8px 0;direction:ltr}
+.banner{background:var(--deep-soft);border:1px solid var(--ln);border-right:3px solid var(--deep);border-radius:var(--r);padding:11px 12px;margin-bottom:10px;font-size:14px}
+body.ro .fab,body.ro #todayBtns{display:none !important}
+.prop{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--ln)}
+.prop:last-child{border-bottom:0}
 /* ---- reduced motion: cross-fade instead of slide/spring, no gesture, no bounce ---- */
 @media (prefers-reduced-motion:reduce){
  .pane.on{animation:none}
@@ -223,6 +230,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-u
   <div class="blab"><span id="hP"></span><span id="hL"></span></div>
  </div>
  <div id="alerts"></div>
+ <div id="famToday"></div>
  <div class="dnav">
   <button onclick="hop(1)">‹</button>
   <div class="lab"><b id="dLab">—</b><small id="dInfo"></small></div>
@@ -231,7 +239,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-u
  <div class="chips" id="dQuick"></div>
  <div id="dTop"></div>
  <div id="tl"></div>
- <div class="btnrow" style="margin-top:12px">
+ <div class="btnrow" style="margin-top:12px" id="todayBtns">
   <button class="btn sm ghost grow" onclick="openEv()">+ אירוע</button>
   <button class="btn sm ghost grow" onclick="openOv(viewK)">שינוי במערכת</button>
  </div>
@@ -248,6 +256,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-u
  <div id="lHw"></div>
  <h2 class="sec">משבצות ההפסקה</h2>
  <div class="card" id="lMicro"></div>
+ <div id="famEv"></div>
  <h2 class="sec">אירועים קבועים <span class="r" id="evCount"></span></h2>
  <div id="lEv"></div>
  <button class="btn wide ghost" onclick="openEv()">+ אירוע חדש</button>
@@ -260,6 +269,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-u
 </section>
 
 <section class="pane" id="p-set">
+ <h2 class="sec" id="famH">משפחה <span class="r">צפייה ובקשות מההורים</span></h2>
+ <div class="card" id="famBox"><div class="sub" style="margin:0">טוען…</div></div>
  <h2 class="sec">זמן פנוי בכל יום</h2>
  <div class="card" id="capBox"></div>
  <h2 class="sec">כללי חלוקה</h2>
@@ -397,8 +408,7 @@ function method(sub,phase){
 }
 function phaseOf(d){return d<=3?"near":(d<=8?"mid":"far")}
 /* מנת התרגול: כמה שאלות נכנסות למשבצת, לפי הקצב של המקצוע */
-function dose(sub,min){
- var p=paceOf(sub);
+function dose(p,min){
  if(!p)return"";
  var n=Math.max(2,Math.round(min/p));
  return n+" שאלות";
@@ -408,13 +418,13 @@ function recipe(e,left,min,topic){
  var bits=[];
  if(e.sheet)bits.push("מתוך "+e.sheet);
  if(topic&&topic.indexOf("מעורב")<0)bits.push(topic);
- var d=dose(e.sub,min||S.len);if(d)bits.push(d);
+ var d=dose(paceFor(e),min||S.len);if(d)bits.push(d);
  var head=bits.join(" · ");
  return (head?head+" — ":"")+method(e.sub,phaseOf(left));
 }
 
 /* ---------- state ---------- */
-var S,exams,hw,done,plan,over,evts,ovr,prog,seen,calib,heat,filter="all",viewK=null;
+var S,exams,hw,done,plan,over,evts,ovr,prog,seen,calib,heat,pull,filter="all",viewK=null;
 function defs(){return{cap:[60,150,180,60,120,90,120],len:50,hor:21,same:true,hard:true,
  resAuto:true,res:[30,50,50,30,40,0,0],endH:19,lateH:21,travel:60,energy:"none",
  w:{bagrut:14,matkonet:9,hagbara:6,mivchan:4,bochan:2}}}
@@ -428,12 +438,12 @@ function load(){
  });
  hw=J("l_hw",[]);done=J("l_dn",{});evts=J("l_ev",[]);ovr=J("l_ov",{});
  /* prog: משבצות שבוצעו לכל מבחן · seen: מתי נלמד כל נושא (לחזרה מרווחת) · calib: כיול קצב · heat: עקביות יומית */
- prog=J("l_pg",{});seen=J("l_sn",{});calib=J("l_cb",{});heat=J("l_ht",{});
+ prog=J("l_pg",{});seen=J("l_sn",{});calib=J("l_cb",{});heat=J("l_ht",{});pull=J("l_pl",{});
  var cut=key(ad(tod(),-90));for(var hk in heat)if(hk<cut)delete heat[hk];
 }
 function save(){ST("l_s",JSON.stringify(S));ST("l_ex",JSON.stringify(exams));ST("l_hw",JSON.stringify(hw));
  ST("l_dn",JSON.stringify(done));ST("l_ev",JSON.stringify(evts));ST("l_ov",JSON.stringify(ovr));
- ST("l_pg",JSON.stringify(prog));ST("l_sn",JSON.stringify(seen));ST("l_cb",JSON.stringify(calib));ST("l_ht",JSON.stringify(heat))}
+ ST("l_pg",JSON.stringify(prog));ST("l_sn",JSON.stringify(seen));ST("l_cb",JSON.stringify(calib));ST("l_ht",JSON.stringify(heat));ST("l_pl",JSON.stringify(pull))}
 
 /* ---------- dates ---------- */
 function p2(n){return n<10?"0"+n:""+n}
@@ -498,12 +508,16 @@ function gapsFor(d){
 
 /* ---------- scheduler ---------- */
 function paceKeyOf(sub){for(var k in PACE)if(sub.indexOf(k)>-1)return k;return null}
-/* קצב לשאלה — מכויל לפי מה שדיווחת בפועל אחרי משבצות ("לקח יותר" / "פחות") */
-function paceOf(sub){var pk=paceKeyOf(sub);return pk?PACE[pk]*(calib[pk]||1):0}
+function calKey(sub){return paceKeyOf(sub)||String(sub).trim()}
+function calibMult(sub){return calib[calKey(sub)]||1}
+/* קצב לשאלה — ברירת המחדל של המקצוע, מכוילת לפי מה שדיווחת בפועל ("לקח יותר" / "פחות") */
+function paceOf(sub){var pk=paceKeyOf(sub);return pk?PACE[pk]*calibMult(sub):0}
+/* קצב של מבחן ספציפי: "דקות לתרגיל" שהגדרת לו, אחרת ברירת המחדל של המקצוע — ותמיד עובר כיול */
+function paceFor(e){return e.pace>0?e.pace*calibMult(e.sub):paceOf(e.sub)}
 /* סך המשבצות שהמבחן דורש: מכמות תרגילים אמיתית אם יש, אחרת ממשקל סוג המבחן. נושא חלש = 25% נוספות */
 function rawNeed(e){
  if(e.ses!=null&&e.ses!=="")return +e.ses;
- var n,pace=paceOf(e.sub);
+ var n,pace=paceFor(e);
  if(e.tex&&pace)n=Math.max(2,Math.ceil((e.tex*pace)/S.len));
  else{
   n=S.w[e.type]||4;
@@ -566,6 +580,7 @@ function rollover(){
   }
   if(missed>0)S.carry=missed;
  }
+ for(var pk in pull)if(pk<todayK)delete pull[pk];
  S.lastBuild=todayK;
 }
 function build(){
@@ -604,10 +619,24 @@ function build(){
    left[k0]=0;over.push(h.sub+" — "+h.what+": חסרות "+rem+" דקות ביומן");}
  });
 
+ /* 2א. הקדמות: משבצות שביקשת להביא ליום מסוים — נלקחות מהמבחן הקרוב ביותר קודם,
+    ומקטינות את מה שנותר לפרוס בימים הבאים. בקשה מפורשת שלך, אז הרזרבה לא חוסמת אותה */
+ var pulled={},pullUsed={},pullDays=Object.keys(pull).filter(function(k){return pull[k]>0&&pr(k)>=t}).sort();
+ if(pullDays.length)exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).forEach(function(e){
+  var n=need(e);
+  pullDays.forEach(function(k){
+   var d=pr(k);if(d>=pr(e.date))return;
+   var want=pull[k]-(pullUsed[k]||0),rem=n-(pulled[e.id]||0);if(want<=0||rem<=0)return;
+   var take=Math.min(Math.floor(free(d)/S.len),want,rem);if(take<=0)return;
+   for(var j=0;j<take;j++)push(k,{kind:"ex",id:e.id,sub:e.sub,type:e.type,date:e.date,min:S.len,pulled:true});
+   left[k]-=take*S.len;pullUsed[k]=(pullUsed[k]||0)+take;pulled[e.id]=(pulled[e.id]||0)+take;
+  });
+ });
+
  /* 2. לימוד למבחנים — רק לתוך מה שנשאר אחרי הרזרבה */
  exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).forEach(function(e){
   var n=need(e);if(n<=0)return;
-  var ed=pr(e.date),placed=0;
+  var ed=pr(e.date),placed=pulled[e.id]||0;
   for(var pass=0;pass<3&&placed<n;pass++){
    var hor=pass===0?S.hor:(pass===1?S.hor:60), onlyMatch=(pass===0&&S.same);
    for(var i=1;i<=hor&&placed<n;i++){
@@ -722,7 +751,7 @@ function dayView(){
  var w=winFor(d),cap=capOfD(d),rs=resFor(d),used=(plan[k]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
  var o=ovr[k]||{};
  document.getElementById("dInfo").textContent=
-  (o.off?"אין לימודים · ":"")+hhmm(w.s)+"–"+hhmm(w.e)+" · "+fm(cap)+" פנוי"+(rs?" · "+fm(rs)+" לשי\"ב":"")+" · "+fm(used)+" מתוכנן";
+  (o.off?"אין לימודים · ":"")+hhmm(w.s)+"–"+hhmm(w.e)+" · "+fm(cap)+" פנוי"+(rs?" · "+fm(rs)+" לשי\"ב":"")+" · "+fm(used)+" מתוכנן"+(pull[k]?" · "+pull[k]+" מוקדמות":"");
  document.getElementById("dQuick").innerHTML=[0,1,2,3,4,5,6].map(function(i){
   var dd=ad(t,i),kk=key(dd),lb=i===0?"היום":(i===1?"מחר":DAYS[dd.getDay()].slice(0,3)+" "+dd.getDate()+"."+(dd.getMonth()+1));
   var mm=(plan[kk]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
@@ -815,8 +844,8 @@ function tlRows(d){
   }else{
    var e=exById(s.id)||{sub:s.sub,type:s.type,date:s.date},left=df(s.date,tod());
    rows.push({s:s.t0,e:s.t1,cls:"study",h:s.sub+(s.topic?" · "+s.topic:""),
-    t:TYPE[s.type].l+" בעוד "+left+" ימים",
-    m:recipe(e,left,s.min||S.len,s.topic),cal:s.sub,
+    t:TYPE[s.type].l+" בעוד "+left+" ימים"+(s.pulled?" · הוקדמה":""),
+    m:recipe(e,left,s.min||S.len,s.topic),cal:s.sub,pace:paceFor(e),
     chk:id,on:on,act:"openEx('"+s.id+"')",actL:"✎ חומר"});
   }
  });
@@ -835,9 +864,13 @@ function tlHTML(d){
   var gap=to-rows[i].e;
   if(gap>=25){
    var inSchool=sp&&rows[i].e>=sp.s&&to<=sp.e;
+   var fit=pullFit(k),hasLater=pr(k)>=tod()&&exams.some(function(e){return pr(e.date)>pr(k)&&need(e)>0});
+   var canPull=!inSchool&&hasLater&&(fit>0||pull[k]);
    withGaps.push({s:rows[i].e,e:to,cls:inSchool?"win":"free",
     h:inSchool?"חלון בבית ספר":"פנוי",
-    t:inSchool?"שיעור שבוטל — שליפה מהזיכרון, בלי חומר חדש":fm(gap)+" בלי משבצת. אפשר להקדים משבצת ממחר."});
+    t:inSchool?"שיעור שבוטל — שליפה מהזיכרון, בלי חומר חדש":
+      fm(gap)+" בלי משבצת."+(hasLater&&!fit&&!pull[k]?" הקיבולת היומית מנוצלת — אפשר להגדיל בהגדרות → זמן פנוי.":""),
+    act:canPull?"openPull('"+k+"')":null,actL:pull[k]?"✎ הקדמה ("+pull[k]+")":"⏩ הקדם משבצות מהימים הבאים"});
   }
  }
  if(!withGaps.length){
@@ -860,7 +893,7 @@ function tlHTML(d){
      (r.act?'<button class="btn xs ghost" onclick="'+r.act+'">'+r.actL+'</button>':'')+
      (r.ev?'<button class="btn xs ghost" onclick="openEv(\''+r.ev+'\')">✎ אירוע</button>':'')+
     '</div>':'')+
-   (r.cal&&r.on&&paceKeyOf(r.cal)?'<div class="tlact"><span class="sub" style="margin:0">כמה זמן לקח?</span>'+
+   (r.cal&&r.on&&r.pace>0?'<div class="tlact"><span class="sub" style="margin:0">כמה זמן לקח?</span>'+
      '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',.85)">פחות</button>'+
      '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',1)">בול</button>'+
      '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',1.25)">יותר</button></div>':'')+
@@ -1036,7 +1069,7 @@ function setView(){
 }
 function setEnergy(v){S.energy=v;render()}
 /* ממוצע נע: כל דיווח מזיז את המכפיל 30% לכיוון שלו, בין 0.6 ל-1.8 */
-function calibLog(subEnc,sig){var pk=paceKeyOf(decodeURIComponent(subEnc));if(!pk)return;
+function calibLog(subEnc,sig){var pk=calKey(decodeURIComponent(subEnc));if(!pk)return;
  calib[pk]=Math.max(.6,Math.min(1.8,(calib[pk]||1)*.7+sig*.3));
  toast(sig>1?"נרשם — אקצה יותר זמן ל"+pk:sig<1?"נרשם — "+pk+" הולך לך מהר":"נרשם — ההערכה מדויקת");save();render()}
 function calibReset(){calib={};render()}
@@ -1194,6 +1227,33 @@ function saveOv(){
 }
 function delOv(k){delete ovr[k];closeS();render()}
 
+/* --- הקדמת משבצות ליום פנוי --- */
+/* כמה משבצות לימוד היום הזה יכול להכיל בסך הכול לפי הקיבולת שהגדרת (לא לפי החלון בלבד), אחרי שיעורי הבית.
+   משבצות לימוד שכבר נפרסו לא נספרות — הן ייפרסו מחדש סביב ההקדמה */
+function pullRoom(k){var d=pr(k),hwMin=(plan[k]||[]).reduce(function(a,s){return a+(s.kind==="hw"?(s.min||S.len):0)},0);
+ return Math.max(0,Math.floor((capOfD(d)-hwMin)/S.len))}
+function pullFit(k){return Math.max(0,pullRoom(k)-(plan[k]||[]).filter(function(s){return s.kind==="ex"}).length)}
+function openPull(k){
+ var d=pr(k);if(d<tod())return;
+ var cur=pull[k]||0,fit=pullRoom(k);
+ var later=exams.filter(function(e){return pr(e.date)>d}).sort(function(a,b){return pr(a.date)-pr(b.date)}).map(function(e){
+  var c=0;for(var kk in plan)if(kk>k)plan[kk].forEach(function(s){if(s.kind==="ex"&&s.id===e.id)c++});
+  return{e:e,c:c}}).filter(function(x){return x.c>0}).slice(0,4);
+ var avail=later.reduce(function(a,x){return a+x.c},0),mx=Math.min(fit,avail+cur),chips="";
+ for(var n=1;n<=mx;n++)chips+='<div class="qb'+(n===cur?" on":"")+'" onclick="setPull(\''+k+'\','+n+')">'+n+'</div>';
+ openS('<h3>הקדמת משבצות ל'+heb(k)+'</h3>'+
+  '<div class="sub" style="margin:0 0 10px">'+(fit?'נכנסות עד '+fit+' משבצות של '+S.len+' ד\' בזמן הפנוי של היום הזה.':'הקיבולת היומית של היום הזה מנוצלת — אפשר להגדיל ב"הגדרות → זמן פנוי בכל יום".')+'</div>'+
+  (later.length?'<div class="card" style="margin-bottom:12px">'+later.map(function(x){
+   return '<div class="dayline"><div class="grow" style="font-weight:600">'+esc(x.e.sub)+'<div class="sub" style="margin:0">'+TYPE[x.e.type].l+' · '+heb(x.e.date)+'</div></div>'+
+    '<div class="sub" style="margin:0">'+x.c+' משבצות בימים הבאים</div></div>'}).join("")+'</div>':
+   '<div class="empty" style="margin-bottom:12px">אין משבצות בימים הבאים שאפשר להקדים.</div>')+
+  (mx>0?'<div class="sub" style="margin:0 0 6px">כמה להקדים ליום הזה?</div><div class="quick" style="margin:0 0 14px">'+chips+'</div>':'')+
+  '<div class="sub" style="margin:0 0 12px">המשבצות נלקחות מהמבחן הקרוב ביותר קודם, והתוכנית מתאזנת מחדש מיד. הנושאים מתחלקים מחדש בהתאם.</div>'+
+  '<div class="btnrow">'+(cur?'<button class="btn" onclick="setPull(\''+k+'\',0)" style="color:var(--hot)">ביטול ההקדמה</button>':'')+
+  '<button class="btn" onclick="closeS()">סגירה</button></div>');
+}
+function setPull(k,n){if(n>0)pull[k]=n;else delete pull[k];viewK=k;closeS();render()}
+
 /* --- מבחנים וחומר --- */
 var topicMeta={};
 function openEx(id){
@@ -1211,7 +1271,8 @@ function openEx(id){
   '<div class="fld"><label>מאיפה מתרגלים</label><input id="fSh" value="'+(e&&e.sheet?esc(e.sheet):"")+'" placeholder="שאלון 581, פרקים 3-5"></div>'+
   '<div class="two"><div class="fld"><label>סה"כ תרגילים בחומר <span style="color:var(--dim)">(אופציונלי)</span></label>'+
   '<input id="fTex" type="number" min="0" step="1" value="'+(e&&e.tex?e.tex:"")+'" placeholder="למשל 40" oninput="updTexHint()"></div>'+
-  '<div class="fld"><label>מספר משבצות (ריק = אוטומטי)</label><input id="fN" type="number" min="0" max="60" value="'+(e&&e.ses!=null?e.ses:"")+'" placeholder="אוטומטי"></div></div>'+
+  '<div class="fld"><label>דקות לתרגיל אחד</label><input id="fPace" type="number" min="1" max="120" step="1" value="'+(e&&e.pace?e.pace:"")+'" placeholder="'+(e&&paceKeyOf(e.sub)?"ברירת מחדל "+PACE[paceKeyOf(e.sub)]:"למשל 12")+'" oninput="updTexHint()"></div></div>'+
+  '<div class="fld"><label>מספר משבצות (ריק = אוטומטי)</label><input id="fN" type="number" min="0" max="60" value="'+(e&&e.ses!=null?e.ses:"")+'" placeholder="אוטומטי"></div>'+
   '<div class="sub" id="texHint" style="margin:-6px 0 10px"></div>'+
   (e?'<div class="btnrow" style="margin-bottom:12px"><button class="btn sm ghost grow" onclick="showPlan(\''+e.id+'\')">תוכנית התרגול המלאה</button></div><div id="pvPlan"></div>':'')+
   '<div class="btnrow" style="margin-top:10px"><button class="btn pri grow" onclick="saveEx()">שמירה</button>'+
@@ -1242,10 +1303,11 @@ function setTWk(nameEnc){var n=decodeURIComponent(nameEnc);topicMeta[n].wk=!topi
 function updTexHint(){
  var hint=document.getElementById("texHint");if(!hint)return;
  var sub=(document.getElementById("fS").value||"").trim(),tex=+document.getElementById("fTex").value||0;
- var pace=paceOf(sub);
+ var pp=+document.getElementById("fPace").value||0,pace=pp?pp*calibMult(sub):paceOf(sub);
  if(tex&&pace){var mins=tex*pace,ses=Math.max(2,Math.ceil(mins/S.len));
-  hint.textContent="≈"+fm(mins)+" עבודה בסך הכול → מומלץ "+ses+" משבצות של "+S.len+" ד'.";}
- else if(tex&&!pace)hint.textContent="אין נתוני קצב למקצוע הזה עדיין — ייקבע לפי סוג המבחן וקושי.";
+  hint.textContent="≈"+fm(mins)+" עבודה ("+tex+" תרגילים × "+Math.round(pace)+" ד') → מומלץ "+ses+" משבצות של "+S.len+" ד'.";}
+ else if(tex&&!pace)hint.textContent="הגדר \"דקות לתרגיל\" כדי לחשב מהכמות — אחרת ייקבע לפי סוג המבחן וקושי.";
+ else if(pp)hint.textContent="קצב של "+pp+" ד' לתרגיל → "+dose(pace,S.len)+" במשבצת של "+S.len+" ד'.";
  else hint.textContent="";
 }
 /* התוכנית שנגזרת מהחומר: איזה נושא, באיזה יום, כמה, ואיך */
@@ -1269,7 +1331,8 @@ function saveEx(){
  var tp=uniq.map(function(n){return topicMeta[n]||{n:n,w:2,wk:false}});
  var tex=+document.getElementById("fTex").value||null;
  var o={sub:(document.getElementById("fS").value||"מבחן").trim(),type:document.getElementById("fT").value,
-  date:document.getElementById("fD").value,ses:v===""?null:+v,topics:tp,tex:tex,sheet:document.getElementById("fSh").value.trim()};
+  date:document.getElementById("fD").value,ses:v===""?null:+v,topics:tp,tex:tex,pace:+document.getElementById("fPace").value||null,
+  sheet:document.getElementById("fSh").value.trim()};
  if(edit)exams=exams.map(function(x){return x.id===edit?Object.assign(x,o):x});
  else{o.id="u"+Date.now();exams.push(o)}
  closeS();render();
@@ -1324,7 +1387,7 @@ function go(p){["today","week","hw","ex","set"].forEach(function(x){document.get
  document.getElementById("tbSub").textContent=p==="today"?heb(key(tod())):"";
  window.scrollTo(0,0)}
 function rsDone(){if(confirm("לאפס את כל סימוני הביצוע?")){done={};render()}}
-function rsAll(){if(confirm("לאפס הכל?")){["l_s","l_ex","l_hw","l_dn","l_ev","l_ov","l_pg","l_sn","l_cb","l_ht"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});mem={};load();render()}}
+function rsAll(){if(confirm("לאפס הכל?")){["l_s","l_ex","l_hw","l_dn","l_ev","l_ov","l_pg","l_sn","l_cb","l_ht","l_pl"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});mem={};load();render()}}
 function ics(){
  var L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//lomed//HE","CALSCALE:GREGORIAN"];
  function dt(k,m){return k.replace(/-/g,"")+"T"+p2(Math.floor(m/60))+p2(m%60)+"00"}
@@ -1393,6 +1456,153 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(
  zone.addEventListener("pointercancel",onUp);
  document.addEventListener("touchstart",function(){},{passive:true}); /* enables :active feedback on iOS Safari */
 })();
+</script>
+<script type="module">
+/* ---------- משפחה: התחברות, סנכרון ענן, מצב צפייה להורים, הצעות אירועים שמחכות לאישור ---------- */
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged}
+ from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,doc,collection,onSnapshot,setDoc,getDoc,updateDoc,deleteDoc,addDoc,query,where}
+ from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig={
+ apiKey:"AIzaSyBj55cidZE-LGjODjDcm5p8xpF9d71cfXw",authDomain:"babysitter-3e8a2.firebaseapp.com",projectId:"babysitter-3e8a2",
+ storageBucket:"babysitter-3e8a2.firebasestorage.app",messagingSenderId:"508050364959",appId:"1:508050364959:web:9429de0c06e3b5c4ee132a"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const cfgRef=doc(db,'lomed','config'),secRef=doc(db,'lomed','secret'),stateRef=doc(db,'lomed','state');
+const membersCol=collection(db,'lomed','app','members'),propsCol=collection(db,'lomed','app','proposals');
+const DEV=(()=>{try{let d=localStorage.getItem('l_dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('l_dev',d)}return d}catch(e){return 'x'}})();
+const F=window.fb={user:null,role:'none',code:'',ownerName:'',members:[],props:[],err:'',ready:false};
+const STATE_KEYS=['S','exams','hw','done','evts','ovr','prog','seen','calib','heat','pull'];
+let unsubs=[],pushT=null,applying=false;
+const origSave=window.save,origRender=window.render,origOpenEv=window.openEv;
+
+/* פעולות שמשנות נתונים — חסומות במצב צפייה */
+['tk','saveHw','doneHw','delHw','saveEx','delEx','saveOv','delOv','setPull','calibLog','markReview','setEnergy','cp','rs','wc','tg',
+ 'rsDone','rsAll','saveEv','delEv','openHw','openEx','openOv','openPull','openAdd','saveGC','gcSync','calibReset'].forEach(n=>{
+ const f=window[n];if(typeof f!=='function')return;
+ window[n]=function(){if(window.RO){toast('מצב צפייה — אפשר רק להציע אירוע');return}return f.apply(this,arguments)}});
+window.save=function(){if(window.RO)return;origSave();if(F.role==='owner'&&!applying){clearTimeout(pushT);pushT=setTimeout(pushState,1200)}};
+window.render=function(){origRender();fbUI()};
+window.openEv=function(id){if(window.RO)return openPropose();return origOpenEv(id)};
+
+function snap(){const o={};STATE_KEYS.forEach(k=>o[k]=window[k]);return o}
+function applyState(d){applying=true;try{const st=JSON.parse(d.json);STATE_KEYS.forEach(k=>{if(st[k]!==undefined)window[k]=st[k]});
+ window.S.updatedAt=d.updatedAt||0;if(!window.RO)origSave();origRender()}finally{applying=false}}
+async function pushState(){if(F.role!=='owner')return;
+ try{const t=Date.now();window.S.updatedAt=t;origSave();await setDoc(stateRef,{json:JSON.stringify(snap()),updatedAt:t,dev:DEV});F.err=''}
+ catch(e){F.err='סנכרון נכשל: '+(e.code||e.message);fbUI()}}
+const genCode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=A[Math.floor(Math.random()*A.length)];return s};
+
+F.signIn=async()=>{const p=new GoogleAuthProvider();try{await signInWithPopup(auth,p)}catch(e){
+ if(/popup|operation-not-supported|cancelled/i.test(e.code||''))try{await signInWithRedirect(auth,p)}catch(e2){F.err=e2.code||e2.message;fbUI()}
+ else{F.err=e.code||e.message;fbUI()}}};
+F.signOut=()=>signOut(auth);
+F.join=async code=>{code=(code||'').trim().toUpperCase();if(!code||!F.user)return;
+ try{await setDoc(doc(membersCol,F.user.uid),{name:F.user.displayName||'',email:F.user.email||'',code,joinedAt:Date.now()});
+  F.role='member';F.err='';memberStart();toast('הצטרפת — מצב צפייה');}
+ catch(e){F.err=(e.code==='permission-denied')?'קוד לא נכון':(e.code||e.message)}fbUI()};
+F.remove=async uid=>{if(!confirm('להסיר את בן המשפחה הזה?'))return;try{await deleteDoc(doc(membersCol,uid))}catch(e){F.err=e.code||e.message;fbUI()}};
+F.newCode=async()=>{if(!confirm('להחליף את קוד המשפחה? מי שכבר הצטרף נשאר.'))return;F.code=genCode();await setDoc(secRef,{code:F.code});fbUI()};
+F.copy=()=>{try{navigator.clipboard.writeText(F.code).then(()=>toast('הקוד הועתק'))}catch(e){}};
+F.decide=async(id,ok)=>{const p=F.props.find(x=>x.id===id);if(!p)return;
+ try{await updateDoc(doc(propsCol,id),{status:ok?'approved':'rejected',decidedAt:Date.now()});
+  if(ok){window.evts.push({id:'v'+Date.now(),title:p.title,rep:p.rep,date:p.rep==='once'?p.date:null,dow:p.rep==='weekly'?p.dow:null,
+   from:key(tod()),s:p.s,e:p.e,blocks:p.blocks!==false,by:p.byName||''});window.save();}
+  toast(ok?'אושר ונוסף לתוכנית':'נדחה');origRender();fbUI()}catch(e){F.err=e.code||e.message;fbUI()}};
+const origGo=window.go;window.go=function(p){origGo(p);if(window.RO)document.getElementById('tbSub').textContent='צפייה · '+F.ownerName};
+F.cancel=async id=>{try{await deleteDoc(doc(propsCol,id))}catch(e){F.err=e.code||e.message;fbUI()}};
+
+async function ownerStart(){
+ const st=await getDoc(stateRef);
+ if(st.exists()){const d=st.data();if((d.updatedAt||0)>(window.S.updatedAt||0)&&d.dev!==DEV)applyState(d)}
+ else pushState();
+ const sec=await getDoc(secRef);if(sec.exists())F.code=sec.data().code;else{F.code=genCode();await setDoc(secRef,{code:F.code})}
+ unsubs.push(onSnapshot(stateRef,s=>{if(!s.exists())return;const d=s.data();if(d.dev===DEV||(d.updatedAt||0)<=(window.S.updatedAt||0))return;applyState(d);fbUI()}));
+ unsubs.push(onSnapshot(query(propsCol,where('status','==','pending')),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
+ unsubs.push(onSnapshot(membersCol,s=>{F.members=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
+}
+function memberStart(){window.RO=true;document.body.classList.add('ro');
+ unsubs.push(onSnapshot(stateRef,s=>{if(s.exists())applyState(s.data());fbUI()}));
+ unsubs.push(onSnapshot(query(propsCol,where('by','==',F.user.uid)),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt-a.createdAt);fbUI()}));
+}
+getRedirectResult(auth).catch(()=>{});
+onAuthStateChanged(auth,async user=>{
+ unsubs.forEach(u=>u());unsubs=[];F.user=user;F.role='none';F.props=[];F.members=[];F.err='';
+ window.RO=false;document.body.classList.remove('ro');F.ready=true;
+ if(!user){fbUI();return}
+ try{let cfg=await getDoc(cfgRef);
+  if(!cfg.exists()){await setDoc(cfgRef,{ownerUid:user.uid,ownerName:user.displayName||'',createdAt:Date.now()});cfg=await getDoc(cfgRef)}
+  const c=cfg.data();F.ownerName=c.ownerName||'';
+  if(c.ownerUid===user.uid){F.role='owner';await ownerStart()}
+  else{const m=await getDoc(doc(membersCol,user.uid));if(m.exists()){F.role='member';memberStart()}else F.role='guest'}
+ }catch(e){F.err='שגיאה: '+(e.code||e.message)}
+ fbUI();
+});
+
+/* --- טופס הצעת אירוע (להורים) --- */
+function openPropose(){
+ const presets=['רופא','אירוע משפחתי','נסיעה','חוג','טיול','אורחים'];
+ openS('<h3>הצעת אירוע לתוכנית של '+esc(F.ownerName||'')+'</h3>'+
+  '<div class="sub" style="margin:0 0 10px">ההצעה תיכנס לתוכנית רק אחרי אישור.</div>'+
+  '<div class="fld"><label>מה זה</label><input id="pT" placeholder="רופא שיניים"><div class="quick">'+
+   presets.map(s=>'<div class="qb" onclick="document.getElementById(\'pT\').value=\''+s+'\'">'+s+'</div>').join('')+'</div></div>'+
+  '<div class="fld"><label>מתי</label><select id="pR" onchange="document.getElementById(\'pDW\').style.display=this.value===\'weekly\'?\'none\':\'block\';document.getElementById(\'pWW\').style.display=this.value===\'weekly\'?\'block\':\'none\'">'+
+   '<option value="once">חד-פעמי</option><option value="weekly">כל שבוע</option></select></div>'+
+  '<div class="fld" id="pDW"><label>תאריך</label><input id="pD" type="date" value="'+(window.viewK||key(tod()))+'"></div>'+
+  '<div class="fld" id="pWW" style="display:none"><label>יום בשבוע</label><select id="pW">'+DAYS.map((n,i)=>'<option value="'+i+'">'+n+'</option>').join('')+'</select></div>'+
+  '<div class="two"><div class="fld"><label>משעה</label><input id="pS" type="time" value="16:00"></div><div class="fld"><label>עד שעה</label><input id="pE" type="time" value="18:00"></div></div>'+
+  '<div class="fld"><label>הערה (לא חובה)</label><input id="pN" placeholder="למשל: אי אפשר להזיז"></div>'+
+  '<div class="btnrow" style="margin-top:8px"><button class="btn pri grow" id="pGo">שליחה לאישור</button><button class="btn" onclick="closeS()">ביטול</button></div>');
+ document.getElementById('pGo').onclick=async()=>{
+  const rep=document.getElementById('pR').value,s=document.getElementById('pS').value||'16:00',e=document.getElementById('pE').value||'18:00';
+  if(m2(e)<=m2(s)){alert('שעת הסיום צריכה להיות אחרי ההתחלה.');return}
+  try{await addDoc(propsCol,{title:(document.getElementById('pT').value||'אירוע').trim(),rep,date:rep==='once'?document.getElementById('pD').value:null,
+   dow:rep==='weekly'?+document.getElementById('pW').value:null,s,e,blocks:true,note:document.getElementById('pN').value.trim(),
+   by:F.user.uid,byName:F.user.displayName||'',createdAt:Date.now(),status:'pending'});closeS();toast('נשלח לאישור')}
+  catch(err){F.err=err.code||err.message;fbUI();toast('השליחה נכשלה')}};
+}
+const when=p=>(p.rep==='weekly'?'כל יום '+DAYS[p.dow]:heb(p.date))+' · '+p.s+'–'+p.e;
+const STATUS={pending:['ממתין לאישור','var(--warm)'],approved:['אושר','var(--cool)'],rejected:['נדחה','var(--hot)']};
+function propRow(p,owner){const st=STATUS[p.status]||STATUS.pending;
+ return '<div class="prop"><div class="grow"><b>'+esc(p.title)+'</b><div class="sub" style="margin:0">'+when(p)+(p.note?' · '+esc(p.note):'')+(owner?' · מאת '+esc(p.byName||''):'')+'</div></div>'+
+  (owner?'<button class="btn xs" onclick="fb.decide(\''+p.id+'\',true)">אשר</button><button class="btn xs ghost" style="color:var(--hot)" onclick="fb.decide(\''+p.id+'\',false)">דחה</button>':
+   '<span class="tag" style="color:'+st[1]+'">'+st[0]+'</span>'+(p.status==='pending'?'<button class="btn xs ghost" onclick="fb.cancel(\''+p.id+'\')">ביטול</button>':''))+'</div>'}
+
+function fbUI(){
+ const box=document.getElementById('famBox'),today=document.getElementById('famToday'),ev=document.getElementById('famEv');if(!box)return;
+ const err=F.err?'<div class="sub" style="color:var(--hot);margin:8px 0 0">'+esc(F.err)+'</div>':'';
+ const who=F.user?esc(F.user.displayName||F.user.email||''):'';
+ /* במצב צפייה מסתירים את שאר ההגדרות */
+ Array.from(document.querySelectorAll('#p-set > *')).forEach(el=>{if(el.id!=='famH'&&el.id!=='famBox')el.hidden=window.RO});
+ today.innerHTML='';ev.innerHTML='';
+ if(!F.ready){box.innerHTML='<div class="sub" style="margin:0">מתחבר…</div>';return}
+ if(!F.user){
+  box.innerHTML='<div class="sub" style="margin:0 0 10px">התחברות עם Google מאפשרת גיבוי בענן, סנכרון בין טלפון לטאבלט, ולהורים — צפייה בתוכנית והצעת אירועים שאתה מאשר.</div>'+
+   '<button class="btn sm" onclick="fb.signIn()">התחברות עם Google</button>'+err;return}
+ if(F.role==='owner'){
+  box.innerHTML='<div class="sub" style="margin:0">מחובר כ־<b>'+who+'</b> · בעלים. הנתונים מגובים ומסונכרנים.</div>'+
+   '<div class="sub" style="margin:10px 0 0">קוד משפחה — מי שמזין אותו אחרי התחברות רואה את התוכנית ויכול להציע אירועים:</div>'+
+   '<div class="code">'+esc(F.code||'…')+'</div><div class="btnrow"><button class="btn xs" onclick="fb.copy()">העתקה</button><button class="btn xs ghost" onclick="fb.newCode()">קוד חדש</button><button class="btn xs ghost" onclick="fb.signOut()">התנתקות</button></div>'+
+   (F.members.length?'<div class="sub" style="margin:12px 0 4px">בני משפחה:</div>'+F.members.map(m=>'<div class="prop"><div class="grow"><b>'+esc(m.name||m.email||m.id)+'</b><div class="sub" style="margin:0">'+esc(m.email||'')+'</div></div><button class="btn xs ghost" style="color:var(--hot)" onclick="fb.remove(\''+m.id+'\')">הסרה</button></div>').join(''):
+    '<div class="sub" style="margin:12px 0 0">עוד אף אחד לא הצטרף.</div>')+err;
+  if(F.props.length)today.innerHTML='<div class="card" style="background:var(--warm-soft)"><div class="sub" style="margin:0 0 4px;color:var(--warm);font-weight:600">📨 '+F.props.length+' הצעות מהמשפחה ממתינות לאישור</div>'+F.props.map(p=>propRow(p,true)).join('')+'</div>';
+  return}
+ if(F.role==='member'){
+  box.innerHTML='<div class="sub" style="margin:0">מחובר כ־<b>'+who+'</b> · צפייה בתוכנית של '+esc(F.ownerName)+'. אפשר להציע אירועים; הם נכנסים רק אחרי אישור.</div>'+
+   '<div class="btnrow" style="margin-top:10px"><button class="btn xs ghost" onclick="fb.signOut()">התנתקות</button></div>'+err;
+  today.innerHTML='<div class="banner">👀 מצב צפייה — התוכנית של '+esc(F.ownerName)+'. <button class="btn xs" style="margin-inline-start:6px" onclick="openEv()">+ הצעת אירוע</button></div>'+
+   (F.props.some(p=>p.status==='pending')?'<div class="card"><div class="sub" style="margin:0 0 4px;font-weight:600">הבקשות שלי</div>'+F.props.filter(p=>p.status==='pending').map(p=>propRow(p,false)).join('')+'</div>':'');
+  ev.innerHTML=F.props.length?'<h2 class="sec">הבקשות שלי</h2><div class="card">'+F.props.map(p=>propRow(p,false)).join('')+'</div>':'';
+  document.getElementById('tbSub').textContent='צפייה · '+F.ownerName;return}
+ /* guest: מחובר אבל עדיין לא במשפחה */
+ box.innerHTML='<div class="sub" style="margin:0 0 8px">מחובר כ־<b>'+who+'</b>. הזן את קוד המשפחה שקיבלת:</div>'+
+  '<div class="two"><div class="fld"><input id="famCode" placeholder="ABC123" style="direction:ltr;text-align:center;letter-spacing:.12em"></div>'+
+  '<button class="btn" style="margin-bottom:12px" onclick="fb.join(document.getElementById(\'famCode\').value)">הצטרפות</button></div>'+
+  '<div class="btnrow"><button class="btn xs ghost" onclick="fb.signOut()">התנתקות</button></div>'+err;
+ today.innerHTML='<div class="banner">להצטרפות למשפחה: הגדרות → משפחה → הזנת קוד.</div>';
+}
+window.fbUI=fbUI;
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
