@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F3EC">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1B1A17">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="לומד">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>לומד</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* פלטה טבעית: נייר חם, דיו, חימר, אוקר, מרווה, צפחה, ורוד מאובק. עוקבת אחרי מצב המערכת (בהיר/כהה) */
+:root{--bg:#F6F3EC;--pn:#FFFFFF;--pn2:#EFEBE2;--ln:#E4DFD3;--ink:#2A2924;--mut:#6E6A60;--dim:#A6A194;
+ --hot:#C4653A;--warm:#B08A2E;--cool:#5E8F6E;--deep:#5B6E8C;--pink:#B26A7A;
+ --hot-soft:rgba(196,101,58,.12);--warm-soft:rgba(176,138,46,.14);--cool-soft:rgba(94,143,110,.14);
+ --deep-soft:rgba(91,110,140,.13);--pink-soft:rgba(178,106,122,.13);
+ --glass:rgba(246,243,236,.8);--glass-line:rgba(42,41,36,.08);--sheet-bg:rgba(255,255,255,.92);--veil:rgba(42,41,36,.35);
+ --shadow:0 1px 2px rgba(42,41,36,.05),0 4px 14px rgba(42,41,36,.04);--r:14px;color-scheme:light}
+@media (prefers-color-scheme:dark){
+ :root{--bg:#1B1A17;--pn:#242320;--pn2:#2D2B27;--ln:#3B3933;--ink:#EDE8DD;--mut:#A39E92;--dim:#6F6B62;
+  --hot:#D9855C;--warm:#D1A54E;--cool:#82B391;--deep:#8C9DBA;--pink:#CB8D9C;
+  --hot-soft:rgba(217,133,92,.16);--warm-soft:rgba(209,165,78,.16);--cool-soft:rgba(130,179,145,.16);
+  --deep-soft:rgba(140,157,186,.16);--pink-soft:rgba(203,141,156,.16);
+  --glass:rgba(27,26,23,.76);--glass-line:rgba(255,255,255,.07);--sheet-bg:rgba(36,35,32,.93);--veil:rgba(0,0,0,.5);
+  --shadow:0 1px 2px rgba(0,0,0,.25);color-scheme:dark}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;overscroll-behavior-y:contain}
+body{background:var(--bg);color:var(--ink);font-family:'Heebo',system-ui,-apple-system,Arial,sans-serif;
+ line-height:1.5;padding-bottom:96px;-webkit-font-smoothing:antialiased;font-size:15px}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px}
+.hero{padding:24px 0 16px;border-bottom:1px solid var(--ln);margin-bottom:16px}
+.kick{color:var(--mut);font-size:13px;margin-bottom:8px}
+.cnt{display:flex;align-items:baseline;gap:9px}
+.cnt .n{font-size:72px;font-weight:800;line-height:.85;letter-spacing:-.03em}
+.cnt .u{font-size:16px;color:var(--mut);font-weight:600}
+.hero h1{font-size:22px;font-weight:600;margin:11px 0 3px}
+.hero .wh{color:var(--mut);font-size:14px}
+.bar{height:5px;background:var(--pn2);border-radius:99px;margin-top:15px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.blab{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:6px}
+h2.sec{font-size:14px;font-weight:600;color:var(--mut);margin:22px 0 9px;display:flex;justify-content:space-between;align-items:center}
+h2.sec span.r{font-weight:400;font-size:13px;color:var(--dim)}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:13px;margin-bottom:9px;box-shadow:var(--shadow)}
+.row{display:flex;gap:11px;align-items:center}
+.grow{flex:1;min-width:0}
+.ttl{font-weight:600;font-size:16px}
+.sub{color:var(--mut);font-size:13px;margin-top:3px}
+.meth{font-size:13px;color:var(--ink);opacity:.8;margin-top:6px;padding-top:6px;border-top:1px dashed var(--ln)}
+.days{font-size:25px;font-weight:800;min-width:50px;text-align:center;line-height:1}
+.days small{display:block;font-size:10.5px;font-weight:400;color:var(--dim);margin-top:3px}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--pn2);color:var(--mut);white-space:nowrap}
+.tag.bag{background:var(--hot-soft);color:var(--hot)}
+.tag.mat{background:var(--warm-soft);color:var(--warm)}
+.tag.hag{background:var(--deep-soft);color:var(--deep)}
+.tag.hw{background:var(--pink-soft);color:var(--pink)}
+.tag.ev{background:var(--deep-soft);color:var(--deep)}
+.empty{color:var(--dim);font-size:14px;text-align:center;padding:26px 14px;border:1px dashed var(--ln);border-radius:var(--r)}
+.ses{display:flex;gap:11px;align-items:flex-start;background:var(--pn);border:1px solid var(--ln);
+ border-radius:var(--r);padding:12px 13px;margin-bottom:9px}
+.ses.done{opacity:.42}
+.ses.done .ttl{text-decoration:line-through}
+.ses.hwx{border-color:var(--pink)}
+.chk{width:25px;height:25px;flex:0 0 25px;border-radius:8px;border:2px solid var(--ln);background:transparent;
+ display:grid;place-items:center;cursor:pointer;font-size:14px;color:var(--bg);margin-top:1px}
+.chk.on{background:var(--cool);border-color:var(--cool)}
+.stripe{width:3px;align-self:stretch;border-radius:99px;min-height:34px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--pn2);
+ border:1px solid var(--ln);border-radius:11px;padding:11px 15px;font-weight:600;cursor:pointer}
+.btn:active{transform:scale(.985)}
+.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:9px}
+.btn.xs{padding:4px 9px;font-size:12px;border-radius:8px;font-weight:500}
+.btn.wide{width:100%;margin-top:6px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.dayline{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--ln)}
+.dayline:last-child{border-bottom:0}
+.dn{width:88px;font-weight:600;font-size:14px}
+.dn small{display:block;font-weight:400;font-size:11px;color:var(--dim)}
+input[type=range]{flex:1;accent-color:var(--cool);height:26px;background:transparent}
+.mins{width:58px;text-align:left;color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln)}
+.sw:last-child{border-bottom:0}
+.tgl{width:46px;height:27px;border-radius:99px;background:var(--pn2);border:1px solid var(--ln);position:relative;cursor:pointer;flex:0 0 46px}
+.tgl i{position:absolute;top:2px;right:2px;width:21px;height:21px;border-radius:50%;background:var(--dim);transition:.18s}
+.tgl.on{background:var(--cool-soft);border-color:var(--cool)}
+.tgl.on i{right:23px;background:var(--cool)}
+.num{width:66px;background:var(--pn2);border:1px solid var(--ln);border-radius:9px;padding:8px;text-align:center}
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:9px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:7px 13px;border-radius:99px;background:var(--pn);border:1px solid var(--ln);
+ font-size:13px;color:var(--mut);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.chip small{display:block;font-size:10px;opacity:.7;font-weight:400}
+nav{position:fixed;bottom:0;right:0;left:0;background:var(--glass);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);
+ border-top:1px solid var(--glass-line);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav button{background:none;border:0;padding:10px 2px 12px;color:var(--dim);font-size:11px;cursor:pointer;
+ display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s,transform .1s ease-out}
+nav button.on{color:var(--ink)}
+nav .ic{font-size:18px;line-height:1}
+.pane{display:none}.pane.on{display:block;animation:paneIn .18s ease-out}
+@keyframes paneIn{from{opacity:0}to{opacity:1}}
+/* ---- Apple-style translucent nav bar ---- */
+.topbar{position:sticky;top:0;z-index:45;background:var(--glass);backdrop-filter:blur(20px) saturate(160%);
+ -webkit-backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--glass-line)}
+.topbar-in{max-width:640px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;
+ display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.topbar-in h2{font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0}
+.topbar-in .sub{color:var(--mut);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fab{position:fixed;left:16px;bottom:calc(84px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;
+ background:var(--ink);color:var(--bg);border:0;font-size:27px;font-weight:300;z-index:49;
+ box-shadow:0 6px 18px rgba(42,41,36,.25);cursor:pointer;display:none;line-height:1;transition:transform .1s ease-out}
+.fab.on{display:block}
+.veil{position:fixed;inset:0;background:var(--veil);backdrop-filter:blur(2px);z-index:60;opacity:0;visibility:hidden;
+ transition:opacity .25s,visibility 0s linear .25s}
+.veil.on{opacity:1;visibility:visible;transition:opacity .25s,visibility 0s}
+.sheet{position:fixed;bottom:0;right:0;left:0;max-height:90vh;overflow:auto;background:var(--sheet-bg);
+ backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);
+ border-top:1px solid var(--glass-line);box-shadow:0 -8px 30px rgba(42,41,36,.12);
+ border-radius:20px 20px 0 0;padding:8px 16px calc(24px + env(safe-area-inset-bottom));z-index:61;
+ transform:translateY(101%);transition:transform .32s cubic-bezier(.32,.72,0,1);max-width:640px;margin:0 auto}
+.sheet.on{transform:none}
+.hand-zone{display:flex;justify-content:center;padding:12px 0 14px;margin:0 -16px 4px;cursor:grab;touch-action:none}
+.hand-zone:active{cursor:grabbing}
+.hand{width:38px;height:4px;background:var(--ln);border-radius:99px}
+.sheet h3{margin:0 0 15px;font-size:19px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:13px;color:var(--mut);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;background:var(--pn2);border:1px solid var(--ln);
+ border-radius:10px;padding:11px;font-size:16px}
+.fld textarea{min-height:64px;resize:vertical}
+.two{display:flex;gap:9px}.two .fld{flex:1}
+.quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.qb{padding:6px 11px;border-radius:99px;background:var(--pn2);border:1px solid var(--ln);font-size:13px;cursor:pointer}
+.qb.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.lsn{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.lsn span{font-size:12px;padding:4px 9px;border-radius:7px;background:var(--pn2);color:var(--mut)}
+.lsn span.off{text-decoration:line-through;opacity:.5}
+.warn{background:var(--hot-soft);border:1px solid var(--ln);border-right:3px solid var(--hot);border-radius:var(--r);
+ padding:12px;margin-bottom:10px;font-size:14px}
+.mic{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln)}
+.mic:last-child{border-bottom:0}
+.mic b{font-variant-numeric:tabular-nums;font-size:15px;min-width:52px}
+/* ---- ציר היום ---- */
+.dnav{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.dnav .lab{flex:1;text-align:center}
+.dnav .lab b{display:block;font-size:17px;font-weight:600}
+.dnav .lab small{color:var(--dim);font-size:12px}
+.dnav button{width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:var(--pn2);border:1px solid var(--ln);
+ color:var(--mut);font-size:17px;cursor:pointer;line-height:1}
+.tlr{display:flex;gap:9px;align-items:stretch;margin-bottom:6px}
+.tlt{width:46px;flex:0 0 46px;text-align:left;font-size:12px;color:var(--dim);
+ font-variant-numeric:tabular-nums;padding-top:11px;line-height:1.35}
+.tlt small{display:block;font-size:10px;opacity:.65}
+.tlb{flex:1;min-width:0;background:var(--pn);border:1px solid var(--ln);border-radius:11px;
+ padding:9px 12px;border-right:3px solid var(--ln);box-shadow:var(--shadow)}
+.tlb .h{font-weight:600;font-size:15px}
+.tlb .s{color:var(--mut);font-size:12.5px;margin-top:2px}
+.tlb.school{border-right-color:var(--deep)}
+.tlb.evt{border-right-color:var(--pink)}
+.tlb.study{border-right-color:var(--hot)}
+.tlb.hwb{border-right-color:var(--pink)}
+.tlb.exam{border-color:var(--hot);background:var(--hot-soft);border-right-color:var(--hot)}
+.tlb.brk,.tlb.trav,.tlb.free{background:transparent;border-style:dashed;border-right-style:dashed;box-shadow:none}
+.tlb.free .h,.tlb.trav .h{color:var(--dim);font-weight:500}
+.tlb.win{background:var(--cool-soft);border-right-color:var(--cool);border-style:dashed;box-shadow:none}
+.tlb.off{opacity:.45}
+.tlb.off .h{text-decoration:line-through}
+.tlb.late{border-color:var(--hot)}
+.tlb.now{box-shadow:0 0 0 1px var(--warm)}
+.nowl{display:flex;align-items:center;gap:8px;margin:2px 0 8px;padding-right:46px}
+.nowl i{flex:1;height:1px;background:var(--hot);display:block}
+.nowl b{color:var(--hot);font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+.tlact{display:flex;gap:7px;margin-top:8px;align-items:center}
+.load{height:4px;background:var(--pn2);border-radius:99px;overflow:hidden;margin-top:7px}
+.load i{display:block;height:100%;border-radius:99px}
+/* ---- typography: system font stack first, Heebo for Hebrew glyphs it lacks ---- */
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Heebo',system-ui,Arial,sans-serif;font-optical-sizing:auto}
+.cnt .n{font-variant-numeric:tabular-nums}
+.days{letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+/* ---- respond on press, not on release: instant feedback on every tappable element ---- */
+[onclick]:active{transform:scale(.97);transition:transform .1s ease-out}
+.chk:active{transform:scale(1.12)}
+.toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(8px);
+ background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:11px;font-size:13px;font-weight:600;z-index:70;
+ opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ---- reduced motion: cross-fade instead of slide/spring, no gesture, no bounce ---- */
+@media (prefers-reduced-motion:reduce){
+ .pane.on{animation:none}
+ .sheet{transition:opacity .2s ease}
+ .hand-zone{display:none}
+ [onclick]:active{transform:none}
+ .fab:active{transform:none}
+}
+/* ---- reduced transparency: solid materials, no blur ---- */
+@media (prefers-reduced-transparency:reduce){
+ .topbar,nav,.sheet{background:var(--pn) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+ .veil{background:rgba(0,0,0,.8) !important;backdrop-filter:none !important}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in"><h2 id="tbTitle">היום</h2><span class="sub" id="tbSub"></span></div></header>
+<div class="wrap">
+
+<section class="pane on" id="p-today">
+ <div class="hero">
+  <div class="kick" id="hK">הבא בתור</div>
+  <div class="cnt"><span class="n" id="hN">–</span><span class="u" id="hU">ימים</span></div>
+  <h1 id="hT">—</h1><div class="wh" id="hD"></div>
+  <div class="bar"><i id="hB" style="width:0"></i></div>
+  <div class="blab"><span id="hP"></span><span id="hL"></span></div>
+ </div>
+ <div id="alerts"></div>
+ <div class="dnav">
+  <button onclick="hop(1)">‹</button>
+  <div class="lab"><b id="dLab">—</b><small id="dInfo"></small></div>
+  <button onclick="hop(-1)">›</button>
+ </div>
+ <div class="chips" id="dQuick"></div>
+ <div id="dTop"></div>
+ <div id="tl"></div>
+ <div class="btnrow" style="margin-top:12px">
+  <button class="btn sm ghost grow" onclick="openEv()">+ אירוע</button>
+  <button class="btn sm ghost grow" onclick="openOv(viewK)">שינוי במערכת</button>
+ </div>
+</section>
+
+<section class="pane" id="p-week">
+ <h2 class="sec">עקביות <span class="r">28 הימים האחרונים · לחיצה על יום</span></h2>
+ <div class="card" id="heatBox"></div>
+ <h2 class="sec">14 הימים הקרובים <span class="r">לחיצה פותחת את היום</span></h2>
+ <div id="lWeek"></div>
+</section>
+
+<section class="pane" id="p-hw">
+ <div id="lHw"></div>
+ <h2 class="sec">משבצות ההפסקה</h2>
+ <div class="card" id="lMicro"></div>
+ <h2 class="sec">אירועים קבועים <span class="r" id="evCount"></span></h2>
+ <div id="lEv"></div>
+ <button class="btn wide ghost" onclick="openEv()">+ אירוע חדש</button>
+</section>
+
+<section class="pane" id="p-ex">
+ <div class="chips" id="chips"></div>
+ <div id="lEx"></div>
+ <button class="btn wide ghost" onclick="ics()">ייצוא ליומן (ICS)</button>
+</section>
+
+<section class="pane" id="p-set">
+ <h2 class="sec">זמן פנוי בכל יום</h2>
+ <div class="card" id="capBox"></div>
+ <h2 class="sec">כללי חלוקה</h2>
+ <div class="card">
+  <div class="sw"><div>אורך משבצת<div class="sub">דקות</div></div><input class="num" type="number" id="sLen" min="20" max="120" step="5"></div>
+  <div class="sw"><div>חלון לימוד מקסימלי<div class="sub">כמה ימים לפני מבחן מתחילים</div></div><input class="num" type="number" id="sHor" min="3" max="60"></div>
+  <div class="sw"><div>חוק היום הצמוד<div class="sub">להעדיף ללמוד מקצוע ביום שיש אותו במערכת. שישי-שבת תמיד פתוחים.</div></div><div class="tgl" id="tSame" onclick="tg('same')"><i></i></div></div>
+  <div class="sw"><div>משקל כפול למקצועות הקשים<div class="sub">מתמטיקה, פיזיקה, הנדסת תוכנה</div></div><div class="tgl" id="tHard" onclick="tg('hard')"><i></i></div></div>
+  <div class="sw"><div>עד איזו שעה ללמוד<div class="sub">ברירת מחדל 19:00</div></div><input class="num" type="number" id="sEnd" min="15" max="23"></div>
+  <div class="sw"><div>גבול חירום<div class="sub">רק לדדליין אמיתי, ותמיד מסומן</div></div><input class="num" type="number" id="sLate" min="16" max="24"></div>
+  <div class="sw"><div>נסיעה והתאוששות<div class="sub">דקות מסיום הלימודים עד שאתה מתיישב</div></div><input class="num" type="number" id="sTrv" min="0" max="180" step="15"></div>
+ </div>
+ <h2 class="sec">אנרגיה אישית</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 8px">באיזה חלק של הזמן הפנוי אתה הכי חד? מתמטיקה, פיזיקה והנדסת תוכנה ישובצו שם.</div>
+  <div class="quick" id="enBox" style="margin:0"></div>
+ </div>
+ <h2 class="sec">כיול קצב <span class="r">נלמד ממה שדיווחת</span></h2>
+ <div class="card" id="cbBox"></div>
+ <h2 class="sec">שיתוף</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">סיכום קריא של השבוע הקרוב — להורים, למורה פרטי, או לעצמך בוואטסאפ.</div>
+  <button class="btn sm" onclick="shareSummary()">📤 שיתוף סיכום שבוע</button>
+ </div>
+ <h2 class="sec">רזרבה לשיעורי בית</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 8px">זמן שנשמר מראש למטלות שעוד לא קיבלת. היום ומחר לא נשמרים — שם אתה כבר יודע מה יש לך.</div>
+  <div class="sw"><div>רזרבה אוטומטית<div class="sub">נלמדת מהמטלות שהוספת בפועל</div></div><div class="tgl" id="tRes" onclick="tg('resAuto')"><i></i></div></div>
+  <div id="resBox"></div>
+ </div>
+ <h2 class="sec">משבצות לפי סוג מבחן</h2>
+ <div class="card" id="wBox"></div>
+ <h2 class="sec">שינויים במערכת <span class="r">ביטולים וימים חופשיים</span></h2>
+ <div class="card" id="ovBox"></div>
+ <h2 class="sec">המערכת שלי</h2>
+ <div class="card" id="ttBox"></div>
+ <h2 class="sec">Google Classroom</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">הדבק Client ID מ-Google Cloud כדי למשוך מטלות אוטומטית. ריק = מצב ידני.</div>
+  <div class="fld"><input id="gcid" placeholder="xxxxx.apps.googleusercontent.com"></div>
+  <div class="btnrow"><button class="btn sm" onclick="saveGC()">שמירה</button><button class="btn sm" onclick="gcSync()">סנכרון עכשיו</button></div>
+  <div class="sub" id="gcStat" style="margin-top:9px">לא מחובר</div>
+ </div>
+ <h2 class="sec">איפוס</h2>
+ <div class="card"><div class="btnrow">
+  <button class="btn sm" onclick="render()">חישוב מחדש</button>
+  <button class="btn sm" onclick="rsDone()">איפוס ביצוע</button>
+  <button class="btn sm" onclick="rsAll()">איפוס מלא</button>
+ </div><div class="sub" style="margin-top:9px">הכל נשמר במכשיר שלך בלבד.</div></div>
+</section>
+</div>
+
+<button class="fab" id="fab" onclick="openAdd()">+</button>
+
+<nav><div class="in">
+ <button class="on" data-p="today" onclick="go('today')"><span class="ic">◎</span>היום</button>
+ <button data-p="week" onclick="go('week')"><span class="ic">▤</span>שבועיים</button>
+ <button data-p="hw" onclick="go('hw')"><span class="ic">✎</span>מטלות</button>
+ <button data-p="ex" onclick="go('ex')"><span class="ic">✦</span>מבחנים</button>
+ <button data-p="set" onclick="go('set')"><span class="ic">⚙</span>הגדרות</button>
+</div></nav>
+
+<div class="veil" id="veil" onclick="closeS()"></div>
+<div class="sheet" id="sheet"><div class="hand-zone" id="handZone"><div class="hand"></div></div><div id="shBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- storage ---------- */
+var mem={};
+function ST(k,v){if(v===undefined){try{var r=localStorage.getItem(k);return r===null?mem[k]:r}catch(e){return mem[k]}}
+ mem[k]=v;try{localStorage.setItem(k,v)}catch(e){}}
+function J(k,d){try{var v=JSON.parse(ST(k));return v==null?d:v}catch(e){return d}}
+
+/* ---------- constants ---------- */
+var DAYS=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+/* המערכת: יום -> [שיעור, מקצוע]. שיעורים 10-11 = 15:25-17:00 */
+var TT={
+0:{end:"17:00",l:[[1,"מתמטיקה"],[2,"מתמטיקה"],[4,"ספרות"],[5,'חנ"ג'],[6,"היסטוריה"],[7,"היסטוריה"],[8,"פיזיקה"],[9,"פיזיקה"],[10,"הנדסת תוכנה"],[11,"הנדסת תוכנה"]]},
+1:{end:"15:15",l:[[1,"אנגלית"],[2,"אנגלית"],[4,"הנדסת תוכנה"],[5,"הנדסת תוכנה"],[6,"ספרות"],[7,"מתמטיקה"],[8,"מתמטיקה"],[9,"מתמטיקה"]]},
+2:{end:"13:10",l:[[1,"לשון"],[2,"לשון"],[4,"אנגלית"],[5,"אנגלית"],[6,"היסטוריה"],[7,"היסטוריה"]]},
+3:{end:"17:00",l:[[1,"ספרות"],[2,'חנ"ג'],[4,"לשון"],[5,'תנ"ך'],[6,"פיזיקה"],[7,"פיזיקה"],[8,"הנדסת תוכנה"],[9,"הנדסת תוכנה"],[10,"הנדסת תוכנה"],[11,"הנדסת תוכנה"]]},
+4:{end:"15:15",l:[[1,"פיזיקה"],[2,"פיזיקה"],[4,"הנדסת תוכנה"],[5,"הנדסת תוכנה"],[6,"מתמטיקה"],[7,"מתמטיקה"],[9,'תנ"ך']]},
+5:{end:"",l:[]},6:{end:"",l:[]}};
+/* צלצולים. שיעור 3 = בוקר טוב חינוך (15 דק') */
+var BELL={1:["07:55","08:37"],2:["08:38","09:20"],3:["09:40","09:55"],4:["09:55","10:40"],5:["10:40","11:25"],
+ 6:["11:45","12:30"],7:["12:30","13:10"],8:["13:45","14:30"],9:["14:30","15:15"],10:["15:25","16:10"],11:["16:15","17:00"]};
+var BRK=[["09:20","09:40"],["11:25","11:45"]];
+var TYPE={bagrut:{l:"בגרות",c:"bag",w:14},matkonet:{l:"מתכונת",c:"mat",w:9},
+ hagbara:{l:"הגברה",c:"hag",w:6},mivchan:{l:"מבחן",c:"",w:4},bochan:{l:"בוחן",c:"",w:2}};
+var HARD=["מתמטיקה","פיזיקה","הנדסת תוכנה"];
+/* דקות לשאלה אחת — לחישוב מנת התרגול לכל משבצת */
+var PACE={"מתמטיקה":8,"פיזיקה":13,"הנדסת תוכנה":16,"אנגלית":10,"לשון":9};
+/* מהיומן הבית ספרי, מסונן לכיתה ולמקצועות שלך. הגברות תורגמו: בי"ס=פיזיקה, קמפוסי=הנדסת תוכנה */
+var SEED=[
+["2026-09-17","פיזיקה","mivchan"],["2026-10-06","לשון","bochan"],["2026-10-12","אנגלית","mivchan"],
+["2026-10-15","מתמטיקה","mivchan"],["2026-10-19","הנדסת תוכנה","bagrut"],["2026-10-29","הנדסת תוכנה","hagbara"],
+["2026-11-02","לשון","mivchan"],["2026-11-05","פיזיקה","hagbara"],["2026-11-10","ספרות","mivchan"],
+["2026-11-12","מתמטיקה","mivchan"],["2026-11-16","אנגלית","mivchan"],["2026-12-14","לשון","mivchan"],
+["2026-12-16","היסטוריה","mivchan"],["2026-12-21","אנגלית","mivchan"],["2026-12-23",'תנ"ך',"mivchan"],
+["2026-12-27","מתמטיקה","mivchan"],["2027-01-04","ספרות","mivchan"],["2027-01-07","הנדסת תוכנה","hagbara"],
+["2027-01-14","פיזיקה","hagbara"],["2027-01-24","מתמטיקה","mivchan"],["2027-02-01","ספרות אנגלית","mivchan"],
+["2027-02-03","ספרות","mivchan"],["2027-02-08","אנגלית","mivchan"],["2027-02-17","לשון","mivchan"],
+["2027-02-22","אנגלית","mivchan"],["2027-02-24",'תנ"ך',"mivchan"],["2027-03-04","הנדסת תוכנה","hagbara"],
+["2027-03-09","היסטוריה","mivchan"],["2027-03-11","פיזיקה","hagbara"],["2027-03-18","מתמטיקה","mivchan"],
+["2027-03-29","אנגלית","matkonet"],["2027-04-01","ספרות","mivchan"],["2027-04-06",'חנ"ג',"matkonet"],
+["2027-04-12","לשון","matkonet"],["2027-04-29","מתמטיקה","matkonet"],["2027-05-03","היסטוריה","matkonet"],
+["2027-05-05",'חנ"ג',"bagrut"],["2027-05-06","אנגלית","matkonet"],["2027-05-17","לשון","bagrut"],
+["2027-05-26","מתמטיקה","bagrut"],["2027-05-31","אנגלית","bagrut"],["2027-06-07","היסטוריה","bagrut"],
+["2027-06-28","פיזיקה","bagrut"]];
+
+/* ---------- study methods (evidence-based) ---------- */
+function method(sub,phase){
+ var s=sub;
+ function has(x){return s.indexOf(x)>-1}
+ if(has("מתמטיקה")){
+  if(phase==="far")return"תרגול מעורב: 6 שאלות מ-3 נושאים שונים. לא בלוק מאותו סוג.";
+  if(phase==="mid")return"שאלון ישן, חצי ממנו. אחרי כל שאלה — למה בחרת בשיטה הזו?";
+  return"בגרות שלמה בתנאי מבחן. שעון פועל, בלי הצצות לפתרון.";}
+ if(has("פיזיקה")){
+  if(phase==="far")return"נוסחה מהזיכרון → הסבר מאיפה היא באה → תרגיל אחד בלי דף נוסחאות.";
+  if(phase==="mid")return"שאלת בגרות מלאה. כתוב את ההנחות הפיזיקליות לפני שאתה מציב מספרים.";
+  return"סימולציה רצופה. אם נתקעת — סמן ותמשיך, אל תעצור.";}
+ if(has("הנדסת תוכנה")){
+  if(phase==="far")return"כתוב את המימוש מאפס על דף בלי לראות, ואז השווה לקוד המקורי.";
+  if(phase==="mid")return"מעקב ידני: הרץ את הקוד בראש שורה-שורה עם טבלת משתנים.";
+  return"שאלת בגרות מלאה בכתב יד, כולל סיבוכיות ומקרי קצה.";}
+ if(has("אנגלית")){
+  if(phase==="far")return"20 מילים חדשות + חזרה על אלה מלפני 3 ימים.";
+  if(phase==="mid")return"אנסין אחד עם שעון. סמן כל מילה שעצרה אותך.";
+  return"אנסין + כתיבה בתנאי זמן מלאים.";}
+ if(has("חנ"))return"אימון בפועל לפי דרישות המבחן המעשי.";
+ if(phase==="far")return"מוח ריק: כתוב כל מה שאתה זוכר על הנושא, ורק אז פתח מחברת וסמן חורים.";
+ if(phase==="mid")return"ענה על שאלת בגרות בכתב, 25 דקות, מחברת סגורה.";
+ return"שחזור בעל פה: הסבר את הנושא בקול רם כאילו אתה מלמד.";
+}
+function phaseOf(d){return d<=3?"near":(d<=8?"mid":"far")}
+/* מנת התרגול: כמה שאלות נכנסות למשבצת, לפי הקצב של המקצוע */
+function dose(sub,min){
+ var p=paceOf(sub);
+ if(!p)return"";
+ var n=Math.max(2,Math.round(min/p));
+ return n+" שאלות";
+}
+/* ההמלצה המלאה למשבצת: מאיפה, מה, כמה, איך */
+function recipe(e,left,min,topic){
+ var bits=[];
+ if(e.sheet)bits.push("מתוך "+e.sheet);
+ if(topic&&topic.indexOf("מעורב")<0)bits.push(topic);
+ var d=dose(e.sub,min||S.len);if(d)bits.push(d);
+ var head=bits.join(" · ");
+ return (head?head+" — ":"")+method(e.sub,phaseOf(left));
+}
+
+/* ---------- state ---------- */
+var S,exams,hw,done,plan,over,evts,ovr,prog,seen,calib,heat,filter="all",viewK=null;
+function defs(){return{cap:[60,150,180,60,120,90,120],len:50,hor:21,same:true,hard:true,
+ resAuto:true,res:[30,50,50,30,40,0,0],endH:19,lateH:21,travel:60,energy:"none",
+ w:{bagrut:14,matkonet:9,hagbara:6,mivchan:4,bochan:2}}}
+function load(){
+ S=J("l_s",null)||defs();var d=defs();for(var k in d)if(S[k]===undefined)S[k]=d[k];
+ exams=J("l_ex",null);
+ if(!Array.isArray(exams)||!exams.length)exams=SEED.map(function(e,i){return{id:"s"+i,sub:e[1],date:e[0],type:e[2],ses:null}});
+ /* מיגרציה: נושאים ישנים היו רשימת מחרוזות. עכשיו כל נושא הוא {n:שם,w:היקף חומר 1-3,wk:מרגיש חלש} */
+ exams.forEach(function(e){
+  if(e.topics&&e.topics.length&&typeof e.topics[0]==="string")e.topics=e.topics.map(function(s){return{n:s,w:2,wk:false}});
+ });
+ hw=J("l_hw",[]);done=J("l_dn",{});evts=J("l_ev",[]);ovr=J("l_ov",{});
+ /* prog: משבצות שבוצעו לכל מבחן · seen: מתי נלמד כל נושא (לחזרה מרווחת) · calib: כיול קצב · heat: עקביות יומית */
+ prog=J("l_pg",{});seen=J("l_sn",{});calib=J("l_cb",{});heat=J("l_ht",{});
+ var cut=key(ad(tod(),-90));for(var hk in heat)if(hk<cut)delete heat[hk];
+}
+function save(){ST("l_s",JSON.stringify(S));ST("l_ex",JSON.stringify(exams));ST("l_hw",JSON.stringify(hw));
+ ST("l_dn",JSON.stringify(done));ST("l_ev",JSON.stringify(evts));ST("l_ov",JSON.stringify(ovr));
+ ST("l_pg",JSON.stringify(prog));ST("l_sn",JSON.stringify(seen));ST("l_cb",JSON.stringify(calib));ST("l_ht",JSON.stringify(heat))}
+
+/* ---------- dates ---------- */
+function p2(n){return n<10?"0"+n:""+n}
+function key(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
+function pr(s){var a=s.split("-");return new Date(+a[0],+a[1]-1,+a[2])}
+function tod(){var d=new Date();d.setHours(0,0,0,0);return d}
+function ad(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x}
+function df(s,b){return Math.round((pr(s)-b)/864e5)}
+function heb(s){var d=pr(s);return"יום "+DAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)}
+function m2(s){var a=String(s).split(":");return (+a[0])*60+(+a[1]||0)}
+function hhmm(m){return p2(Math.floor(m/60)%24)+":"+p2(Math.round(m)%60)}
+function nowMin(){var n=new Date();return n.getHours()*60+n.getMinutes()}
+
+/* ---------- מערכת, ביטולים, אירועים ---------- */
+/* השיעורים שבאמת מתקיימים בתאריך הזה, אחרי ביטולים */
+function lessonsOn(d){
+ var o=ovr[key(d)]||{},base=(TT[d.getDay()]||{l:[]}).l;
+ if(o.off)return[];
+ var cx=o.cx||[];
+ return base.filter(function(x){return cx.indexOf(x[0])<0});
+}
+function spanOf(list){
+ var mn=1e9,mx=-1;list.forEach(function(x){var b=BELL[x[0]];if(!b)return;
+  mn=Math.min(mn,m2(b[0]));mx=Math.max(mx,m2(b[1]))});
+ return mx<0?null:{s:mn,e:mx};
+}
+function schoolSpan(d){return spanOf(lessonsOn(d))}
+/* חלון הלימוד האמיתי: מסיום הלימודים בפועל + נסיעה, עד שעת הסיום */
+function winFor(d){var sp=schoolSpan(d);return sp?{s:sp.e+S.travel,e:S.endH*60}:{s:600,e:S.endH*60}}
+function winWd(wd){var l=(TT[wd]||{l:[]}).l,sp=spanOf(l);return sp?{s:sp.e+S.travel,e:S.endH*60}:{s:600,e:S.endH*60}}
+function capWd(wd){var w=winWd(wd);return Math.min(S.cap[wd],Math.max(0,w.e-w.s))}
+function evtsOn(d){
+ var k=key(d),wd=d.getDay();
+ return evts.filter(function(e){
+  if(e.rep==="weekly")return e.dow===wd&&(!e.from||k>=e.from);
+  return e.date===k;
+ }).sort(function(a,b){return m2(a.s)-m2(b.s)});
+}
+function busyOn(d){return evtsOn(d).filter(function(e){return e.blocks!==false})}
+/* כמה מהחלון נאכל על ידי אירועים */
+function busyMin(d){
+ var w=winFor(d),t=0;
+ busyOn(d).forEach(function(e){var a=Math.max(w.s,m2(e.s)),b=Math.min(S.lateH*60,m2(e.e));if(b>a)t+=Math.min(b,w.e)-a>0?Math.min(b,w.e)-a:0});
+ return t;
+}
+function capOfD(d){var w=winFor(d);return Math.max(0,Math.min(S.cap[d.getDay()],Math.max(0,w.e-w.s)-busyMin(d)))}
+function lateCapD(d){var w=winFor(d);return Math.max(0,S.lateH*60-w.s-busyMin(d))}
+/* קטעי הזמן הפנויים באמת ביום — החלון פחות האירועים */
+function gapsFor(d){
+ var w=winFor(d),segs=[{s:w.s,e:Math.max(w.s,S.lateH*60)}];
+ busyOn(d).forEach(function(e){
+  var a=m2(e.s),b=m2(e.e),out=[];
+  segs.forEach(function(g){
+   if(b<=g.s||a>=g.e){out.push(g);return}
+   if(a>g.s)out.push({s:g.s,e:a});
+   if(b<g.e)out.push({s:b,e:g.e});
+  });
+  segs=out;
+ });
+ return segs.filter(function(g){return g.e-g.s>=15});
+}
+
+/* ---------- scheduler ---------- */
+function paceKeyOf(sub){for(var k in PACE)if(sub.indexOf(k)>-1)return k;return null}
+/* קצב לשאלה — מכויל לפי מה שדיווחת בפועל אחרי משבצות ("לקח יותר" / "פחות") */
+function paceOf(sub){var pk=paceKeyOf(sub);return pk?PACE[pk]*(calib[pk]||1):0}
+/* סך המשבצות שהמבחן דורש: מכמות תרגילים אמיתית אם יש, אחרת ממשקל סוג המבחן. נושא חלש = 25% נוספות */
+function rawNeed(e){
+ if(e.ses!=null&&e.ses!=="")return +e.ses;
+ var n,pace=paceOf(e.sub);
+ if(e.tex&&pace)n=Math.max(2,Math.ceil((e.tex*pace)/S.len));
+ else{
+  n=S.w[e.type]||4;
+  if(S.hard&&HARD.some(function(h){return e.sub.indexOf(h)>-1}))n=Math.round(n*1.6);
+ }
+ if(e.topics&&e.topics.some(function(t){return t.wk}))n=Math.ceil(n*1.25);
+ return n;
+}
+/* מה שנותר לתזמן: הסך פחות מה שכבר בוצע בימים שעברו. ככה משבצת שפספסת חוזרת לתוכנית,
+   ומשבצת שהקדמת נזקפת לזכותך במקום להישכח */
+function need(e){return Math.max(0,rawNeed(e)-(prog[e.id]||0))}
+/* עדיפות אמת (עקרון אייזנהאואר: דחיפות × חשיבות) — כמה שהמבחן קרוב יותר, חשוב יותר (בגרות > בוחן),
+   קשה יותר, ויש בו נושאים חלשים — כך העדיפות שלו גבוהה יותר. משמש למיון ולתצוגת "מה קודם" */
+function priority(e){
+ var d=Math.max(0.5,df(e.date,tod())),urgency=1/d;
+ var imp=(TYPE[e.type]||{w:4}).w;
+ var hard=S.hard&&HARD.some(function(h){return e.sub.indexOf(h)>-1})?1.6:1;
+ var weak=e.topics&&e.topics.some(function(t){return t.wk})?1.3:1;
+ return urgency*imp*hard*weak;
+}
+/* חוק היום הצמוד. ביום בלי מערכת (שישי, שבת, חופש) הכלל לא חל — אחרת הם נדלגים תמיד */
+function subOn(d,sub){
+ var l=lessonsOn(d);
+ if(!l.length)return true;
+ return l.some(function(x){return sub.indexOf(x[1])>-1||x[1].indexOf(sub)>-1});
+}
+/* כמה דקות שיעורי בית אתה מקבל בפועל ביום כזה — נלמד מ-4 השבועות האחרונים */
+function learned(wd){
+ var t=tod(),tot=0,wks={};
+ hw.forEach(function(h){var d=pr(h.due),g=Math.round((t-d)/864e5);
+  if(g>=0&&g<=28&&d.getDay()===wd){tot+=(h.min||30);wks[Math.floor(g/7)]=1}});
+ var n=Math.max(1,Object.keys(wks).length),avg=tot/n;
+ var base=(TT[wd]&&TT[wd].l.length)?35:0;
+ return Math.min(Math.round(Math.max(avg,base)/5)*5,Math.round(S.cap[wd]*0.5));
+}
+/* רזרבה: רק לימים רחוקים. היום ומחר אתה כבר יודע מה יש לך, אז אין מה לשמור */
+function resFor(d){
+ var g=Math.round((d-tod())/864e5);
+ if(g<=1)return 0;
+ if((ovr[key(d)]||{}).off)return 0;
+ return S.resAuto?learned(d.getDay()):(S.res[d.getDay()]||0);
+}
+/* מעבר יום: פעם אחת כשהתאריך מתקדם, לפני שהתוכנית נבנית מחדש — סופרים מה בוצע בימים שנסגרו
+   (לזיכוי המבחן ולמפת העקביות), ומה לא בוצע חוזר אוטומטית לתוכנון קדימה דרך need() */
+function rollover(){
+ var todayK=key(tod());
+ if(!plan){S.lastBuild=todayK;return}
+ if(S.lastBuild&&S.lastBuild<todayK){
+  var missed=0;
+  for(var k in plan){
+   if(k>=todayK)continue;
+   var tot=0,dn=0;
+   plan[k].forEach(function(s,i){
+    var m=s.min||S.len,id=sid(k,s,i);tot+=m;
+    if(done[id]){dn+=m;if(s.kind==="ex")prog[s.id]=(prog[s.id]||0)+1}
+    else if(s.kind==="ex")missed++;
+    delete done[id];
+   });
+   if(tot>0)heat[k]={t:tot,d:dn};
+  }
+  if(missed>0)S.carry=missed;
+ }
+ S.lastBuild=todayK;
+}
+function build(){
+ rollover();
+ var t=tod(),left={},out={},used={},late={};over=[];
+ function free(d){var k=key(d);if(left[k]===undefined)left[k]=capOfD(d);return left[k]}
+ function push(k,o){(out[k]=out[k]||[]).push(o)}
+ /* הרזרבה משוחררת ברגע ששיעורי בית אמיתיים תפסו אותה — אחרת היא נספרת פעמיים */
+ function resLeft(d){var k=key(d);return Math.max(0,resFor(d)-(used[k]||0))}
+
+ /* 1. שיעורי בית קודמים — דדליין קשיח, ומשתמשים גם ברזרבה */
+ hw.filter(function(h){return !h.done&&pr(h.due)>=t}).sort(function(a,b){return pr(a.due)-pr(b.due)}).forEach(function(h){
+  var rem=h.min||30;
+  for(var i=1;i<=10&&rem>0;i++){
+   var d=ad(pr(h.due),-i);if(d<t)break;
+   var k=key(d);if(free(d)<=0)continue;
+   while(rem>0&&left[k]>0){
+    var ch=Math.min(S.len,rem,left[k]);
+    push(k,{kind:"hw",id:h.id,sub:h.sub,what:h.what,due:h.due,min:ch});
+    left[k]-=ch;rem-=ch;used[k]=(used[k]||0)+ch;
+   }
+  }
+  /* אם אין ברירה — נמתחים לשעות המאוחרות, אבל זה מסומן ולא מוסתר */
+  for(var i2=1;i2<=3&&rem>0;i2++){
+   var d2=ad(pr(h.due),-i2);if(d2<t)break;
+   var k2=key(d2),wd=d2.getDay();
+   var extra=Math.max(0,lateCapD(d2)-capOfD(d2)-(late[k2]||0));
+   if(extra<=0)continue;
+   var ch2=Math.min(rem,extra);
+   push(k2,{kind:"hw",id:h.id,sub:h.sub,what:h.what,due:h.due,min:ch2,late:true});
+   late[k2]=(late[k2]||0)+ch2;used[k2]=(used[k2]||0)+ch2;rem-=ch2;
+   over.push(h.sub+" — "+h.what+": חריגה ביום "+DAYS[wd]+" עד "+hhmm(winFor(d2).s+capOfD(d2)+late[k2]));
+  }
+  if(rem>0){var k0=key(t);
+   push(k0,{kind:"hw",id:h.id,sub:h.sub,what:h.what,due:h.due,min:rem,tight:true});
+   left[k0]=0;over.push(h.sub+" — "+h.what+": חסרות "+rem+" דקות ביומן");}
+ });
+
+ /* 2. לימוד למבחנים — רק לתוך מה שנשאר אחרי הרזרבה */
+ exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).forEach(function(e){
+  var n=need(e);if(n<=0)return;
+  var ed=pr(e.date),placed=0;
+  for(var pass=0;pass<3&&placed<n;pass++){
+   var hor=pass===0?S.hor:(pass===1?S.hor:60), onlyMatch=(pass===0&&S.same);
+   for(var i=1;i<=hor&&placed<n;i++){
+    var d=ad(ed,-i);if(d<t)break;
+    if(onlyMatch&&!subOn(d,e.sub))continue;
+    var k=key(d),avail=free(d)-resLeft(d);
+    var take=Math.min(Math.floor(avail/S.len),n-placed,i<=3?3:2);
+    if(take<=0)continue;
+    for(var j=0;j<take;j++)push(k,{kind:"ex",id:e.id,sub:e.sub,type:e.type,date:e.date,min:S.len});
+    left[k]-=take*S.len;placed+=take;
+   }
+  }
+ });
+
+ /* 3. פריסת הנושאים מדף המטרים על המשבצות — לפי משקל: נושא "הרבה חומר" או "חלש" מקבל יותר משבצות */
+ var byEx={},ks=Object.keys(out).sort();
+ ks.forEach(function(k){out[k].forEach(function(s){if(s.kind==="ex")(byEx[s.id]=byEx[s.id]||[]).push({k:k,s:s})})});
+ exams.forEach(function(e){
+  var l=byEx[e.id];if(!l||!e.topics||!e.topics.length)return;
+  var wl=weightedTopics(e.topics),n=wl.length,i=0;
+  var weakN=e.topics.filter(function(t){return t.wk}).map(function(t){return t.n});
+  l.forEach(function(o){
+   var gap=Math.round((pr(e.date)-pr(o.k))/864e5);
+   o.s.topic=gap<=3?(weakN.length?"מעורב — דגש על "+weakN.join(", "):"מעורב — כל הנושאים"):wl[(i++)%n];
+  });
+ });
+ plan=out;
+ stamp();
+}
+/* פורס כל נושא לפי היקף החומר שלו (1-3) + בונוס אם מרגישים חלשים בו, ומערבב בסבבים כדי לא לרכז אותו נושא ברצף */
+function weightedTopics(topics){
+ var pool=topics.map(function(t){return{n:t.n,left:(t.w||2)+(t.wk?1:0)}}),out=[],any=true;
+ while(any){any=false;pool.forEach(function(p){if(p.left>0){out.push(p.n);p.left--;any=true}})}
+ return out.length?out:topics.map(function(t){return t.n});
+}
+/* 4. מתן שעות אמיתיות לכל משבצת, מסביב לאירועים */
+function stamp(){
+ for(var k in plan){
+  var d=pr(k),gs=gapsFor(d),gi=0,cur=gs.length?gs[0].s:winFor(d).s;
+  energyOrder(plan[k]).forEach(function(s){
+   var need=s.min||S.len;
+   while(gi<gs.length){
+    if(cur<gs[gi].s)cur=gs[gi].s;
+    if(gs[gi].e-cur>=need)break;
+    gi++;if(gi<gs.length)cur=gs[gi].s;
+   }
+   s.t0=cur;s.t1=cur+need;cur=s.t1+5;
+  });
+ }
+}
+/* תזמון לפי אנרגיה: מחזיר את אותם אובייקטים בסדר שבו יקבלו שעות — מקצועות קשים בחלק שבו אתה הכי חד.
+   לא משנה את סדר המערך עצמו, כי האינדקס שם הוא המזהה של סימוני הביצוע */
+function energyOrder(arr){
+ var en=S.energy||"none";if(en==="none")return arr;
+ var hard=arr.filter(function(s){return s.kind==="ex"&&HARD.some(function(h){return s.sub.indexOf(h)>-1})});
+ if(!hard.length||hard.length===arr.length)return arr;
+ var rest=arr.filter(function(s){return hard.indexOf(s)<0});
+ if(en==="early")return hard.concat(rest);
+ if(en==="late")return rest.concat(hard);
+ var q=Math.ceil(rest.length/2);return rest.slice(0,q).concat(hard).concat(rest.slice(q));
+}
+function sid(k,s,i){return k+"|"+(s.kind==="hw"?"h":"e")+s.id+"|"+i}
+function col(s){return s.kind==="hw"?"var(--pink)":
+ s.type==="bagrut"?"var(--hot)":s.type==="matkonet"?"var(--warm)":s.type==="hagbara"?"var(--deep)":"var(--dim)"}
+function exById(id){return exams.filter(function(e){return e.id===id})[0]}
+
+/* ---------- render ---------- */
+function render(){
+ if(!viewK||pr(viewK)<tod())viewK=key(tod());
+ build();hero();alerts();dayView();week();hwView();micro();evView();exView();setView();save();
+}
+
+function hero(){
+ var t=tod(),nx=exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)})[0];
+ if(!nx){document.getElementById("hN").textContent="–";document.getElementById("hT").textContent="אין מבחנים";return}
+ var d=df(nx.date,t),n=document.getElementById("hN");
+ n.style.fontSize=d===0?"44px":"72px";n.textContent=d===0?"היום":d;
+ document.getElementById("hU").textContent=d===0?"":(d===1?"יום":"ימים");
+ document.getElementById("hK").textContent=TYPE[nx.type].l+" · הבא בתור";
+ document.getElementById("hT").textContent=nx.sub;
+ document.getElementById("hD").textContent=heb(nx.date);
+ var tt=0,dn=0;for(var k in plan)plan[k].forEach(function(s,i){if(s.kind==="ex"&&s.id===nx.id){tt++;if(done[sid(k,s,i)])dn++}});
+ var pd=prog[nx.id]||0;tt+=pd;dn+=pd; /* מה שכבר בוצע בימים שעברו נספר בהתקדמות */
+ var pc=tt?Math.round(dn/tt*100):0,b=document.getElementById("hB");
+ b.style.width=pc+"%";b.style.background=pc>66?"var(--cool)":pc>33?"var(--warm)":"var(--hot)";
+ document.getElementById("hP").textContent=dn+" מתוך "+tt+" משבצות";
+ document.getElementById("hL").textContent=pc+"%";
+}
+function alerts(){
+ var h="",t=tod();
+ exams.filter(function(e){var d=df(e.date,t);return d>=0&&d<=14&&(!e.topics||!e.topics.length)&&e.type!=="bochan"})
+  .sort(function(a,b){return pr(a.date)-pr(b.date)}).slice(0,3).forEach(function(e){
+   h+='<div class="warn"><b>אין דף מטרים ל'+esc(e.sub)+'</b> — '+df(e.date,t)+' ימים למבחן.'+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn sm" onclick="openEx(\''+e.id+'\')">הוספת נושאים</button></div></div>';});
+ if(S.carry>0)h+='<div class="warn" style="border-right-color:var(--deep);background:var(--deep-soft)"><b>↪ '+S.carry+' משבצות שלא בוצעו נפרסו מחדש קדימה</b>'+
+  '<div class="sub" style="color:inherit;opacity:.85">התוכנית לא שכחה אותן — הן חזרו לתוך הימים הבאים.</div>'+
+  '<div class="btnrow" style="margin-top:8px"><button class="btn sm" onclick="S.carry=0;render()">הבנתי</button></div></div>';
+ if(over.length)h+='<div class="warn"><b>לחץ ביומן</b><div class="sub" style="color:inherit;opacity:.85">'+
+  over.map(esc).join("<br>")+'</div></div>';
+ hw.filter(function(x){return !x.done&&pr(x.due)<t}).forEach(function(x){
+  h+='<div class="warn"><b>עבר הדדליין:</b> '+esc(x.sub+" — "+x.what)+'</div>';});
+ document.getElementById("alerts").innerHTML=h;
+}
+
+/* ---------- ציר היום ---------- */
+function hop(n){var d=ad(pr(viewK),n);if(d<tod())return;viewK=key(d);dayView()}
+function openDay(k){viewK=k;go("today");dayView()}
+function dayView(){
+ var d=pr(viewK),k=viewK,t=tod(),g=Math.round((d-t)/864e5);
+ var lab=g===0?"היום":(g===1?"מחר":(g===2?"מחרתיים":heb(k)));
+ document.getElementById("dLab").textContent=lab+(g<=2?" · "+heb(k):"");
+ var w=winFor(d),cap=capOfD(d),rs=resFor(d),used=(plan[k]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
+ var o=ovr[k]||{};
+ document.getElementById("dInfo").textContent=
+  (o.off?"אין לימודים · ":"")+hhmm(w.s)+"–"+hhmm(w.e)+" · "+fm(cap)+" פנוי"+(rs?" · "+fm(rs)+" לשי\"ב":"")+" · "+fm(used)+" מתוכנן";
+ document.getElementById("dQuick").innerHTML=[0,1,2,3,4,5,6].map(function(i){
+  var dd=ad(t,i),kk=key(dd),lb=i===0?"היום":(i===1?"מחר":DAYS[dd.getDay()].slice(0,3)+" "+dd.getDate()+"."+(dd.getMonth()+1));
+  var mm=(plan[kk]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
+  return '<div class="chip'+(kk===k?" on":"")+'" onclick="openDay(\''+kk+'\')">'+lb+'<small>'+(mm?fm(mm):"—")+'</small></div>';
+ }).join("");
+
+ /* מבחן היום */
+ var top="";
+ exams.filter(function(e){return e.date===k}).forEach(function(e){
+  top+='<div class="card" style="border-color:var(--hot)"><div class="row">'+
+   '<div class="days" style="color:var(--hot)">!<small>'+(g===0?"היום":"ביום הזה")+'</small></div>'+
+   '<div class="grow"><div class="ttl">'+TYPE[e.type].l+" "+esc(e.sub)+'</div>'+
+   '<div class="sub">'+(e.sheet?esc(e.sheet)+" · ":"")+(e.topics&&e.topics.length?esc(e.topics.map(function(t){return t.n}).join(" · ")):"בהצלחה")+'</div></div></div></div>';});
+ if(g===0){
+  var rv=spacedReviews();
+  if(rv.length)top+='<div class="card" style="background:var(--cool-soft)"><div class="sub" style="margin:0 0 4px;color:var(--cool);font-weight:600">🔁 חזרה מרווחת — רענון של 10 דקות</div>'+
+   rv.map(function(r){return '<div class="row" style="padding:5px 0"><div class="grow"><b style="font-size:14px">'+esc(r.topic)+'</b>'+
+    '<div class="sub" style="margin:0">'+esc(r.sub)+' · למדת לפני '+r.gap+' ימים · שליפה מהזיכרון בלי לפתוח חומר</div></div>'+
+    '<button class="btn xs" onclick="markReview(\''+encodeURIComponent(r.key)+'\')">✓ חזרתי</button></div>'}).join("")+'</div>';
+  var f=frog();if(f)top='<div class="card" style="border-color:var(--hot);background:var(--hot-soft)"><div class="row">'+
+  '<div class="grow"><div class="sub" style="margin:0 0 3px;color:var(--hot);font-weight:600">🐸 קודם כול — הכי חשוב עכשיו</div>'+
+  '<div class="ttl">'+esc(f.lab)+'</div><div class="sub">'+esc(f.sub)+'</div></div>'+
+  '<button class="btn xs" onclick="'+f.act+'">פתח</button></div></div>'+top;
+ }
+ document.getElementById("dTop").innerHTML=top;
+ document.getElementById("tl").innerHTML=tlHTML(d);
+}
+/* "אכול את הצפרדע" — מתוך כל המטלות/משבצות הפתוחות היום, מוצא את בעלת ציון העדיפות הגבוה ביותר.
+   מטלה שעבר הדדליין שלה מנצחת תמיד; אחר כך משווים דחיפות (זמן שנשאר) מול חשיבות (משקל/קושי/חולשה) */
+function frog(){
+ var t=tod(),k=key(t),cands=[];
+ hw.filter(function(h){return !h.done}).forEach(function(h){
+  var d=df(h.due,t),hard=HARD.some(function(x){return h.sub.indexOf(x)>-1});
+  cands.push({score:(d<0?1e6:d===0?1e5:1000/Math.max(1,d))*(hard?1.3:1),lab:h.sub+" — "+h.what,
+   sub:(d<0?"עבר הדדליין! ":d===0?"להגשה היום · ":"מטלה · ל")+heb(h.due),act:"openHw('"+h.id+"')"});
+ });
+ (plan[k]||[]).forEach(function(s,i){
+  if(s.kind!=="ex")return;
+  var id=sid(k,s,i);if(done[id])return;
+  var e=exById(s.id);if(!e)return;
+  cands.push({score:priority(e)*8,lab:s.sub+(s.topic?" · "+s.topic:""),
+   sub:TYPE[s.type].l+" · "+hhmm(s.t0)+"–"+hhmm(s.t1),act:"openEx('"+s.id+"')"});
+ });
+ if(!cands.length)return null;
+ cands.sort(function(a,b){return b.score-a.score});
+ return cands[0];
+}
+function tlRows(d){
+ var k=key(d),o=ovr[k]||{},rows=[],base=(TT[d.getDay()]||{l:[]}).l,cx=o.cx||[];
+ /* שיעורים, מקובצים לרצפים של אותו מקצוע */
+ if(base.length){
+  var g=null;
+  function flush(){if(!g)return;
+   rows.push({s:g.s,e:g.e,cls:g.off?"school off":"school",
+    h:g.sub+(g.n>1?" ×"+g.n:"")+(g.off?" · בוטל":""),
+    t:"שיעור "+g.f+(g.la>g.f?"–"+g.la:"")});g=null}
+  base.forEach(function(x){
+   var b=BELL[x[0]];if(!b)return;
+   var off=o.off||cx.indexOf(x[0])>-1;
+   if(g&&g.sub===x[1]&&g.off===off&&m2(b[0])-g.e<=22){g.e=m2(b[1]);g.n++;g.la=x[0];return}
+   flush();g={sub:x[1],s:m2(b[0]),e:m2(b[1]),n:1,off:off,f:x[0],la:x[0]};
+  });
+  flush();
+ }
+ /* הפסקות — רק אם בית הספר באמת פועל סביבן */
+ var sp=schoolSpan(d),t=tod();
+ if(sp){
+  var nx=exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)});
+  BRK.forEach(function(b,i){
+   var a=m2(b[0]),z=m2(b[1]);
+   if(a<sp.s||z>sp.e)return;
+   var e=nx[i]||nx[0];
+   rows.push({s:a,e:z,cls:"brk",h:"הפסקה · שליפה מהזיכרון",
+    t:e?esc2(e.sub)+" — "+method(e.sub,"far"):"אין מבחן קרוב"});
+  });
+  rows.push({s:sp.e,e:sp.e+S.travel,cls:"trav",h:"נסיעה והתאוששות",t:fm(S.travel)});
+ }
+ /* אירועים */
+ evtsOn(d).forEach(function(e){
+  rows.push({s:m2(e.s),e:m2(e.e),cls:"evt",h:e.title,ev:e.id,
+   t:(e.blocks===false?"לא חוסם לימודים":"תפוס")+(e.rep==="weekly"?" · כל "+DAYS[e.dow]:"")});
+ });
+ /* משבצות למידה */
+ (plan[k]||[]).forEach(function(s,i){
+  var id=sid(k,s,i),on=!!done[id];
+  if(s.kind==="hw"){
+   rows.push({s:s.t0,e:s.t1,cls:"hwb"+(s.late?" late":""),h:s.sub+" — "+s.what,
+    t:"מטלה · להגשה "+heb(s.due)+(s.late?" · שעה מאוחרת":"")+(s.tight?" · דחוק":""),
+    chk:id,on:on,act:"openHw('"+s.id+"')",actL:"✎ מטלה"});
+  }else{
+   var e=exById(s.id)||{sub:s.sub,type:s.type,date:s.date},left=df(s.date,tod());
+   rows.push({s:s.t0,e:s.t1,cls:"study",h:s.sub+(s.topic?" · "+s.topic:""),
+    t:TYPE[s.type].l+" בעוד "+left+" ימים",
+    m:recipe(e,left,s.min||S.len,s.topic),cal:s.sub,
+    chk:id,on:on,act:"openEx('"+s.id+"')",actL:"✎ חומר"});
+  }
+ });
+ rows.sort(function(a,b){return a.s-b.s||a.e-b.e});
+ return rows;
+}
+function tlHTML(d){
+ var rows=tlRows(d),k=key(d),isToday=k===key(tod()),now=nowMin(),h="",placedNow=false;
+ var w=winFor(d),sp=schoolSpan(d),o=ovr[k]||{};
+ /* חורים: חלון בבית ספר, או זמן פנוי אחרי הלימודים */
+ var withGaps=[];
+ for(var i=0;i<rows.length;i++){
+  withGaps.push(rows[i]);
+  var nxt=rows[i+1];
+  var to=nxt?nxt.s:Math.max(w.e,rows[i].e);
+  var gap=to-rows[i].e;
+  if(gap>=25){
+   var inSchool=sp&&rows[i].e>=sp.s&&to<=sp.e;
+   withGaps.push({s:rows[i].e,e:to,cls:inSchool?"win":"free",
+    h:inSchool?"חלון בבית ספר":"פנוי",
+    t:inSchool?"שיעור שבוטל — שליפה מהזיכרון, בלי חומר חדש":fm(gap)+" בלי משבצת. אפשר להקדים משבצת ממחר."});
+  }
+ }
+ if(!withGaps.length){
+  var msg=o.off?"אין לימודים ואין משבצות. יום פתוח לגמרי.":
+   (d.getDay()===6?"שבת. מנוחה — אלא אם תוסיף משבצת ידנית.":"אין משבצות מתוכננות ביום הזה.");
+  return '<div class="empty">'+msg+'</div>';
+ }
+ withGaps.forEach(function(r){
+  if(isToday&&!placedNow&&now<r.s){h+=nowLine(now);placedNow=true}
+  var cur=isToday&&now>=r.s&&now<r.e;
+  if(cur&&!placedNow){placedNow=true}
+  h+='<div class="tlr"><div class="tlt">'+hhmm(r.s)+'<small>'+hhmm(r.e)+'</small></div>'+
+   '<div class="tlb '+r.cls+(cur?" now":"")+'">'+
+   '<div class="row" style="align-items:flex-start;gap:9px">'+
+   (r.chk?'<div class="chk'+(r.on?" on":"")+'" onclick="tk(\''+r.chk+'\')">'+(r.on?"✓":"")+'</div>':"")+
+   '<div class="grow"><div class="h"'+(r.on?' style="text-decoration:line-through;opacity:.5"':'')+'>'+esc(r.h)+'</div>'+
+   '<div class="s">'+esc(r.t)+'</div>'+
+   (r.m?'<div class="meth">'+esc(r.m)+'</div>':'')+'</div></div>'+
+   (r.act||r.ev?'<div class="tlact">'+
+     (r.act?'<button class="btn xs ghost" onclick="'+r.act+'">'+r.actL+'</button>':'')+
+     (r.ev?'<button class="btn xs ghost" onclick="openEv(\''+r.ev+'\')">✎ אירוע</button>':'')+
+    '</div>':'')+
+   (r.cal&&r.on&&paceKeyOf(r.cal)?'<div class="tlact"><span class="sub" style="margin:0">כמה זמן לקח?</span>'+
+     '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',.85)">פחות</button>'+
+     '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',1)">בול</button>'+
+     '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',1.25)">יותר</button></div>':'')+
+   '</div></div>';
+ });
+ if(isToday&&!placedNow)h+=nowLine(now);
+ return h;
+}
+function nowLine(n){return '<div class="nowl"><b>עכשיו '+hhmm(n)+'</b><i></i></div>'}
+function tk(id){
+ done[id]=!done[id];
+ /* סימון משבצת-נושא כבוצעה מתחיל את שעון החזרה המרווחת של הנושא הזה */
+ if(done[id]){var k=id.split("|")[0];
+  (plan[k]||[]).forEach(function(s,i){
+   if(s.kind==="ex"&&sid(k,s,i)===id&&s.topic&&s.topic.indexOf("מעורב")<0)seen[s.id+"|"+s.topic]={last:key(tod()),stage:0};
+  });}
+ save();render();
+}
+/* חזרה מרווחת: אחרי שנושא נלמד, רענון קצר אחרי 1, 3, 7 ו-14 ימים — לפי עקומת השכחה, לא רק לפני המבחן */
+var REV=[1,3,7,14];
+function spacedReviews(){
+ var t=tod(),out=[];
+ for(var k in seen){
+  var p=k.indexOf("|"),e=exById(k.slice(0,p));
+  if(!e||pr(e.date)<=t)continue;
+  var st=seen[k],gap=Math.round((t-pr(st.last))/864e5),due=REV[Math.min(st.stage||0,REV.length-1)];
+  if(gap>=due)out.push({key:k,topic:k.slice(p+1),sub:e.sub,gap:gap});
+ }
+ return out;
+}
+function markReview(kEnc){var k=decodeURIComponent(kEnc),st=seen[k];if(!st)return;
+ st.stage=Math.min(REV.length-1,(st.stage||0)+1);st.last=key(tod());save();render()}
+
+function week(){
+ var h="",t=tod();
+ for(var i=0;i<14;i++){
+  var d=ad(t,i),k=key(d),arr=plan[k]||[],ex=exams.filter(function(e){return e.date===k});
+  var o=ovr[k]||{},ev=evtsOn(d),cap=capOfD(d);
+  var mins=arr.reduce(function(a,s){return a+(s.min||S.len)},0);
+  var pc=cap?Math.min(100,Math.round(mins/cap*100)):(mins?100:0);
+  var nm={};arr.forEach(function(s){var n=s.kind==="hw"?("שי\"ב "+s.sub):s.sub;nm[n]=(nm[n]||0)+1});
+  var line=Object.keys(nm).map(function(n){return n+(nm[n]>1?" ×"+nm[n]:"")}).join(" · ");
+  h+='<div class="card" onclick="openDay(\''+k+'\')"><div class="row">'+
+   '<div class="days">'+d.getDate()+'<small>'+DAYS[d.getDay()].slice(0,3)+'</small></div><div class="grow">';
+  ex.forEach(function(e){h+='<div class="ttl" style="color:var(--hot)">'+TYPE[e.type].l+" "+esc(e.sub)+'</div>'});
+  h+='<div class="sub" style="font-size:14px;color:var(--ink);opacity:.85">'+
+   (line?esc(line):'<span style="opacity:.6">אין משבצות</span>')+'</div>'+
+   '<div class="sub">'+fm(mins)+" מתוך "+fm(cap)+(resFor(d)?" · "+fm(resFor(d))+" לשי\"ב":"")+
+   (o.off?" · אין לימודים":"")+(o.cx&&o.cx.length?" · "+o.cx.length+" שיעורים בוטלו":"")+
+   (ev.length?" · "+ev.length+" אירועים":"")+'</div>'+
+   '<div class="load"><i style="width:'+pc+'%;background:'+(pc>90?"var(--hot)":pc>60?"var(--warm)":"var(--cool)")+'"></i></div>'+
+   '</div></div></div>';
+ }
+ document.getElementById("lWeek").innerHTML=h;
+ document.getElementById("heatBox").innerHTML=heatHTML();
+}
+/* מפת עקביות: כל תא = יום שעבר, צבע לפי אחוז ביצוע (מתוכנן מול בוצע) */
+function heatHTML(){
+ var days=Object.keys(heat).sort().slice(-28);
+ if(!days.length)return '<div class="sub" style="margin:0">עוד אין נתונים — המפה מתחילה להתמלא מהיום הראשון שיסתיים.</div>';
+ var cells=days.map(function(k){
+  var h=heat[k],pc=h.t?Math.round(h.d/h.t*100):0,col=pc>=70?"var(--cool)":pc>=35?"var(--warm)":"var(--hot)";
+  return '<div onclick="showHeatDay(\''+k+'\')" title="'+k+'" style="aspect-ratio:1;border-radius:6px;cursor:pointer;background:'+col+';opacity:'+(0.25+0.75*pc/100).toFixed(2)+'"></div>';
+ }).join("");
+ var tot=0,dn=0;days.forEach(function(k){tot+=heat[k].t;dn+=heat[k].d});
+ return '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">'+cells+'</div>'+
+  '<div class="sub" id="heatSel" style="margin-top:8px">'+days.length+' ימים · ביצוע ממוצע '+(tot?Math.round(dn/tot*100):0)+'%</div>';
+}
+function showHeatDay(k){var h=heat[k],pc=h.t?Math.round(h.d/h.t*100):0;
+ document.getElementById("heatSel").textContent=heb(k)+": "+fm(h.d)+" מתוך "+fm(h.t)+" ("+pc+"%)"}
+/* דחיפות מטלה — עקרון אייזנהאואר, ציר הדחיפות: כמה זמן נשאר להגשה */
+function hwUrgency(h){
+ var d=df(h.due,tod());
+ if(d<=1)return{lab:"דחוף מאוד",col:"var(--hot)",bg:"var(--hot-soft)"};
+ if(d<=3)return{lab:"השבוע",col:"var(--warm)",bg:"var(--warm-soft)"};
+ return{lab:"יש זמן",col:"var(--mut)",bg:"var(--pn2)"};
+}
+function hwView(){
+ var t=tod(),list=hw.filter(function(x){return !x.done}).sort(function(a,b){return pr(a.due)-pr(b.due)});
+ document.getElementById("lHw").innerHTML=list.map(function(x){
+  var d=df(x.due,t),u=hwUrgency(x),hard=HARD.some(function(h){return x.sub.indexOf(h)>-1});
+  return '<div class="card" onclick="openHw(\''+x.id+'\')"><div class="row">'+
+   '<div class="days" style="color:'+(d<=1?"var(--hot)":"var(--pink)")+'">'+d+'<small>ימים</small></div>'+
+   '<div class="grow"><div class="ttl">'+(hard?"⭐ ":"")+esc(x.what)+'</div><div class="sub">'+esc(x.sub)+" · "+heb(x.due)+" · ~"+(x.min||30)+' דק\'</div></div>'+
+   '<span class="tag" style="background:'+u.bg+';color:'+u.col+'">'+u.lab+'</span></div></div>';
+ }).join("")||'<div class="empty">אין מטלות פתוחות. הוסף עם + כשאתה מקבל שיעורי בית.</div>';
+}
+function evView(){
+ var l=evts.slice().sort(function(a,b){return (a.rep==="weekly"?a.dow:9)-(b.rep==="weekly"?b.dow:9)||m2(a.s)-m2(b.s)});
+ document.getElementById("evCount").textContent=evts.length?evts.length+" אירועים":"";
+ document.getElementById("lEv").innerHTML=l.map(function(e){
+  var when=e.rep==="weekly"?"כל יום "+DAYS[e.dow]:heb(e.date);
+  return '<div class="card" onclick="openEv(\''+e.id+'\')"><div class="row">'+
+   '<div class="grow"><div class="ttl">'+esc(e.title)+'</div>'+
+   '<div class="sub">'+when+" · "+e.s+"–"+e.e+(e.blocks===false?" · לא חוסם":"")+'</div></div>'+
+   '<span class="tag ev">'+(e.rep==="weekly"?"קבוע":"חד-פעמי")+'</span></div></div>';
+ }).join("")||'<div class="empty">אין אירועים. הוסף חוגים, עבודה, אימונים או כל דבר שתופס לך זמן — והמערכת תתכנן סביבם.</div>';
+}
+function micro(){
+ var t=tod(),nx=exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).slice(0,2);
+ var h='<div class="sub" style="margin-bottom:8px">40 דקות ביום שאתה כבר בבית הספר. שליפה מהזיכרון בלבד — בלי לפתוח חומר חדש.</div>';
+ ["09:20–09:40","11:25–11:45"].forEach(function(tm,i){
+  var e=nx[i]||nx[0];
+  h+='<div class="mic"><b>'+tm+'</b><div class="grow">'+(e?
+   '<div style="font-weight:600">'+esc(e.sub)+'</div><div class="sub">'+esc(method(e.sub,"far"))+'</div>':
+   '<div class="sub">אין מבחן קרוב</div>')+'</div></div>';});
+ document.getElementById("lMicro").innerHTML=h;
+}
+var exSort="date";
+function exView(){
+ var t=tod(),cs=[["all","הכל"],["bagrut","בגרויות"],["matkonet","מתכונות"],["hagbara","הגברות"],["mivchan","מבחנים"]];
+ document.getElementById("chips").innerHTML=cs.map(function(c){
+  return '<div class="chip'+(filter===c[0]?" on":"")+'" onclick="setF(\''+c[0]+'\')">'+c[1]+'</div>'}).join("")+
+  '<div class="chip'+(exSort==="pri"?" on":"")+'" onclick="toggleSort()">⚡ מיון לפי עדיפות</div>';
+ var l=exams.filter(function(e){return pr(e.date)>=t&&(filter==="all"||e.type===filter)});
+ l.sort(exSort==="pri"?function(a,b){return priority(b)-priority(a)}:function(a,b){return pr(a.date)-pr(b.date)});
+ document.getElementById("lEx").innerHTML=(exSort==="pri"?'<div class="sub" style="margin:0 0 10px">מיון לפי דחיפות×חשיבות (אייזנהאואר): קרבה למבחן, משקל הבגרות/מתכונת, מקצוע קשה, ונושאים שסימנת כחלשים.</div>':"")+
+  l.map(function(e,idx){var d=df(e.date,t);
+  return '<div class="card" onclick="openEx(\''+e.id+'\')"><div class="row">'+
+   '<div class="days" style="color:'+col({type:e.type})+'">'+d+'<small>ימים</small></div>'+
+   '<div class="grow"><div class="ttl">'+(exSort==="pri"?'<span class="tag" style="margin-inline-end:5px">עדיפות #'+(idx+1)+'</span>':"")+esc(e.sub)+'</div><div class="sub">'+heb(e.date)+" · "+(prog[e.id]?"בוצעו "+prog[e.id]+" · נותרו ":"")+need(e)+' משבצות'+
+   (e.topics&&e.topics.length?" · "+e.topics.length+" נושאים":" · אין מטרים")+(e.sheet?" · "+esc(e.sheet):"")+'</div>'+
+   (e.topics&&e.topics.length?'<div class="lsn">'+e.topics.slice(0,6).map(function(x){return '<span>'+esc(x.n)+(x.wk?" ⚠":"")+'</span>'}).join("")+'</div>':"")+
+   '</div>'+
+   '<span class="tag '+TYPE[e.type].c+'">'+TYPE[e.type].l+'</span></div></div>'}).join("")
+  +'<button class="btn wide" onclick="openEx()">+ הוספת מבחן</button>';
+}
+function setF(f){filter=f;exView()}
+function toggleSort(){exSort=exSort==="pri"?"date":"pri";exView()}
+function setView(){
+ document.getElementById("capBox").innerHTML=[0,1,2,3,4,5,6].map(function(i){
+  var w=winWd(i),tt=TT[i];
+  var lab=(tt&&tt.l.length?"סיום "+tt.end+" → ":"")+hhmm(w.s)+"–"+hhmm(w.e);
+  return '<div class="dayline"><div class="dn">'+DAYS[i]+'<small>'+lab+'</small></div>'+
+   '<input type="range" min="0" max="300" step="15" value="'+S.cap[i]+'" oninput="cp('+i+',this.value)">'+
+   '<div class="mins" id="m'+i+'">'+fm(capWd(i))+'</div></div>'}).join("");
+ document.getElementById("sLen").value=S.len;document.getElementById("sHor").value=S.hor;
+ document.getElementById("sEnd").value=S.endH;document.getElementById("sLate").value=S.lateH;
+ document.getElementById("sTrv").value=S.travel;
+ document.getElementById("tSame").className="tgl"+(S.same?" on":"");
+ document.getElementById("tHard").className="tgl"+(S.hard?" on":"");
+ document.getElementById("tRes").className="tgl"+(S.resAuto?" on":"");
+ document.getElementById("resBox").innerHTML=[0,1,2,3,4,5,6].map(function(i){
+  var v=S.resAuto?learned(i):S.res[i];
+  return '<div class="dayline"><div class="dn">'+DAYS[i]+'</div>'+
+   (S.resAuto?'<div class="grow sub" style="margin:0">נלמד אוטומטית</div>':
+    '<input type="range" min="0" max="150" step="10" value="'+S.res[i]+'" oninput="rs('+i+',this.value)">')+
+   '<div class="mins" id="r'+i+'">'+fm(v)+'</div></div>'}).join("");
+ document.getElementById("wBox").innerHTML=["bagrut","matkonet","hagbara","mivchan","bochan"].map(function(t){
+  return '<div class="sw"><div>'+TYPE[t].l+'</div><input class="num" type="number" min="0" max="40" value="'+S.w[t]+'" onchange="wc(\''+t+'\',this.value)"></div>'}).join("");
+ var ks=Object.keys(ovr).filter(function(k){return pr(k)>=tod()}).sort();
+ document.getElementById("ovBox").innerHTML=(ks.map(function(k){
+  var o=ovr[k];
+  return '<div class="dayline"><div class="grow"><div style="font-weight:600">'+heb(k)+'</div>'+
+   '<div class="sub">'+(o.off?"אין לימודים":"בוטלו שיעורים "+(o.cx||[]).join(", "))+'</div></div>'+
+   '<button class="btn xs ghost" onclick="openOv(\''+k+'\')">שינוי</button>'+
+   '<button class="btn xs ghost" style="color:var(--hot)" onclick="delOv(\''+k+'\')">ביטול</button></div>'}).join("")||
+  '<div class="sub" style="margin:0">אין שינויים. כשמבטלים לך שיעור — הוסף כאן והזמן ייפתח אוטומטית.</div>')+
+  '<button class="btn wide ghost" onclick="openOv()">+ ביטול שיעור / יום חופש</button>';
+ document.getElementById("ttBox").innerHTML=[0,1,2,3,4].map(function(i){
+  var u={};TT[i].l.forEach(function(x){u[x[1]]=(u[x[1]]||0)+1});
+  return '<div class="dayline"><div class="dn">'+DAYS[i]+'<small>'+TT[i].end+'</small></div><div class="grow"><div class="lsn">'+
+   Object.keys(u).map(function(n){return '<span>'+esc(n)+(u[n]>1?" ×"+u[n]:"")+'</span>'}).join("")+'</div></div></div>'}).join("");
+ document.getElementById("gcid").value=ST("l_gc")||"";
+ document.getElementById("enBox").innerHTML=[["none","ללא העדפה"],["early","מיד כשמתיישב"],["mid","באמצע"],["late","לקראת הסוף"]].map(function(o){
+  return '<div class="qb'+((S.energy||"none")===o[0]?" on":"")+'" onclick="setEnergy(\''+o[0]+'\')">'+o[1]+'</div>'}).join("");
+ var cks=Object.keys(calib);
+ document.getElementById("cbBox").innerHTML=(cks.length?cks.map(function(k){var m=calib[k];
+  return '<div class="dayline"><div class="grow" style="font-weight:600">'+esc(k)+'</div><div class="sub" style="margin:0">'+
+   (m>1.03?"לוקח לך פי "+m.toFixed(2)+" מהמשוער — הוקצה יותר זמן":m<.97?"מהיר פי "+(1/m).toFixed(2)+" — הוקצה פחות":"מדויק")+'</div></div>'}).join("")+
+  '<button class="btn xs ghost" style="margin-top:8px" onclick="calibReset()">איפוס כיול</button>':
+  '<div class="sub" style="margin:0">אחרי שתסמן משבצת כבוצעה, ענה "כמה זמן לקח?" — וההערכות למקצוע יתכווננו לבד.</div>');
+}
+function setEnergy(v){S.energy=v;render()}
+/* ממוצע נע: כל דיווח מזיז את המכפיל 30% לכיוון שלו, בין 0.6 ל-1.8 */
+function calibLog(subEnc,sig){var pk=paceKeyOf(decodeURIComponent(subEnc));if(!pk)return;
+ calib[pk]=Math.max(.6,Math.min(1.8,(calib[pk]||1)*.7+sig*.3));
+ toast(sig>1?"נרשם — אקצה יותר זמן ל"+pk:sig<1?"נרשם — "+pk+" הולך לך מהר":"נרשם — ההערכה מדויקת");save();render()}
+function calibReset(){calib={};render()}
+function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+ clearTimeout(window._toastT);window._toastT=setTimeout(function(){t.classList.remove("show")},2200)}
+/* סיכום קריא לשיתוף — דרך שיתוף המערכת אם יש, אחרת ללוח */
+function shareSummary(){
+ var t=tod(),L=["📅 השבוע של "+heb(key(t))+" — לומד",""];
+ for(var i=0;i<7;i++){
+  var d=ad(t,i),k=key(d),arr=plan[k]||[],mins=arr.reduce(function(a,s){return a+(s.min||S.len)},0),nm={};
+  arr.forEach(function(s){var n=s.kind==="hw"?"שי\"ב "+s.sub:s.sub;nm[n]=1});
+  var ex=exams.filter(function(e){return e.date===k}).map(function(e){return "🔴 "+TYPE[e.type].l+" "+e.sub});
+  L.push((i===0?"היום":i===1?"מחר":DAYS[d.getDay()]+" "+d.getDate()+"."+(d.getMonth()+1))+": "+
+   (ex.length?ex.join(", ")+" · ":"")+(mins?fm(mins)+" — "+Object.keys(nm).join(", "):"פנוי"));
+ }
+ var nx=exams.filter(function(e){var g=df(e.date,t);return g>=0&&g<=14}).sort(function(a,b){return pr(a.date)-pr(b.date)});
+ if(nx.length){L.push("","מבחנים ב-14 הימים הקרובים:");nx.forEach(function(e){L.push("• "+e.sub+" ("+TYPE[e.type].l+") — "+heb(e.date)+" — עוד "+df(e.date,t)+" ימים")})}
+ var text=L.join("\n");
+ if(navigator.share)navigator.share({title:"סיכום שבוע — לומד",text:text}).catch(function(){});
+ else if(navigator.clipboard)navigator.clipboard.writeText(text).then(function(){toast("הועתק ללוח — הדבק בהודעה")},function(){toast("לא הצלחתי להעתיק")});
+ else toast("שיתוף לא נתמך בדפדפן הזה");
+}
+/* תצוגה מקדימה של אירוע: כמה מזמן הלימוד הוא יאכל, לפני שמתחייבים */
+function evImpact(){
+ var box=document.getElementById("evImp");if(!box)return;
+ if(!document.getElementById("eB").classList.contains("on")){box.innerHTML='<span style="color:var(--cool)">רק תזכורת על הציר — לא חוסם זמן לימוד.</span>';return}
+ var rep=document.getElementById("eR").value,s=m2(document.getElementById("eS").value||"0:0"),e=m2(document.getElementById("eE").value||"0:0");
+ if(e<=s){box.textContent="";return}
+ var wd;if(rep==="weekly")wd=+document.getElementById("eW").value;
+ else{var dv=document.getElementById("eD").value;if(!dv){box.textContent="";return}wd=pr(dv).getDay()}
+ var w=winWd(wd),core=Math.max(0,Math.min(e,w.e)-Math.max(s,w.s)),lateX=Math.max(0,Math.min(e,S.lateH*60)-Math.max(s,w.e));
+ if(core<=0&&lateX<=0){box.innerHTML='<span style="color:var(--cool)">✓ מחוץ לחלון הלימוד של יום '+DAYS[wd]+' ('+hhmm(w.s)+'–'+hhmm(w.e)+') — לא פוגע בתוכנית.</span>';return}
+ var cap=capWd(wd),pct=cap?Math.round(core/cap*100):0;
+ box.innerHTML='<span style="color:var(--warm)">⚠ תופס '+fm(core)+(rep==="weekly"?" בכל שבוע":"")+' מתוך '+fm(cap)+' פנויות ביום '+DAYS[wd]+' ('+pct+'%)'+
+  (lateX>0?' + '+fm(lateX)+' מגבול החירום':'')+'.'+(pct>=60?' זה יום שרוף — שקול יום אחר.':'')+'</span>';
+}
+function fm(m){return m===0?"—":(m>=60?Math.floor(m/60)+"ש'"+(m%60?" "+m%60+"ד'":""):m+" ד'")}
+function cp(i,v){S.cap[i]=+v;document.getElementById("m"+i).textContent=fm(+v);clearTimeout(window._t);window._t=setTimeout(render,260)}
+function rs(i,v){S.res[i]=+v;document.getElementById("r"+i).textContent=fm(+v);clearTimeout(window._r);window._r=setTimeout(render,260)}
+function wc(t,v){S.w[t]=+v;render()}
+function tg(k){S[k]=!S[k];render()}
+document.getElementById("sLen").onchange=function(){S.len=Math.max(20,+this.value||50);render()};
+document.getElementById("sHor").onchange=function(){S.hor=Math.max(3,+this.value||21);render()};
+document.getElementById("sEnd").onchange=function(){S.endH=Math.min(23,Math.max(15,+this.value||19));render()};
+document.getElementById("sLate").onchange=function(){S.lateH=Math.min(24,Math.max(S.endH,+this.value||21));render()};
+document.getElementById("sTrv").onchange=function(){S.travel=Math.max(0,+this.value||0);render()};
+
+/* ---------- sheets ---------- */
+var edit=null;
+/* פתיחה וסגירה סינכרוניות — הדעיכה של המסך המעומעם נעשית ב-CSS, בלי טיימר שעלול להיתקע ברקע */
+function openS(html){document.getElementById("shBody").innerHTML=html;
+ document.getElementById("veil").classList.add("on");document.getElementById("sheet").classList.add("on")}
+function closeS(){document.getElementById("sheet").classList.remove("on");document.getElementById("veil").classList.remove("on")}
+function openAdd(){
+ openS('<h3>מה להוסיף</h3>'+
+  '<div class="btnrow"><button class="btn pri grow" onclick="closeS();setTimeout(openHw,240)">מטלה / שיעורי בית</button></div>'+
+  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openEv()},240)">אירוע (חוג, עבודה, משפחה)</button></div>'+
+  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openOv(viewK)},240)">ביטול שיעור / יום חופש</button></div>'+
+  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openEx()},240)">מבחן</button></div>');
+}
+function openHw(id){
+ edit=id||null;var x=id?hw.filter(function(y){return y.id===id})[0]:null;
+ var subs=["מתמטיקה","פיזיקה","הנדסת תוכנה","אנגלית","לשון","ספרות","היסטוריה",'תנ"ך'];
+ openS('<h3>'+(x?"עריכת מטלה":"שיעורי בית חדשים")+'</h3>'+
+  '<div class="fld"><label>מקצוע</label><input id="fS" value="'+(x?esc(x.sub):"")+'" placeholder="פיזיקה">'+
+  '<div class="quick">'+subs.map(function(s){return '<div class="qb" onclick="document.getElementById(\'fS\').value=\''+s+'\'">'+s+'</div>'}).join("")+'</div></div>'+
+  '<div class="fld"><label>מה צריך לעשות</label><textarea id="fW" placeholder="תרגילים 12-18 עמוד 94">'+(x?esc(x.what):"")+'</textarea></div>'+
+  '<div class="fld"><label>להגשה בתאריך</label><input id="fD" type="date" value="'+(x?x.due:key(ad(tod(),1)))+'"></div>'+
+  '<div class="fld"><label>כמה זמן זה ייקח (דקות)</label><input id="fM" type="number" min="10" max="300" step="10" value="'+(x?(x.min||30):30)+'"></div>'+
+  '<div class="btnrow" style="margin-top:16px"><button class="btn pri grow" onclick="saveHw()">שמירה</button>'+
+  (x?'<button class="btn" onclick="doneHw()">בוצע</button><button class="btn" onclick="delHw()" style="color:var(--hot)">מחיקה</button>':'')+
+  '<button class="btn" onclick="closeS()">ביטול</button></div>');
+}
+function saveHw(){
+ var o={sub:(document.getElementById("fS").value||"כללי").trim(),what:(document.getElementById("fW").value||"מטלה").trim(),
+  due:document.getElementById("fD").value,min:+document.getElementById("fM").value||30,done:false};
+ if(edit)hw=hw.map(function(x){return x.id===edit?Object.assign(x,o):x});
+ else{o.id="h"+Date.now();hw.push(o)}
+ closeS();render();
+}
+function doneHw(){hw=hw.map(function(x){return x.id===edit?Object.assign(x,{done:true}):x});closeS();render()}
+function delHw(){hw=hw.filter(function(x){return x.id!==edit});closeS();render()}
+
+/* --- אירועים --- */
+function openEv(id){
+ edit=id||null;var e=id?evts.filter(function(x){return x.id===id})[0]:null;
+ var presets=["חוג","עבודה","אימון","משפחה","חברים","נסיעה","שיעור פרטי","מנוחה"];
+ var wk=e?e.rep==="weekly":false;
+ openS('<h3>'+(e?"עריכת אירוע":"אירוע חדש")+'</h3>'+
+  '<div class="fld"><label>מה זה</label><input id="eT" value="'+(e?esc(e.title):"")+'" placeholder="אימון כדורסל">'+
+  '<div class="quick">'+presets.map(function(s){return '<div class="qb" onclick="document.getElementById(\'eT\').value=\''+s+'\'">'+s+'</div>'}).join("")+'</div></div>'+
+  '<div class="fld"><label>מתי</label><select id="eR" onchange="evMode();evImpact()">'+
+   '<option value="once"'+(wk?"":" selected")+'>חד-פעמי</option>'+
+   '<option value="weekly"'+(wk?" selected":"")+'>כל שבוע</option></select></div>'+
+  '<div class="fld" id="eDateW"><label>תאריך</label><input id="eD" type="date" value="'+((e&&e.date)||viewK||key(tod()))+'" onchange="evImpact()"></div>'+
+  '<div class="fld" id="eDowW"><label>יום בשבוע</label><select id="eW" onchange="evImpact()">'+DAYS.map(function(n,i){
+    return '<option value="'+i+'"'+(e&&e.dow===i?" selected":"")+'>'+n+'</option>'}).join("")+'</select></div>'+
+  '<div class="two"><div class="fld"><label>משעה</label><input id="eS" type="time" value="'+(e?e.s:"16:00")+'" oninput="evImpact()"></div>'+
+  '<div class="fld"><label>עד שעה</label><input id="eE" type="time" value="'+(e?e.e:"18:00")+'" oninput="evImpact()"></div></div>'+
+  '<div class="sub" id="evImp" style="margin:-4px 0 10px"></div>'+
+  '<div class="sw" style="margin-bottom:10px"><div>חוסם לימודים<div class="sub">כבוי = רק תזכורת על הציר</div></div>'+
+   '<div class="tgl'+(e&&e.blocks===false?"":" on")+'" id="eB" onclick="this.classList.toggle(\'on\');evImpact()"><i></i></div></div>'+
+  '<div class="btnrow" style="margin-top:12px"><button class="btn pri grow" onclick="saveEv()">שמירה</button>'+
+  (e?'<button class="btn" onclick="delEv()" style="color:var(--hot)">מחיקה</button>':'')+
+  '<button class="btn" onclick="closeS()">ביטול</button></div>');
+ evMode();evImpact();
+}
+function evMode(){
+ var w=document.getElementById("eR").value==="weekly";
+ document.getElementById("eDateW").style.display=w?"none":"block";
+ document.getElementById("eDowW").style.display=w?"block":"none";
+}
+function saveEv(){
+ var rep=document.getElementById("eR").value;
+ var s=document.getElementById("eS").value||"16:00",e2=document.getElementById("eE").value||"18:00";
+ if(m2(e2)<=m2(s)){alert("שעת הסיום צריכה להיות אחרי שעת ההתחלה.");return}
+ var o={title:(document.getElementById("eT").value||"אירוע").trim(),rep:rep,
+  date:rep==="once"?document.getElementById("eD").value:null,
+  dow:rep==="weekly"?+document.getElementById("eW").value:null,
+  from:rep==="weekly"?key(tod()):null,
+  s:s,e:e2,blocks:document.getElementById("eB").classList.contains("on")};
+ if(edit)evts=evts.map(function(x){return x.id===edit?Object.assign(x,o):x});
+ else{o.id="v"+Date.now();evts.push(o)}
+ if(o.rep==="once"&&o.date)viewK=o.date;
+ closeS();render();
+}
+function delEv(){evts=evts.filter(function(x){return x.id!==edit});closeS();render()}
+
+/* --- ביטולי שיעורים --- */
+function openOv(k){
+ var kk=k||viewK||key(tod()),o=ovr[kk]||{};
+ openS('<h3>שינוי במערכת</h3>'+
+  '<div class="fld"><label>תאריך</label><input id="oD" type="date" value="'+kk+'" onchange="openOv(this.value)"></div>'+
+  '<div class="sw"><div>אין לימודים בכלל<div class="sub">חופש, שביתה, טיול, יום מחלה</div></div>'+
+   '<div class="tgl'+(o.off?" on":"")+'" id="oOff" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'+
+  '<div class="sub" style="margin:12px 0 6px">או סמן שיעורים שבוטלו ביום הזה:</div>'+
+  ovLessons(kk,o)+
+  '<div class="btnrow" style="margin-top:14px"><button class="btn pri grow" onclick="saveOv()">שמירה</button>'+
+  '<button class="btn" onclick="delOv(\''+kk+'\')">ניקוי</button>'+
+  '<button class="btn" onclick="closeS()">ביטול</button></div>');
+}
+function ovLessons(k,o){
+ var l=(TT[pr(k).getDay()]||{l:[]}).l,cx=o.cx||[];
+ if(!l.length)return '<div class="sub">אין מערכת ביום הזה.</div>';
+ return '<div class="quick" id="oL">'+l.map(function(x){
+  var b=BELL[x[0]];
+  return '<div class="qb'+(cx.indexOf(x[0])>-1?" on":"")+'" data-n="'+x[0]+'" onclick="this.classList.toggle(\'on\')">'+
+   x[0]+". "+esc(x[1])+'<div style="font-size:10px;opacity:.6">'+(b?b[0]:"")+'</div></div>'}).join("")+'</div>';
+}
+function saveOv(){
+ var k=document.getElementById("oD").value,off=document.getElementById("oOff").classList.contains("on");
+ var cx=[];Array.prototype.forEach.call(document.querySelectorAll("#oL .qb.on"),function(b){cx.push(+b.dataset.n)});
+ if(!off&&!cx.length)delete ovr[k];else ovr[k]=off?{off:true}:{cx:cx};
+ viewK=k;closeS();render();
+}
+function delOv(k){delete ovr[k];closeS();render()}
+
+/* --- מבחנים וחומר --- */
+var topicMeta={};
+function openEx(id){
+ edit=id||null;var e=id?exById(id):null;
+ topicMeta={};if(e&&e.topics)e.topics.forEach(function(t){topicMeta[t.n]={n:t.n,w:t.w||2,wk:!!t.wk}});
+ openS('<h3>'+(e?"עריכת מבחן"+" — "+esc(e.sub):"מבחן חדש")+'</h3>'+
+  '<div class="fld"><label>מקצוע</label><input id="fS" value="'+(e?esc(e.sub):"")+'" oninput="updTexHint()"></div>'+
+  '<div class="fld"><label>סוג</label><select id="fT">'+["bagrut","matkonet","hagbara","mivchan","bochan"].map(function(t){
+   return '<option value="'+t+'"'+(e&&e.type===t?" selected":"")+'>'+TYPE[t].l+'</option>'}).join("")+'</select></div>'+
+  '<div class="fld"><label>תאריך</label><input id="fD" type="date" value="'+(e?e.date:key(ad(tod(),7)))+'"></div>'+
+  '<div class="fld"><label>נושאים מדף המטרים <span style="color:var(--dim)">(מופרדים בפסיק)</span></label>'+
+  '<textarea id="fTop" oninput="clearTimeout(window._tt);window._tt=setTimeout(renderTopicCtl,280)" placeholder="חשמל סטטי, מעגלים, כוח מגנטי">'+(e&&e.topics?esc(e.topics.map(function(t){return t.n}).join(", ")):"")+'</textarea>'+
+  '<div id="fTopCtl"></div>'+
+  '<div class="sub">אפשר לשנות בכל שלב — התוכנית מתחלקת מחדש מיד. ב-3 הימים האחרונים הכל עובר לחזרה מעורבת, בדגש על הנושאים החלשים.</div></div>'+
+  '<div class="fld"><label>מאיפה מתרגלים</label><input id="fSh" value="'+(e&&e.sheet?esc(e.sheet):"")+'" placeholder="שאלון 581, פרקים 3-5"></div>'+
+  '<div class="two"><div class="fld"><label>סה"כ תרגילים בחומר <span style="color:var(--dim)">(אופציונלי)</span></label>'+
+  '<input id="fTex" type="number" min="0" step="1" value="'+(e&&e.tex?e.tex:"")+'" placeholder="למשל 40" oninput="updTexHint()"></div>'+
+  '<div class="fld"><label>מספר משבצות (ריק = אוטומטי)</label><input id="fN" type="number" min="0" max="60" value="'+(e&&e.ses!=null?e.ses:"")+'" placeholder="אוטומטי"></div></div>'+
+  '<div class="sub" id="texHint" style="margin:-6px 0 10px"></div>'+
+  (e?'<div class="btnrow" style="margin-bottom:12px"><button class="btn sm ghost grow" onclick="showPlan(\''+e.id+'\')">תוכנית התרגול המלאה</button></div><div id="pvPlan"></div>':'')+
+  '<div class="btnrow" style="margin-top:10px"><button class="btn pri grow" onclick="saveEx()">שמירה</button>'+
+  (e?'<button class="btn" onclick="delEx()" style="color:var(--hot)">מחיקה</button>':'')+
+  '<button class="btn" onclick="closeS()">ביטול</button></div>');
+ renderTopicCtl();updTexHint();
+}
+/* בונה את שורות הבקרה (היקף חומר + חלש בנושא) לכל שם נושא שהוקלד, בלי לאבד מה שכבר סומן */
+function renderTopicCtl(){
+ var box=document.getElementById("fTopCtl");if(!box)return;
+ var names=(document.getElementById("fTop").value||"").split(/[,\n]/).map(function(x){return x.trim()}).filter(Boolean);
+ var uniq=[];names.forEach(function(n){if(uniq.indexOf(n)<0)uniq.push(n)});
+ uniq.forEach(function(n){if(!topicMeta[n])topicMeta[n]={n:n,w:2,wk:false}});
+ box.innerHTML=uniq.length?('<div class="sub" style="margin:8px 0 2px">כמות חומר וביטחון לכל נושא — קובע לו כמה משבצות יקבל:</div>'+
+  uniq.map(function(n){return topicRow(topicMeta[n])}).join("")):"";
+}
+function topicRow(t){
+ var nEnc=encodeURIComponent(t.n),labs=["מעט","בינוני","הרבה"];
+ return '<div class="dayline" style="padding:7px 0"><div class="grow" style="font-weight:600;font-size:14px">'+esc(t.n)+'</div>'+
+  '<div class="quick" style="margin:0">'+
+  [1,2,3].map(function(w){return '<div class="qb'+(t.w===w?" on":"")+'" onclick="setTW(\''+nEnc+'\','+w+')">'+labs[w-1]+'</div>'}).join("")+
+  '<div class="qb'+(t.wk?" on":"")+'" style="'+(t.wk?"background:var(--hot);border-color:var(--hot);color:#fff":"")+'" onclick="setTWk(\''+nEnc+'\')">חלש בנושא</div>'+
+  '</div></div>';
+}
+function setTW(nameEnc,w){var n=decodeURIComponent(nameEnc);topicMeta[n].w=w;renderTopicCtl()}
+function setTWk(nameEnc){var n=decodeURIComponent(nameEnc);topicMeta[n].wk=!topicMeta[n].wk;renderTopicCtl()}
+/* ניתוח כמות: ממיר "סה"כ תרגילים" לזמן עבודה משוער ולמספר משבצות מומלץ, לפי קצב המקצוע */
+function updTexHint(){
+ var hint=document.getElementById("texHint");if(!hint)return;
+ var sub=(document.getElementById("fS").value||"").trim(),tex=+document.getElementById("fTex").value||0;
+ var pace=paceOf(sub);
+ if(tex&&pace){var mins=tex*pace,ses=Math.max(2,Math.ceil(mins/S.len));
+  hint.textContent="≈"+fm(mins)+" עבודה בסך הכול → מומלץ "+ses+" משבצות של "+S.len+" ד'.";}
+ else if(tex&&!pace)hint.textContent="אין נתוני קצב למקצוע הזה עדיין — ייקבע לפי סוג המבחן וקושי.";
+ else hint.textContent="";
+}
+/* התוכנית שנגזרת מהחומר: איזה נושא, באיזה יום, כמה, ואיך */
+function showPlan(id){
+ var e=exById(id),out=[];
+ for(var k in plan)plan[k].forEach(function(s){if(s.kind==="ex"&&s.id===id)out.push({k:k,s:s})});
+ out.sort(function(a,b){return a.k<b.k?-1:1});
+ var box=document.getElementById("pvPlan");
+ if(!out.length){box.innerHTML='<div class="empty">אין עדיין משבצות. הוסף זמן פנוי בהגדרות או קרב את התאריך.</div>';return}
+ box.innerHTML='<div class="card" style="margin-bottom:12px">'+out.map(function(o){
+  var left=df(e.date,pr(o.k));
+  return '<div class="dayline"><div class="dn">'+heb(o.k).replace("יום ","")+
+   '<small>'+hhmm(o.s.t0)+'</small></div><div class="grow"><div style="font-weight:600;font-size:14px">'+
+   esc(o.s.topic||"כל החומר")+'</div><div class="sub">'+esc(recipe(e,left,o.s.min||S.len,o.s.topic))+'</div></div></div>';
+ }).join("")+'</div>';
+}
+function saveEx(){
+ var v=document.getElementById("fN").value;
+ var names=(document.getElementById("fTop").value||"").split(/[,\n]/).map(function(x){return x.trim()}).filter(Boolean);
+ var uniq=[];names.forEach(function(n){if(uniq.indexOf(n)<0)uniq.push(n)});
+ var tp=uniq.map(function(n){return topicMeta[n]||{n:n,w:2,wk:false}});
+ var tex=+document.getElementById("fTex").value||null;
+ var o={sub:(document.getElementById("fS").value||"מבחן").trim(),type:document.getElementById("fT").value,
+  date:document.getElementById("fD").value,ses:v===""?null:+v,topics:tp,tex:tex,sheet:document.getElementById("fSh").value.trim()};
+ if(edit)exams=exams.map(function(x){return x.id===edit?Object.assign(x,o):x});
+ else{o.id="u"+Date.now();exams.push(o)}
+ closeS();render();
+}
+function delEx(){exams=exams.filter(function(x){return x.id!==edit});
+ delete prog[edit];for(var k in seen)if(k.indexOf(edit+"|")===0)delete seen[k];closeS();render()}
+
+/* ---------- google classroom (מופעל כשיש Client ID) ---------- */
+function saveGC(){ST("l_gc",document.getElementById("gcid").value.trim());
+ document.getElementById("gcStat").textContent="נשמר. לחץ סנכרון.";}
+function gcSync(){
+ var cid=ST("l_gc");var st=document.getElementById("gcStat");
+ if(!cid){st.textContent="חסר Client ID.";return}
+ if(!window.google||!google.accounts){st.textContent="הספרייה של גוגל לא נטענה (צריך אינטרנט).";return}
+ st.textContent="מתחבר...";
+ google.accounts.oauth2.initTokenClient({client_id:cid,
+  scope:"https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/classroom.courses.readonly",
+  callback:function(r){if(!r.access_token){st.textContent="ההתחברות נכשלה.";return}pull(r.access_token,st)}}).requestAccessToken();
+}
+function pull(tok,st){
+ var H={Authorization:"Bearer "+tok};
+ fetch("https://classroom.googleapis.com/v1/courses?courseStates=ACTIVE",{headers:H})
+  .then(function(r){return r.json()}).then(function(d){
+   var cs=d.courses||[];if(!cs.length){st.textContent="לא נמצאו קורסים.";return}
+   return Promise.all(cs.map(function(c){
+    return fetch("https://classroom.googleapis.com/v1/courses/"+c.id+"/courseWork",{headers:H})
+     .then(function(r){return r.json()}).then(function(w){return{c:c,w:w.courseWork||[]}})}))
+    .then(function(all){
+     var live={},n=0;
+     all.forEach(function(x){x.w.forEach(function(w){
+      if(!w.dueDate)return;var due=w.dueDate.year+"-"+p2(w.dueDate.month)+"-"+p2(w.dueDate.day);
+      var gid="gc"+w.id;live[gid]=1;
+      var ex=hw.filter(function(h){return h.id===gid})[0];
+      if(ex){ex.sub=x.c.name;ex.what=w.title;ex.due=due}
+      else{hw.push({id:gid,sub:x.c.name,what:w.title,due:due,min:30,done:false});n++}
+     })});
+     /* מחיקה בקלאסרום -> מחיקה כאן */
+     hw=hw.filter(function(h){return h.id.indexOf("gc")!==0||live[h.id]});
+     st.textContent="סונכרן. "+n+" מטלות חדשות.";render();
+    })})
+  .catch(function(){st.textContent="שגיאה בסנכרון."});
+}
+
+/* ---------- misc ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function esc2(s){return String(s)}
+var PTITLE={today:"היום",week:"14 הימים הקרובים",hw:"מטלות ואירועים",ex:"מבחנים",set:"הגדרות"};
+function go(p){["today","week","hw","ex","set"].forEach(function(x){document.getElementById("p-"+x).classList.toggle("on",x===p)});
+ Array.prototype.forEach.call(document.querySelectorAll("nav button"),function(b){b.classList.toggle("on",b.dataset.p===p)});
+ document.getElementById("fab").classList.toggle("on",p==="hw"||p==="today");
+ document.getElementById("tbTitle").textContent=PTITLE[p]||"לומד";
+ document.getElementById("tbSub").textContent=p==="today"?heb(key(tod())):"";
+ window.scrollTo(0,0)}
+function rsDone(){if(confirm("לאפס את כל סימוני הביצוע?")){done={};render()}}
+function rsAll(){if(confirm("לאפס הכל?")){["l_s","l_ex","l_hw","l_dn","l_ev","l_ov","l_pg","l_sn","l_cb","l_ht"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});mem={};load();render()}}
+function ics(){
+ var L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//lomed//HE","CALSCALE:GREGORIAN"];
+ function dt(k,m){return k.replace(/-/g,"")+"T"+p2(Math.floor(m/60))+p2(m%60)+"00"}
+ function allDay(u,a,b,t,al){L.push("BEGIN:VEVENT","UID:"+u+"@lomed","DTSTAMP:"+key(tod()).replace(/-/g,"")+"T000000Z",
+  "DTSTART;VALUE=DATE:"+a,"DTEND;VALUE=DATE:"+b,"SUMMARY:"+t);
+  if(al)L.push("BEGIN:VALARM","TRIGGER:-PT14H","ACTION:DISPLAY","DESCRIPTION:"+t,"END:VALARM");L.push("END:VEVENT")}
+ function timed(u,k,s,e,t,d){L.push("BEGIN:VEVENT","UID:"+u+"@lomed","DTSTAMP:"+key(tod()).replace(/-/g,"")+"T000000Z",
+  "DTSTART:"+dt(k,s),"DTEND:"+dt(k,e),"SUMMARY:"+t,"DESCRIPTION:"+(d||""),
+  "BEGIN:VALARM","TRIGGER:-PT10M","ACTION:DISPLAY","DESCRIPTION:"+t,"END:VALARM","END:VEVENT")}
+ exams.filter(function(e){return pr(e.date)>=tod()}).forEach(function(e,i){
+  allDay("x"+i,e.date.replace(/-/g,""),key(ad(pr(e.date),1)).replace(/-/g,""),TYPE[e.type].l+" "+e.sub,true)});
+ var n=0;
+ for(var k in plan)plan[k].forEach(function(s){
+  if(s.t0==null)return;
+  var t,d="";
+  if(s.kind==="hw"){t="מטלה: "+s.sub+" — "+s.what}
+  else{var e=exById(s.id)||{sub:s.sub,sheet:"",date:s.date};
+   t="למידה: "+s.sub+(s.topic?" · "+s.topic:"");d=recipe(e,df(s.date,pr(k)),s.min||S.len,s.topic)}
+  timed("p"+(n++),k,s.t0,s.t1,t,d);
+ });
+ L.push("END:VCALENDAR");
+ var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([L.join("\r\n")],{type:"text/calendar"}));
+ a.download="lomed.ics";document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+load();render();
+document.getElementById("tbSub").textContent=heb(key(tod()));
+setInterval(function(){if(viewK===key(tod())&&document.getElementById("p-today").classList.contains("on"))dayView()},60000);
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
+
+/* ---------- sheet: direct manipulation drag-to-dismiss (interruptible, rubber-band, velocity-aware) ---------- */
+(function(){
+ var sheetEl,zone,dragging=false,curY=0,lastY=0,lastT=0,vel=0,reduced=false;
+ try{reduced=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+ function rubber(over){var d=90,c=.55;return(over*d*c)/(d+c*Math.abs(over))}
+ function onDown(e){
+  if(reduced)return;
+  sheetEl=document.getElementById("sheet");
+  dragging=true;curY=0;lastY=e.clientY;lastT=performance.now();vel=0;
+  sheetEl.style.transition="none";
+  try{zone.setPointerCapture(e.pointerId)}catch(er){}
+ }
+ function onMove(e){
+  if(!dragging)return;
+  var now=performance.now(),dt=now-lastT,ddy=e.clientY-lastY;
+  if(dt>4){vel=ddy/dt;lastT=now} /* ignore sub-4ms gaps — near-zero dt spikes velocity artificially */
+  lastY=e.clientY;
+  curY+=ddy;
+  var show=curY<0?rubber(curY):curY;
+  sheetEl.style.transform="translateY("+show+"px)";
+ }
+ function onUp(){
+  if(!dragging)return;dragging=false;
+  sheetEl.style.transition="";
+  var h=sheetEl.offsetHeight||400,shown=curY<0?rubber(curY):curY;
+  if(shown>Math.max(60,h*0.28)||vel>0.6){
+   /* ממשיכים באותו כיוון מהמקום הנוכחי; המצב הלוגי נסגר מיד, כך שגם אם הטיימר מתעכב הגיליון כבר מחוץ למסך */
+   sheetEl.style.transform="translateY("+h+"px)";
+   sheetEl.classList.remove("on");document.getElementById("veil").classList.remove("on");
+   setTimeout(function(){sheetEl.style.transform=""},350);
+  }else sheetEl.style.transform="";
+ }
+ zone=document.getElementById("handZone");
+ zone.addEventListener("pointerdown",onDown);
+ zone.addEventListener("pointermove",onMove);
+ zone.addEventListener("pointerup",onUp);
+ zone.addEventListener("pointercancel",onUp);
+ document.addEventListener("touchstart",function(){},{passive:true}); /* enables :active feedback on iOS Safari */
+})();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
