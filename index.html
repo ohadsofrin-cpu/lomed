@@ -354,6 +354,20 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
 .stkFire.out.near .fire{opacity:.5;filter:grayscale(.2)}
 .stkFire.out.near::before{opacity:.5;animation-duration:1.6s}
 .stkFire.out.near .stkN{border-color:var(--warm);color:var(--warm)}
+
+/* ---- צילום המערכת ---- */
+.scanBox{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:11px;margin-bottom:12px}
+.scanImg{width:100%;max-height:190px;object-fit:contain;border-radius:10px;background:var(--bg);margin-bottom:10px}
+.scanRow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.scanSpin{width:18px;height:18px;flex:0 0 18px;border-radius:50%;border:2px solid var(--ln);
+ border-top-color:var(--cool);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.shBox{background:rgba(90,200,168,.07);border:1px solid rgba(90,200,168,.3);border-radius:14px;padding:12px;margin-bottom:12px;
+ display:flex;flex-direction:column;gap:2px}
+.shRow{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--ln)}
+.shRow:first-of-type{border-top:0}
+.shRow b{display:block;font-size:14.5px}
 </style>
 </head>
 <body>
@@ -679,7 +693,7 @@ function wizGo(n){
  if(n===2&&!WZ.cls){toast("צריך לבחור כיתה");return}
  WZ.step=n;wizRender();window.scrollTo(0,0);
 }
-function wizPick(k,v){WZ[k]=v;wizRender()}
+function wizPick(k,v){WZ[k]=v;if(k==="cls"){SHARE.list=null;SHARE.loaded=""}wizRender()}
 function wizSub(s){var i=WZ.subs.indexOf(s);if(i<0)WZ.subs.push(s);else WZ.subs.splice(i,1);wizRender()}
 function wizDay(d){WZ.day=d;wizRender()}
 function wizSet(n,v){WZ.grid[WZ.day]=WZ.grid[WZ.day]||{};WZ.grid[WZ.day][n]=v;wizRender()}
@@ -732,6 +746,26 @@ function wizRender(){
   var opts=wizOpts(),g=WZ.grid[WZ.day]||{};
   h='<div class="wizStep">4 מתוך 4</div><h2 class="wizH">המערכת השבועית</h2>'+
     '<p class="wizP">מלא רק שיעורים אמיתיים. השיעור האחרון שתמלא קובע מתי אתה משתחרר, ומזה נגזר כמה זמן פנוי יש לך.</p>'+
+    (SHARE.busy?'<div class="shBox"><div class="scanSpin"></div> <span class="sub" style="margin:0">מחפש מערכת של יא\''+WZ.cls+'...</span></div>':
+     (SHARE.list===null?'<div class="shBox"><button class="btn sm" onclick="shareLook()">חיפוש מערכת של יא\''+WZ.cls+'</button>'+
+       '<div class="sub" style="margin-top:6px">מישהו מהכיתה שלך אולי כבר העלה אותה.</div></div>':
+     (SHARE.list.length?'<div class="shBox"><div class="sub" style="margin:0 0 8px">מערכות של יא\''+WZ.cls+' שכבר הועלו:</div>'+
+       SHARE.list.slice(0,3).map(function(it,i){
+        return '<div class="shRow"><div class="grow"><b>'+esc(it.name||"תלמיד")+'</b>'+
+         '<span class="sub" style="margin:0">'+(it.count||0)+' שיעורים</span></div>'+
+         '<button class="btn xs" onclick="shareLoad('+i+')">טעינה</button></div>'}).join("")+
+       (SHARE.loaded?'<div class="sub" style="margin-top:8px">נטענה מ'+esc(SHARE.loaded)+'. ההגברות הותאמו לשלך — עבור ותקן מה שצריך.</div>':'')+
+      '</div>':'<div class="shBox"><div class="sub" style="margin:0">אף אחד מיא\''+WZ.cls+' עוד לא העלה מערכת. אתה תהיה הראשון.</div></div>')))+
+    '<div class="scanBox">'+
+     (SCAN.img?'<img class="scanImg" src="'+SCAN.img+'" alt="">':'')+
+     '<div class="scanRow">'+
+      (SCAN.busy?'<div class="scanSpin"></div><span class="grow sub" style="margin:0">'+esc(SCAN.msg)+'</span>':
+       '<button class="btn sm" onclick="scanPick()">'+(SCAN.img?"תמונה אחרת":"מילוי מצילום המערכת")+'</button>'+
+       (SCAN.img?'<button class="btn sm ghost" onclick="scanClear()">הסרה</button>':'')+
+       (SCAN.msg?'<span class="grow sub" style="margin:0">'+esc(SCAN.msg)+'</span>':''))+
+     '</div>'+
+     '<input type="file" id="ttPhoto" accept="image/*" capture="environment" style="display:none" onchange="scanFile(this)">'+
+    '</div>'+
     '<div class="wizDays">'+[0,1,2,3,4].map(function(d){
       var cnt=Object.keys(WZ.grid[d]||{}).filter(function(k){return WZ.grid[d][k]&&WZ.grid[d][k]!=="—"}).length;
       return '<button class="wizDay'+(WZ.day===d?" on":"")+'" onclick="wizDay('+d+')">'+DAYS[d].slice(0,3)+
@@ -783,6 +817,8 @@ function wizFinish(){
  exams=deriveExams(p);
  evts=(evts||[]).concat(deriveEvents(p));
  save();
+ /* תורם את המערכת לכיתה, עם תגיות במקום ההגברות האישיות */
+ if(window.ttPublish&&WZ.cls)window.ttPublish("יא"+WZ.cls,gridGeneric(WZ.grid,p),gridCount(WZ.grid));
  document.getElementById("wizWrap").style.display="none";
  document.body.classList.remove("wizOn");
  render();
@@ -796,6 +832,115 @@ function setupAgain(){
  if(S.tt){var g={};for(var d=0;d<7;d++){g[d]={};(S.tt[d].l||[]).forEach(function(x){g[d][x[0]]=x[1]})}WZ.grid=g}
  wizRender();
 }
+
+
+
+/* ---- מערכת משותפת של הכיתה ---- */
+var SHARE={list:null,busy:false,msg:"",loaded:""};
+var TOK_S="הגברה בית ספרית",TOK_C="הגברה קמפוסית";
+/* לפני שיתוף: מחליפים את ההגברות האישיות בתגיות, כדי שהמערכת תתאים לכל הכיתה */
+function gridGeneric(g,p){
+ var o={};
+ for(var d in g){o[d]={};for(var n in g[d]){
+  var v=g[d][n];
+  if(p.hagS&&p.hagS!=="אין"&&v===p.hagS)v=TOK_S;
+  else if(p.hagC&&p.hagC!=="אין"&&v===p.hagC)v=TOK_C;
+  o[d][n]=v;
+ }}
+ return o;
+}
+/* בטעינה: מתרגמים את התגיות להגברות של מי שטוען עכשיו */
+function gridPersonal(g){
+ var o={};
+ for(var d in g){o[d]={};for(var n in g[d]){
+  var v=g[d][n];
+  if(v===TOK_S)v=(WZ.hagS&&WZ.hagS!=="אין")?WZ.hagS:TOK_S;
+  else if(v===TOK_C)v=(WZ.hagC&&WZ.hagC!=="אין")?WZ.hagC:TOK_C;
+  o[d][n]=v;
+ }}
+ return o;
+}
+function gridCount(g){var n=0;for(var d in g)for(var k in g[d])if(g[d][k])n++;return n}
+function shareLook(){
+ if(!WZ.cls||!window.ttFetch){SHARE.list=[];return}
+ SHARE.busy=true;wizRender();
+ window.ttFetch("יא"+WZ.cls).then(function(l){
+  SHARE.busy=false;SHARE.list=l;wizRender();
+ }).catch(function(){SHARE.busy=false;SHARE.list=[];wizRender()});
+}
+function shareLoad(i){
+ var it=(SHARE.list||[])[i];if(!it)return;
+ var g;try{g=JSON.parse(it.grid)}catch(e){return toast("הקובץ פגום")}
+ WZ.grid=gridPersonal(g);
+ /* מקצוע שקיים במערklת ואינו ברשימה שלי — מתווסף כדי שלא ייעלם */
+ var mine=WZ.subs.concat(myHag(WZ));
+ for(var d in WZ.grid)for(var n in WZ.grid[d]){
+  var v=WZ.grid[d][n];
+  if(v&&v!=="חינוך"&&v!==TOK_S&&v!==TOK_C&&mine.indexOf(v)<0){WZ.subs.push(v);mine.push(v)}
+ }
+ SHARE.loaded=it.name||"תלמיד";
+ wizRender();
+ toast("נטענה המערכת של "+SHARE.loaded);
+}
+
+/* ---- מילוי המערכת מצילום ---- */
+var SCAN={busy:false,img:"",msg:"",model:""};
+function scanPick(){document.getElementById("ttPhoto").click()}
+function scanFile(inp){
+ var f=inp.files&&inp.files[0];if(!f)return;
+ if(f.size>8e6){toast("התמונה גדולה מדי, צלם מקרוב יותר");return}
+ var fr=new FileReader();
+ fr.onload=function(){
+  SCAN.img=fr.result;SCAN.busy=true;SCAN.msg="קורא את המערכת...";wizRender();
+  var b64=String(fr.result).split(",")[1];
+  window.aiTimetable(b64,f.type||"image/jpeg").then(function(res){
+   var n=scanApply(res.data);
+   SCAN.busy=false;SCAN.model=res.model;
+   SCAN.msg=n?("זוהו "+n+" שיעורים. עבור עליהם ותקן מה שצריך."):"לא זוהו שיעורים. נסה תמונה חדה יותר.";
+   wizRender();
+  }).catch(function(e){
+   SCAN.busy=false;SCAN.msg="לא הצלחתי: "+(e&&e.message?e.message:"שגיאה")+". אפשר למלא ידנית.";wizRender();
+  });
+ };
+ fr.readAsDataURL(f);
+ inp.value="";
+}
+/* ממלא את הרשת של האשף — לא מחיל ישר על המערכת. אתה מאשר. */
+function scanApply(d){
+ if(!d||!d.days)return 0;
+ var n=0,extra=[];
+ d.days.forEach(function(day){
+  var di=+day.day;if(isNaN(di)||di<0||di>6)return;
+  WZ.grid[di]=WZ.grid[di]||{};
+  (day.lessons||[]).forEach(function(l){
+   var num=+l.n,sub=(l.subject||"").trim();
+   if(!num||num<1||num>11||!sub)return;
+   sub=scanMap(sub);
+   /* תא ריק בפועל — מקף, קו, "אין". חייב להיפסל, אחרת שעת הסיום של היום זזה והכול נשבר. */
+   if(!sub||/^[-–—_.\s]+$/.test(sub)||sub.length<2||/^(אין|ריק|חופשי|null|none)$/i.test(sub))return;
+   WZ.grid[di][num]=sub;n++;
+   if(sub!=="חינוך"&&WZ.subs.indexOf(sub)<0&&myHag(WZ).indexOf(sub)<0&&extra.indexOf(sub)<0)extra.push(sub);
+  });
+ });
+ /* מקצוע שזוהה ואינו ברשימה — מתווסף כדי שלא ייעלם מהתפריטים */
+ extra.forEach(function(s){WZ.subs.push(s)});
+ return n;
+}
+function scanMap(s){
+ if(/הגברה בית ספרית|בית ספרי|בי"ס|ביס/.test(s))return WZ.hagS&&WZ.hagS!=="אין"?WZ.hagS:"הגברה בית ספרית";
+ if(/הגברה קמפוסית|קמפוסי/.test(s))return WZ.hagC&&WZ.hagC!=="אין"?WZ.hagC:"הגברה קמפוסית";
+ if(/^חינוך/.test(s)||/בוקר טוב/.test(s))return "חינוך";
+ if(/חנ.?ג|חינוך גופני|ספורט/.test(s))return 'חנ"ג';
+ if(/תנ.?ך/.test(s))return 'תנ"ך';
+ /* תא עם כמה מקצועות — לוקחים את הראשון שאני מכיר, אחרת את הראשון */
+ if(s.indexOf("+")>-1){
+  var parts=s.split("+").map(function(x){return x.trim()}).filter(Boolean);
+  var known=parts.filter(function(x){return WZ.subs.indexOf(x)>-1||myHag(WZ).indexOf(x)>-1});
+  return known[0]||parts[0];
+ }
+ return s;
+}
+function scanClear(){SCAN={busy:false,img:"",msg:"",model:""};wizRender()}
 
 /* ---------- סיור פתיחה ---------- */
 var TOUR=[
@@ -2069,7 +2214,7 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged}
  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {getFirestore,doc,collection,onSnapshot,setDoc,getDoc,updateDoc,deleteDoc,addDoc,query,where}
+import {getFirestore,doc,collection,onSnapshot,setDoc,getDoc,getDocs,updateDoc,deleteDoc,addDoc,query,where}
  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig={
@@ -2079,6 +2224,7 @@ const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 const cfgRef=doc(db,'lomed','config'),secRef=doc(db,'lomed','secret'),stateRef=doc(db,'lomed','state');
 const membersCol=collection(db,'lomed','app','members'),propsCol=collection(db,'lomed','app','proposals');
 const streaksCol=collection(db,'lomed','app','streaks');
+const ttCol=collection(db,'lomed','app','timetables');
 const DEV=(()=>{try{let d=localStorage.getItem('l_dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('l_dev',d)}return d}catch(e){return 'x'}})();
 const F=window.fb={user:null,role:'none',code:'',ownerName:'',members:[],props:[],err:'',ready:false};
 const STATE_KEYS=['S','exams','hw','done','evts','ovr','prog','seen','calib','heat','pull'];
@@ -2231,6 +2377,86 @@ function streakStart(){
  }));
  stkLast='';try{streakSync()}catch(e){}
 }
+
+/* ---- Firebase AI Logic: קריאת מערכת מתמונה ----
+   ה-SDK כאן הוא 10.12.2 שקדם למודול firebase/ai, ולכן טוענים עותק נפרד
+   ומאתחלים אפליקציה שנייה עם אותה תצורה. שני עותקים חיים בשלום. */
+let AIM=null,AIERR='';
+const AI_SDK=['https://esm.sh/firebase@11/','https://www.gstatic.com/firebasejs/11.10.0/firebase-'];
+const AI_MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.5-flash','gemini-2.5-flash'];
+async function aiInit(){
+ if(AIM)return AIM;
+ let mods=null;
+ for(const base of AI_SDK){
+  try{
+   const isEsm=base.indexOf('esm.sh')>-1;
+   const [a,b]=await Promise.all([
+    import(isEsm?base+'app':base+'app.js'),
+    import(isEsm?base+'ai':base+'ai.js')
+   ]);
+   mods={app:a,ai:b};break;
+  }catch(e){AIERR=e.message}
+ }
+ if(!mods)throw new Error('לא הצלחתי לטעון את מודול ה-AI. '+AIERR);
+ const app2=mods.app.getApps?.().find(x=>x.name==='ai')||mods.app.initializeApp(firebaseConfig,'ai');
+ const ai=mods.ai.getAI(app2,{backend:new mods.ai.GoogleAIBackend()});
+ const Schema=mods.ai.Schema;
+ const schema=Schema.object({properties:{days:Schema.array({items:Schema.object({properties:{
+   day:Schema.integer({description:'0=ראשון 1=שני 2=שלישי 3=רביעי 4=חמישי 5=שישי 6=שבת'}),
+   lessons:Schema.array({items:Schema.object({properties:{
+     n:Schema.integer({description:'מספר השיעור 1-11'}),
+     subject:Schema.string({description:'שם המקצוע בעברית, או מחרוזת ריקה אם התא ריק'})
+   }})})
+ }})})}});
+ let last='';
+ for(const name of AI_MODELS){
+  try{
+   const m=mods.ai.getGenerativeModel(ai,{model:name,
+     generationConfig:{responseMimeType:'application/json',responseSchema:schema}});
+   await m.countTokens('בדיקה');   /* מאמת שהמודל קיים ושיש הרשאה, לפני שמעלים תמונה */
+   AIM={m:m,name:name};return AIM;
+  }catch(e){last=e.message||String(e)}
+ }
+ throw new Error(last||'אין מודל זמין');
+}
+window.aiTimetable=async(b64,mime)=>{
+ const {m,name}=await aiInit();
+ const prompt=
+  'בתמונה מערכת שעות של בית ספר ישראלי. הטבלה בכתיב מימין לשמאל: העמודה הימנית ביותר היא יום א, ואחריה ב, ג, ד, ה. '+
+  'השורות הן מספרי שיעור. החזר לכל יום את רשימת השיעורים עם מספר השיעור ושם המקצוע. '+
+  'התעלם לחלוטין משמות מורים (שם פרטי ושם משפחה שמופיעים מתחת למקצוע) ומשמות כיתות וחדרים. '+
+  'תא ריק או מקף — החזר מחרוזת ריקה. '+
+  '"בוקר טוב חינוך" הוא "חינוך". "חנג" או חינוך גופני הוא חנ"ג. '+
+  'אם בתא כתוב "הגברות בית ספרי" או "הגברות בי\"ס" החזר בדיוק: הגברה בית ספרית. '+
+  'אם כתוב "הגברות קמפוסי" החזר בדיוק: הגברה קמפוסית. '+
+  'אם בתא יש כמה מקצועות מופרדים בפלוס, החזר את כולם מופרדים בפלוס. '+
+  'החזר JSON בלבד לפי הסכימה.';
+ const r=await m.generateContent([prompt,{inlineData:{mimeType:mime,data:b64}}]);
+ const txt=r.response.text().replace(/```json|```/g,'').trim();
+ return {data:JSON.parse(txt),model:name};
+};
+window.aiReady=()=>!!AIM;
+
+/* ---- מערכות משותפות לפי כיתה ----
+   כל תלמיד כותב רק למסמך שלו (cls_uid), אז אף אחד לא יכול לדרוס לאחר.
+   הקורא מקבל את כל הגרסאות של הכיתה ובוחר את המפורטת ביותר. */
+window.ttPublish=async(cls,grid,count)=>{
+ if(!F.user||!cls)return;
+ try{
+  await setDoc(doc(ttCol,cls+'_'+F.user.uid),
+   {cls:String(cls),grid:JSON.stringify(grid),count:count|0,
+    by:F.user.uid,name:F.user.displayName||'תלמיד',updatedAt:Date.now()},{merge:true});
+ }catch(e){}
+};
+window.ttFetch=async(cls)=>{
+ if(!F.user||!cls)return [];
+ try{
+  const s=await getDocs(query(ttCol,where('cls','==',String(cls))));
+  return s.docs.map(d=>d.data())
+   .filter(x=>x.by!==F.user.uid&&x.grid)
+   .sort((a,b)=>(b.count||0)-(a.count||0)||(b.updatedAt||0)-(a.updatedAt||0));
+ }catch(e){return []}
+};
 window.fbUI=fbUI;
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
