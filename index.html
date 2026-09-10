@@ -215,6 +215,145 @@ body.ro .fab,body.ro #todayBtns{display:none !important}
  .topbar,nav,.sheet{background:var(--pn) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
  .veil{background:rgba(0,0,0,.8) !important;backdrop-filter:none !important}
 }
+
+/* ---- אשף הקמה + סיור ---- */
+body.wizOn{overflow:hidden}
+#wizWrap{position:fixed;inset:0;z-index:200;background:var(--bg);overflow:auto;display:none;
+ padding:max(28px,env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
+#wizBody{max-width:560px;margin:0 auto}
+.wizHero{text-align:center;padding-top:14px}
+.wizMark{width:76px;height:76px;margin:0 auto 20px;border-radius:22px;background:var(--pn);border:1px solid var(--ln);
+ display:grid;place-items:center;font-size:34px;color:var(--cool)}
+.wizHero h1{font-size:34px;margin:0 0 10px;letter-spacing:-.02em}
+.wizP{color:var(--mut);font-size:15px;line-height:1.65;margin:0 0 22px}
+.wizFeat{text-align:start;margin:0 0 26px}
+.wizFeat>div{padding:13px 0;border-top:1px solid var(--ln)}
+.wizFeat b{display:block;font-size:15px;margin-bottom:2px}
+.wizFeat span{color:var(--mut);font-size:13.5px}
+.wizStep{color:var(--dim);font-size:12.5px;letter-spacing:.08em;margin-bottom:8px}
+.wizH{font-size:26px;margin:0 0 10px;letter-spacing:-.02em}
+.wizLbl{font-size:13px;color:var(--mut);margin:18px 0 8px}
+.wizGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:8px}
+.wizCard{padding:20px 8px;border-radius:14px;background:var(--pn);border:1px solid var(--ln);
+ color:var(--ink);font-size:17px;font-weight:600;cursor:pointer}
+.wizCard.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wizChips{display:flex;flex-wrap:wrap;gap:8px}
+.wizChip{padding:10px 15px;border-radius:99px;background:var(--pn);border:1px solid var(--ln);
+ color:var(--mut);font-size:14px;cursor:pointer}
+.wizChip.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.wizDays{display:flex;gap:7px;margin-bottom:12px}
+.wizDay{flex:1;padding:11px 4px;border-radius:12px;background:var(--pn);border:1px solid var(--ln);
+ color:var(--mut);font-size:14px;cursor:pointer;position:relative}
+.wizDay.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.wizDay i{position:absolute;top:-6px;inset-inline-start:-4px;background:var(--cool);color:var(--bg);
+ font-style:normal;font-size:10.5px;font-weight:700;min-width:17px;height:17px;border-radius:99px;
+ display:grid;place-items:center;padding:0 4px}
+.wizRows{background:var(--pn);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.wizRow{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--ln)}
+.wizRow:last-child{border-bottom:0}
+.wizNum{width:22px;color:var(--dim);font-size:13px;font-variant-numeric:tabular-nums}
+.wizRow select{flex:1;background:transparent;border:0;padding:8px 0;font-size:15.5px;color:var(--ink)}
+.wizNav{display:flex;gap:9px;margin-top:22px}
+.wizSum{display:flex;gap:10px;margin:16px 0}
+.wizSum>div{flex:1;background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:16px;text-align:center}
+.wizSum b{display:block;font-size:30px;line-height:1;margin-bottom:6px}
+.wizSum span{color:var(--mut);font-size:12.5px}
+.wizNext{background:rgba(90,200,168,.1);border:1px solid rgba(90,200,168,.3);border-radius:12px;
+ padding:12px;font-size:14px;margin-bottom:16px}
+.wizTbl{background:var(--pn);border:1px solid var(--ln);border-radius:14px;overflow:hidden;margin-bottom:18px}
+.wizTr{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--ln);font-size:14px}
+.wizTr:last-child{border-bottom:0}
+.wizTr>span:first-child{width:58px;font-weight:600}
+.wizEnd{flex:1;color:var(--mut);font-size:13px}
+#tourWrap{position:fixed;inset:0;z-index:190;display:none;pointer-events:none}
+#tourWrap .scrim{position:absolute;inset:0;background:rgba(0,0,0,.62);pointer-events:auto}
+#tourBody{position:absolute;inset-inline:14px;bottom:calc(96px + env(safe-area-inset-bottom));
+ background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:18px;pointer-events:auto;
+ max-width:560px;margin:0 auto;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#tourBody h3{margin:0 0 7px;font-size:19px}
+#tourBody p{margin:0 0 16px;color:var(--mut);font-size:14.5px;line-height:1.6}
+.tourDots{display:flex;gap:5px;margin-bottom:12px}
+.tourDots i{width:16px;height:3px;border-radius:99px;background:var(--ln)}
+.tourDots i.on{background:var(--cool);width:24px}
+nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
+
+/* ---- טיימר · רצפים ---- */
+#tmBar{position:fixed;inset-inline:0;bottom:calc(66px + env(safe-area-inset-bottom));z-index:120;display:none;
+ max-width:640px;margin:0 auto;background:var(--pn);border:1px solid var(--cool);border-radius:14px;
+ overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#tmBar.on{display:block;inset-inline:12px}
+.tmFill{position:absolute;inset-block:0;inset-inline-start:0;background:rgba(90,200,168,.16);transition:width .6s}
+.tmIn{position:relative;display:flex;align-items:center;gap:8px;padding:10px 12px}
+.tmIn b{display:block;font-size:14.5px}
+.tmIn span{color:var(--mut);font-size:12.5px;font-variant-numeric:tabular-nums}
+.stkTop{display:flex;align-items:baseline;gap:12px}
+.stkBig b{font-size:42px;font-weight:800;line-height:1}
+.stkBig span{color:var(--mut);font-size:13px;margin-inline-start:6px}
+.stkSm{margin-inline-start:auto;color:var(--mut);font-size:13px}
+.stkTbl{margin-top:12px;border-top:1px solid var(--ln)}
+.stkRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.stkRow:last-child{border-bottom:0}
+.stkRow.me{color:var(--cool);font-weight:600}
+.stkRow i{font-style:normal;font-size:11px;color:var(--dim)}
+.stkPos{width:22px;text-align:center;font-size:15px}
+.stkNum{font-weight:700;font-variant-numeric:tabular-nums}
+.stkBst{color:var(--dim);font-size:11.5px;min-width:44px;text-align:end}
+
+/* ---- להבת הרצף ---- */
+.stkTop{display:flex;align-items:center;gap:14px}
+.stkFire{position:relative;width:62px;height:74px;flex:0 0 62px;display:grid;place-items:center}
+.fire{width:52px;height:64px;display:block;transform-origin:50% 92%;
+ filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
+.stkFire.on .fire{filter:drop-shadow(0 3px 14px rgba(255,122,69,.45))}
+.stkFire.on .fire.l5{filter:drop-shadow(0 3px 16px rgba(110,160,255,.5))}
+.stkFire.on .fbody{animation:flick 2.6s ease-in-out infinite;transform-origin:50% 92%}
+.stkFire.on .fcore{animation:core 1.7s ease-in-out infinite;transform-origin:50% 88%}
+@keyframes flick{
+ 0%,100%{transform:scaleY(1) scaleX(1) rotate(0)}
+ 22%{transform:scaleY(1.05) scaleX(.97) rotate(-1.4deg)}
+ 46%{transform:scaleY(.97) scaleX(1.03) rotate(1.1deg)}
+ 70%{transform:scaleY(1.04) scaleX(.98) rotate(-.7deg)}
+}
+@keyframes core{0%,100%{opacity:.85}50%{opacity:.5;transform:scaleY(.88)}}
+.stkFire.ignite .fire{animation:ignite .85s cubic-bezier(.2,1.5,.4,1) 1}
+@keyframes ignite{
+ 0%{transform:scale(.2) translateY(16px);opacity:0}
+ 45%{transform:scale(1.28) translateY(-4px);opacity:1}
+ 70%{transform:scale(.94)}
+ 100%{transform:scale(1) translateY(0)}
+}
+.stkFire.ignite::after{content:"";position:absolute;inset:-8px;border-radius:50%;
+ border:2px solid var(--hot);animation:ring .85s ease-out 1 forwards}
+@keyframes ring{0%{transform:scale(.4);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+.stkN{position:absolute;bottom:-2px;inset-inline-end:-2px;background:var(--pn);border:1px solid var(--ln);
+ border-radius:99px;min-width:26px;height:24px;padding:0 6px;display:grid;place-items:center;
+ font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.stkFire.on .stkN{border-color:var(--hot);color:var(--hot)}
+.stkBig{flex:1;min-width:0}
+.stkBig span{display:block;font-size:17px;font-weight:600}
+.stkBig em{display:block;font-style:normal;color:var(--mut);font-size:13px;margin-top:2px}
+.stkMini{flex:0 0 20px;display:grid;place-items:center}
+.stkMini .fire{width:18px;height:22px}
+.stkRow.me .stkMini .fire{filter:drop-shadow(0 0 6px rgba(255,122,69,.5))}
+@media (prefers-reduced-motion:reduce){
+ .stkFire.on .fbody,.stkFire.on .fcore,.stkFire.ignite .fire,.stkFire.ignite::after{animation:none}
+}
+
+/* ---- אש כבויה: גחלים + מד התקדמות ---- */
+.stkFire.out .fire{opacity:.34;filter:grayscale(.55)}
+.stkFire.out .stkN{border-color:var(--ln);color:var(--dim)}
+.stkFire.out::before{content:"";position:absolute;bottom:6px;inset-inline:14px;height:5px;border-radius:99px;
+ background:var(--hot);opacity:.25;filter:blur(3px);animation:ember 3.4s ease-in-out infinite}
+@keyframes ember{0%,100%{opacity:.16}50%{opacity:.4}}
+.fuel{position:absolute;inset-block:10px;inset-inline-start:0;width:3px;border-radius:99px;background:var(--ln);overflow:hidden;display:flex;align-items:flex-end}
+.fuel i{display:block;width:100%;background:var(--hot);border-radius:99px;transition:height .5s}
+.stkMini .fire{opacity:.3;filter:grayscale(.6)}
+.stkMini.on .fire{opacity:1;filter:none}
+
+/* כמעט שם — גחלים חמים יותר */
+.stkFire.out.near .fire{opacity:.5;filter:grayscale(.2)}
+.stkFire.out.near::before{opacity:.5;animation-duration:1.6s}
+.stkFire.out.near .stkN{border-color:var(--warm);color:var(--warm)}
 </style>
 </head>
 <body>
@@ -242,10 +381,13 @@ body.ro .fab,body.ro #todayBtns{display:none !important}
  <div class="btnrow" style="margin-top:12px" id="todayBtns">
   <button class="btn sm ghost grow" onclick="openEv()">+ אירוע</button>
   <button class="btn sm ghost grow" onclick="openOv(viewK)">שינוי במערכת</button>
+  <button class="btn sm ghost grow" id="restBtn" onclick="restToggle(viewK)">אין לי כוח היום</button>
  </div>
 </section>
 
 <section class="pane" id="p-week">
+ <h2 class="sec">רצף <span class="r">יום נספר רק כשהכל סגור</span></h2>
+ <div class="card" id="stkBox"></div>
  <h2 class="sec">עקביות <span class="r">28 הימים האחרונים · לחיצה על יום</span></h2>
  <div class="card" id="heatBox"></div>
  <h2 class="sec">14 הימים הקרובים <span class="r">לחיצה פותחת את היום</span></h2>
@@ -307,6 +449,11 @@ body.ro .fab,body.ro #todayBtns{display:none !important}
  <div class="card" id="ovBox"></div>
  <h2 class="sec">המערכת שלי</h2>
  <div class="card" id="ttBox"></div>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">שינית מערכת, כיתה או הגברה? הרצה מחדש של האשף תבנה את רשימת המבחנים מחדש מהיומן השכבתי.</div>
+  <div class="btnrow"><button class="btn sm" onclick="setupAgain()">אשף ההתאמה</button>
+  <button class="btn sm ghost" onclick="tourStart()">הסיור מחדש</button></div>
+ </div>
  <h2 class="sec">Google Classroom</h2>
  <div class="card">
   <div class="sub" style="margin:0 0 10px">הדבק Client ID מ-Google Cloud כדי למשוך מטלות אוטומטית. ריק = מצב ידני.</div>
@@ -333,6 +480,9 @@ body.ro .fab,body.ro #todayBtns{display:none !important}
  <button data-p="set" onclick="go('set')"><span class="ic">⚙</span>הגדרות</button>
 </div></nav>
 
+<div id="wizWrap"><div id="wizBody"></div></div>
+<div id="tourWrap"><div class="scrim"></div><div id="tourBody"></div></div>
+<div id="tmBar"></div>
 <div class="veil" id="veil" onclick="closeS()"></div>
 <div class="sheet" id="sheet"><div class="hand-zone" id="handZone"><div class="hand"></div></div><div id="shBody"></div></div>
 <div class="toast" id="toast"></div>
@@ -380,6 +530,437 @@ var SEED=[
 ["2027-05-05",'חנ"ג',"bagrut"],["2027-05-06","אנגלית","matkonet"],["2027-05-17","לשון","bagrut"],
 ["2027-05-26","מתמטיקה","bagrut"],["2027-05-31","אנגלית","bagrut"],["2027-06-07","היסטוריה","bagrut"],
 ["2027-06-28","פיזיקה","bagrut"]];
+
+/* ============================================================
+   התאמה אישית: קטלוג היומן השכבתי, אשף הקמה, וסיור פתיחה
+   ============================================================ */
+
+/* הקטלוג = כל היומן "יא קציר תשפ״ז", מתויג.
+   [תאריך, מקצוע, סוג, כיתות, ימים]
+   מקצוע "@S" = ההגברה הבית ספרית של המשתמש · "@C" = הקמפוסית
+   כיתות: 0 = כולם, אחרת מערך מספרי כיתה */
+var CAT=[
+/* --- מבחנים --- */
+["2026-09-06","ביולוגיה","hagbara",0],
+["2026-09-07","ביולוגיה","hagbara",0],
+["2026-09-10","כימיה","hagbara",0],
+["2026-09-16","לשון","bochan",[3,4]],
+["2026-09-17","פיזיקה","mivchan",0],
+["2026-10-06","לשון","bochan",[1,2,5,6]],
+["2026-10-12","אנגלית","mivchan",0],
+["2026-10-15","מתמטיקה","mivchan",0],
+["2026-10-19","הנדסת תוכנה","bagrut",0],
+["2026-10-20","לשון","mivchan",[3,4]],
+["2026-10-25","לשון","mivchan",0],
+["2026-10-29","@C","hagbara",0],
+["2026-11-02","לשון","mivchan",0],
+["2026-11-05","@S","hagbara",0],
+["2026-11-10","ספרות","mivchan",0],
+["2026-11-12","מתמטיקה","mivchan",0],
+["2026-11-16","אנגלית","mivchan",0],
+["2026-11-19","לשון","mivchan",[3,4]],
+["2026-12-14","לשון","mivchan",0],
+["2026-12-14","לשון","matkonet",[3,4]],
+["2026-12-16","היסטוריה","mivchan",[1,2,5,6]],
+["2026-12-21","אנגלית","mivchan",0],
+["2026-12-23",'תנ"ך',"mivchan",0],
+["2026-12-23","היסטוריה","mivchan",[3,4]],
+["2026-12-27","מתמטיקה","mivchan",0],
+["2027-01-04","ספרות","mivchan",0],
+["2027-01-04","לשון","bagrut",[3,4]],
+["2027-01-07","@C","hagbara",0],
+["2027-01-11","ספרות","mivchan",[3,4]],
+["2027-01-14","@S","hagbara",0],
+["2027-01-24","מתמטיקה","mivchan",0],
+["2027-02-01","ספרות אנגלית","mivchan",0],
+["2027-02-03","ספרות","mivchan",0],
+["2027-02-08","אנגלית","mivchan",0],
+["2027-02-17","לשון","mivchan",0],
+["2027-02-22","אנגלית","mivchan",0],
+["2027-02-24",'תנ"ך',"mivchan",0],
+["2027-03-04","@C","hagbara",0],
+["2027-03-09","היסטוריה","mivchan",0],
+["2027-03-11","@S","hagbara",0],
+["2027-03-18","מתמטיקה","mivchan",0],
+["2027-03-29","אנגלית","matkonet",0],
+["2027-04-01","ספרות","mivchan",0],
+["2027-04-06","כימיה","matkonet",0],
+["2027-04-06",'חנ"ג',"matkonet",0],
+["2027-04-12","לשון","matkonet",0],
+["2027-04-29","מתמטיקה","matkonet",0],
+["2027-05-03","היסטוריה","matkonet",0],
+["2027-05-05",'חנ"ג',"bagrut",0],
+["2027-05-06","אנגלית","matkonet",0],
+["2027-05-09","ביולוגיה","matkonet",0],
+["2027-05-17","לשון","bagrut",0],
+["2027-05-17","ספרות","matkonet",[3,4]],
+["2027-05-20","ביולוגיה","matkonet",0],
+["2027-05-26","מתמטיקה","bagrut",0],
+["2027-05-31","אנגלית","bagrut",0],
+["2027-06-02","ביולוגיה","bagrut",0],
+["2027-06-07","היסטוריה","bagrut",0],
+["2027-06-09","כימיה","matkonet",0],
+["2027-06-17","ספרות","bagrut",[3,4]],
+["2027-06-21","כימיה","bagrut",0],
+["2027-06-28","פיזיקה","bagrut",0]
+];
+/* אירועים שאוכלים יום לימודים: [תאריך, שם, מספר ימים] */
+var CATEV=[
+["2026-09-14","הרצאת הכנה לסמינר",1],
+["2026-10-05","יום הזיכרון ל-7 באוקטובר",1],
+["2026-10-07","סמינר חיפה–ת\"א",2],
+["2026-10-13","סדנת סא\"לים",1],
+["2026-10-22","יום הזיכרון ליצחק רבין",1],
+["2026-11-22","טיול שנתי",5],
+["2026-12-17","ניידת מיטב — לשכת גיוס",1],
+["2027-01-05","יד ושם",1],
+["2027-01-14","יום מחצית",1],
+["2027-02-09","סמידבר",3],
+["2027-02-28","שבוע צילום",5]
+];
+/* המקצועות שאפשר לבחור */
+var ALLSUB=["מתמטיקה","אנגלית","לשון","ספרות","היסטוריה",'תנ"ך','חנ"ג',"ספרות אנגלית","אזרחות","מדעי המחשב"];
+var ALLHAG=["פיזיקה","כימיה","ביולוגיה","הנדסת תוכנה","מדעי החברה","מדעי המחשב","אמנות","תיאטרון","מחול","ספרות אנגלית","אין"];
+var LESSONS=[1,2,3,4,5,6,7,8,9,10,11];
+
+/* ---------- גזירת המבחנים מהקטלוג לפי הפרופיל ---------- */
+function myHag(p){var a=[];if(p.hagS&&p.hagS!=="אין")a.push(p.hagS);if(p.hagC&&p.hagC!=="אין")a.push(p.hagC);return a}
+function resolveSub(sub,p){
+ if(sub==="@S")return (p.hagS&&p.hagS!=="אין")?p.hagS:null;
+ if(sub==="@C")return (p.hagC&&p.hagC!=="אין")?p.hagC:null;
+ return sub;
+}
+function deriveExams(p){
+ var mine=(p.subs||[]).concat(myHag(p)),out=[],n=0;
+ CAT.forEach(function(c){
+  if(c[3]&&c[3].indexOf(p.cls)<0)return;              /* לא הכיתה שלי */
+  var sub=resolveSub(c[1],p);
+  if(!sub)return;                                      /* הגברה שאין לי */
+  if(c[1].charAt(0)!=="@"&&mine.indexOf(sub)<0)return; /* מקצוע שאני לא לומד */
+  out.push({id:"c"+(n++),sub:sub,date:c[0],type:c[2],ses:null,topics:[],sheet:""});
+ });
+ return out;
+}
+function deriveEvents(){
+ return CATEV.map(function(e,i){
+  return {id:"ce"+i,title:e[1],date:e[0],days:e[2],allDay:true,from:"",to:"",school:true};
+ });
+}
+
+/* ---------- בניית המערכת מהאשף ---------- */
+function ttFromGrid(g){
+ var t={},BE={1:"08:37",2:"09:20",3:"09:55",4:"10:40",5:"11:25",6:"12:30",7:"13:10",8:"14:30",9:"15:15",10:"16:10",11:"17:00"};
+ for(var d=0;d<7;d++){
+  var l=[],last=0;
+  LESSONS.forEach(function(n){
+   var v=(g[d]||{})[n];
+   if(v&&v!=="—"){l.push([n,v]);if(n>last)last=n}
+  });
+  t[d]={end:last?BE[last]:"",l:l};
+ }
+ return t;
+}
+
+/* ---------- אשף ההקמה ---------- */
+var WZ={step:0,cls:0,hagS:"",hagC:"",subs:[],grid:{},day:0};
+function setupStart(){
+ WZ={step:0,cls:0,hagS:"",hagC:"",subs:ALLSUB.slice(0,7),grid:{},day:0};
+ document.getElementById("wizWrap").style.display="block";
+ document.body.classList.add("wizOn");
+ wizRender();
+}
+function wizGo(n){
+ if(n===2&&!WZ.cls){toast("צריך לבחור כיתה");return}
+ WZ.step=n;wizRender();window.scrollTo(0,0);
+}
+function wizPick(k,v){WZ[k]=v;wizRender()}
+function wizSub(s){var i=WZ.subs.indexOf(s);if(i<0)WZ.subs.push(s);else WZ.subs.splice(i,1);wizRender()}
+function wizDay(d){WZ.day=d;wizRender()}
+function wizSet(n,v){WZ.grid[WZ.day]=WZ.grid[WZ.day]||{};WZ.grid[WZ.day][n]=v;wizRender()}
+function wizCopy(){
+ /* העתקת היום הקודם — חוסך הקלדה כשיומיים דומים */
+ var prev=(WZ.day+6)%7;
+ WZ.grid[WZ.day]=JSON.parse(JSON.stringify(WZ.grid[prev]||{}));
+ wizRender();toast("הועתק מיום "+DAYS[prev]);
+}
+function wizOpts(){
+ var all=WZ.subs.concat(myHag(WZ)).filter(function(v,i,a){return v&&a.indexOf(v)===i});
+ all.push("חינוך");
+ return all;
+}
+function wizFilled(){var n=0;for(var d in WZ.grid)for(var k in WZ.grid[d])if(WZ.grid[d][k]&&WZ.grid[d][k]!=="—")n++;return n}
+function wizRender(){
+ var b=document.getElementById("wizBody"),h="";
+ var S1=WZ.step;
+ if(S1===0){
+  h='<div class="wizHero"><div class="wizMark">◷</div>'+
+    '<h1>לומד</h1><p class="wizP">מנהל הזמן שמסתכל על המערכת שלך, על שיעורי הבית ועל התאריכים של המבחנים — ומחליט בשבילך מה ללמוד היום.</p>'+
+    '<div class="wizFeat"><div><b>לוקח בחשבון</b><span>כמה זמן באמת נשאר לך אחרי בית הספר</span></div>'+
+    '<div><b>מקדים</b><span>שומר מקום לשיעורי בית שעוד לא קיבלת</span></div>'+
+    '<div><b>מלמד נכון</b><span>שיטת לימוד לכל מקצוע לפי המרחק מהמבחן</span></div></div>'+
+    '<button class="btn pri wide" onclick="wizGo(1)">בוא נתחיל</button>'+
+    '<button class="btn ghost wide" onclick="wizSkip()">דלג, אמלא ידנית</button></div>';
+ }
+ if(S1===1){
+  h='<div class="wizStep">1 מתוך 4</div><h2 class="wizH">באיזו כיתה אתה?</h2>'+
+    '<p class="wizP">חלק מהמבחנים ביומן השכבתי מיועדים לכיתות מסוימות. זה מה שיסנן אותם.</p><div class="wizGrid">'+
+    [1,2,3,4,5,6].map(function(c){return '<button class="wizCard'+(WZ.cls===c?" on":"")+'" onclick="wizPick(\'cls\','+c+')">יא\''+c+'</button>'}).join("")+
+    '</div><div class="wizNav"><button class="btn pri grow" onclick="wizGo(2)">המשך</button></div>';
+ }
+ if(S1===2){
+  h='<div class="wizStep">2 מתוך 4</div><h2 class="wizH">ההגברות שלך</h2>'+
+    '<p class="wizP">ביומן כתוב רק "מבחן הגברות בית ספרי" או "קמפוסי". כאן אתה אומר לי מה זה אצלך, ואני אתרגם את כל התאריכים.</p>'+
+    '<div class="wizLbl">הגברה בית ספרית</div><div class="wizChips">'+
+    ALLHAG.map(function(s){return '<button class="wizChip'+(WZ.hagS===s?" on":"")+'" onclick="wizPick(\'hagS\',\''+s+'\')">'+s+'</button>'}).join("")+'</div>'+
+    '<div class="wizLbl">הגברה קמפוסית</div><div class="wizChips">'+
+    ALLHAG.map(function(s){return '<button class="wizChip'+(WZ.hagC===s?" on":"")+'" onclick="wizPick(\'hagC\',\''+s+'\')">'+s+'</button>'}).join("")+'</div>'+
+    '<div class="wizNav"><button class="btn grow ghost" onclick="wizGo(1)">חזרה</button><button class="btn pri grow" onclick="wizGo(3)">המשך</button></div>';
+ }
+ if(S1===3){
+  h='<div class="wizStep">3 מתוך 4</div><h2 class="wizH">שאר המקצועות</h2>'+
+    '<p class="wizP">סמן את מה שאתה לומד. מה שלא מסומן — המבחנים שלו לא ייכנסו.</p><div class="wizChips">'+
+    ALLSUB.map(function(s){return '<button class="wizChip'+(WZ.subs.indexOf(s)>-1?" on":"")+'" onclick="wizSub(\''+s+'\')">'+s+'</button>'}).join("")+'</div>'+
+    '<div class="wizNav"><button class="btn grow ghost" onclick="wizGo(2)">חזרה</button><button class="btn pri grow" onclick="wizGo(4)">המשך</button></div>';
+ }
+ if(S1===4){
+  var opts=wizOpts(),g=WZ.grid[WZ.day]||{};
+  h='<div class="wizStep">4 מתוך 4</div><h2 class="wizH">המערכת השבועית</h2>'+
+    '<p class="wizP">מלא רק שיעורים אמיתיים. השיעור האחרון שתמלא קובע מתי אתה משתחרר, ומזה נגזר כמה זמן פנוי יש לך.</p>'+
+    '<div class="wizDays">'+[0,1,2,3,4].map(function(d){
+      var cnt=Object.keys(WZ.grid[d]||{}).filter(function(k){return WZ.grid[d][k]&&WZ.grid[d][k]!=="—"}).length;
+      return '<button class="wizDay'+(WZ.day===d?" on":"")+'" onclick="wizDay('+d+')">'+DAYS[d].slice(0,3)+
+             (cnt?'<i>'+cnt+'</i>':'')+'</button>'}).join("")+'</div>'+
+    (WZ.day>0?'<button class="btn xs ghost" style="margin-bottom:8px" onclick="wizCopy()">העתקה מיום '+DAYS[(WZ.day+6)%7]+'</button>':'')+
+    '<div class="wizRows">'+LESSONS.map(function(n){
+      var v=g[n]||"—";
+      return '<div class="wizRow"><span class="wizNum">'+n+'</span>'+
+       '<select onchange="wizSet('+n+',this.value)"><option value="—">—</option>'+
+       opts.map(function(o){return '<option'+(v===o?" selected":"")+'>'+o+'</option>'}).join("")+'</select></div>'}).join("")+
+    '</div><div class="wizNav"><button class="btn grow ghost" onclick="wizGo(3)">חזרה</button>'+
+    '<button class="btn pri grow" onclick="wizGo(5)">סיום</button></div>';
+ }
+ if(S1===5){
+  var p={cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
+  var ex=deriveExams(p),tt=ttFromGrid(WZ.grid),caps=wizCaps(tt);
+  var nxt=ex.filter(function(e){return pr(e.date)>=tod()}).sort(function(a,b){return pr(a.date)-pr(b.date)})[0];
+  h='<div class="wizStep">מוכן</div><h2 class="wizH">זה מה שיצא</h2>'+
+    '<div class="wizSum"><div><b>'+ex.filter(function(e){return pr(e.date)>=tod()}).length+'</b><span>מבחנים שנשארו לך</span></div>'+
+    '<div><b>'+Math.round(caps.reduce(function(a,c){return a+c},0)/60*10)/10+'</b><span>שעות לימוד בשבוע</span></div></div>'+
+    (nxt?'<div class="wizNext">הבא בתור: <b>'+esc(nxt.sub)+'</b> · '+heb(nxt.date)+'</div>':'')+
+    '<div class="wizTbl">'+[0,1,2,3,4,5,6].map(function(d){
+      return '<div class="wizTr"><span>'+DAYS[d]+'</span><span class="wizEnd">'+(tt[d].end?"עד "+tt[d].end:"אין לימודים")+'</span><b>'+caps[d]+' דק\'</b></div>'}).join("")+'</div>'+
+    '<p class="wizP">אפשר לשנות הכל אחר כך בהגדרות.</p>'+
+    '<div class="wizNav"><button class="btn grow ghost" onclick="wizGo(4)">חזרה</button>'+
+    '<button class="btn pri grow" onclick="wizFinish()">קדימה</button></div>';
+ }
+ b.innerHTML=h;
+}
+/* קיבולת מוצעת: מסיום הלימודים + נסיעה עד 19:00, ותקרה הגיונית ליום ארוך */
+function wizCaps(tt){
+ return [0,1,2,3,4,5,6].map(function(d){
+  if(!tt[d].end)return d===5?90:120;
+  var free=19*60-(m2(tt[d].end)+60);
+  if(free<=0)return 0;
+  return Math.min(Math.round(free/15)*15,180);
+ });
+}
+function wizSkip(){
+ ST("l_skip","1");
+ document.getElementById("wizWrap").style.display="none";
+ document.body.classList.remove("wizOn");
+ render();
+}
+function wizFinish(){
+ var p={cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
+ S.profile=p;S.tt=ttFromGrid(WZ.grid);S.cap=wizCaps(S.tt);
+ TT=S.tt;
+ exams=deriveExams(p);
+ evts=(evts||[]).concat(deriveEvents());
+ save();
+ document.getElementById("wizWrap").style.display="none";
+ document.body.classList.remove("wizOn");
+ render();
+ setTimeout(tourStart,350);
+}
+/* הרצה מחדש של האשף מההגדרות, בלי לאבד מטלות והתקדמות */
+function setupAgain(){
+ if(!confirm("לפתוח מחדש את אשף ההתאמה? המבחנים ייבנו מחדש מהיומן. המטלות וההתקדמות יישמרו."))return;
+ setupStart();
+ if(S.profile){WZ.cls=S.profile.cls;WZ.hagS=S.profile.hagS;WZ.hagC=S.profile.hagC;WZ.subs=(S.profile.subs||[]).slice()}
+ if(S.tt){var g={};for(var d=0;d<7;d++){g[d]={};(S.tt[d].l||[]).forEach(function(x){g[d][x[0]]=x[1]})}WZ.grid=g}
+ wizRender();
+}
+
+/* ---------- סיור פתיחה ---------- */
+var TOUR=[
+ {t:"today",h:"המסך הזה עונה על שאלה אחת",b:"מה ללמוד עכשיו. הספירה למעלה היא למבחן הקרוב, ומתחתיה המשבצות של היום לפי סדר — כולל באיזו שיטה ללמוד, לא רק מה."},
+ {t:"week",h:"שבועיים קדימה",b:"כאן רואים אם השבוע עמוס או ריק. אם יום נראה לך בלתי אפשרי — תוריד לו את הקיבולת בהגדרות והתוכנית תתפרס מחדש."},
+ {t:"hw",h:"כפתור ה-+ הוא הכי חשוב",b:"כל פעם שאתה מקבל שיעורי בית — תוסיף אותם כאן. הם תופסים זמן לפני הלמידה למבחנים, ולכן התוכנית לא מתפוצצת."},
+ {t:"ex",h:"כשמגיע דף המטרים",b:"פתח את המבחן והזן את הנושאים. מאותו רגע כל משבצת מקבלת נושא משלה, ובימים האחרונים הכל עובר לחזרה מעורבת."},
+ {t:"set",h:"הכל ניתן לשינוי",b:"שעת סיום, זמן נסיעה, כמה זמן שמור לשיעורי בית, ומה נחשב מקצוע קשה. ההגדרות הן לא קישוט — הן המנוע."}
+];
+var tourI=0;
+function tourStart(){tourI=0;document.getElementById("tourWrap").style.display="block";tourRender()}
+function tourRender(){
+ var s=TOUR[tourI];go(s.t);
+ document.getElementById("tourBody").innerHTML=
+  '<div class="tourDots">'+TOUR.map(function(_,i){return '<i class="'+(i===tourI?"on":"")+'"></i>'}).join("")+'</div>'+
+  '<h3>'+s.h+'</h3><p>'+s.b+'</p>'+
+  '<div class="btnrow"><button class="btn pri grow" onclick="tourNext()">'+(tourI===TOUR.length-1?"סיימנו":"הבא")+'</button>'+
+  (tourI<TOUR.length-1?'<button class="btn ghost" onclick="tourEnd()">דילוג</button>':'')+'</div>';
+ var nav=document.querySelectorAll("nav button");
+ Array.prototype.forEach.call(nav,function(b){b.classList.toggle("tourLit",b.dataset.p===s.t)});
+}
+function tourNext(){if(tourI>=TOUR.length-1)return tourEnd();tourI++;tourRender()}
+function tourEnd(){
+ document.getElementById("tourWrap").style.display="none";
+ Array.prototype.forEach.call(document.querySelectorAll("nav button"),function(b){b.classList.remove("tourLit")});
+ ST("l_tour","1");go("today");
+}
+function tourMaybe(){if(!ST("l_tour")&&S.profile)setTimeout(tourStart,400)}
+
+
+/* ============================================================
+   טיימר משבצת · יום מנוחה · רצפים
+   ============================================================ */
+
+/* ---------- טיימר ---------- */
+var TM=null;
+function tmLoad(){try{TM=JSON.parse(ST("l_tm")||"null")}catch(e){TM=null}}
+function tmSave(){ST("l_tm",JSON.stringify(TM))}
+function tmStart(id,subEnc,planned){
+ if(window.RO)return toast("מצב צפייה");
+ var sub=decodeURIComponent(subEnc);
+ if(TM&&TM.id!==id&&!confirm("יש טיימר פעיל על "+TM.sub+". להחליף?"))return;
+ TM={id:id,sub:sub,planned:+planned||S.len,start:Date.now()};tmSave();tmTick();render();
+}
+function tmElapsed(){return TM?Math.max(0,Math.round((Date.now()-TM.start)/60000)):0}
+function tmCancel(){TM=null;tmSave();tmBar();render();toast("הטיימר בוטל")}
+function tmStop(){
+ if(!TM)return;
+ var act=tmElapsed(),pl=TM.planned,sub=TM.sub,id=TM.id;
+ TM=null;tmSave();
+ if(act<3){tmBar();render();return toast("פחות מ-3 דקות — לא נרשם")}
+ /* מדידה אמיתית עדיפה על דיווח: היחס בין הזמן שתכננתי לזמן שבאמת ישבת מכייל את המקצוע */
+ var pk=calKey(sub);
+ if(pk){var sig=Math.max(.6,Math.min(1.8,act/pl));calib[pk]=Math.max(.6,Math.min(1.8,(calib[pk]||1)*.7+sig*.3))}
+ if(!done[id])done[id]=true;
+ tmBar();save();render();
+ toast(act+" דק' נרשמו"+(pk?" · הקצב של "+pk+" עודכן":""));
+}
+function tmBar(){
+ var b=document.getElementById("tmBar");if(!b)return;
+ if(!TM){b.classList.remove("on");return}
+ var e=tmElapsed(),pc=Math.min(100,Math.round(e/TM.planned*100));
+ b.classList.add("on");
+ b.innerHTML='<div class="tmFill" style="width:'+pc+'%"></div>'+
+  '<div class="tmIn"><div class="grow"><b>'+esc(TM.sub)+'</b><span>'+e+' מתוך '+TM.planned+' דק\'</span></div>'+
+  '<button class="btn xs" onclick="tmStop()">סיום</button>'+
+  '<button class="btn xs ghost" onclick="tmCancel()">ביטול</button></div>';
+}
+function tmTick(){clearInterval(window._tmI);if(TM){tmBar();window._tmI=setInterval(tmBar,20000)}}
+
+/* ---------- יום מנוחה ---------- */
+function isRest(k){return !!(S.rest&&S.rest[k])}
+function restToggle(k){
+ if(window.RO)return toast("מצב צפייה");
+ S.rest=S.rest||{};
+ if(S.rest[k]){delete S.rest[k];toast("היום חזר לתוכנית")}
+ else{S.rest[k]=1;toast("היום פונה — התוכנית התפרסה מחדש")}
+ save();render();
+}
+/* ניקוי ימי מנוחה ישנים כדי שהאובייקט לא יתנפח */
+function restClean(){if(!S.rest)return;var cut=key(ad(tod(),-14));for(var k in S.rest)if(k<cut)delete S.rest[k]}
+
+/* ---------- רצפים ---------- */
+/* יום נספר ברצף רק אם סגרת את כל מה שתוכנן. יום בלי תוכנית לא שובר ולא מוסיף. */
+function dayOK(k){var x=heat[k];return !!(x&&x.t>0&&x.d>=x.t)}
+function dayPlanned(k){var x=heat[k];return !!(x&&x.t>0)}
+function streakNow(){
+ var n=0,d=tod();
+ /* היום עדיין פתוח — אם לא הושלם, מתחילים לספור מאתמול */
+ if(!dayOK(key(d)))d=ad(d,-1);
+ for(var i=0;i<400;i++){
+  var k=key(d);
+  if(dayOK(k))n++;
+  else if(dayPlanned(k))break;
+  d=ad(d,-1);
+ }
+ return n;
+}
+function streakBest(){
+ var ks=Object.keys(heat).sort(),best=0,cur=0;
+ ks.forEach(function(k){if(dayOK(k))cur++;else if(dayPlanned(k))cur=0;if(cur>best)best=cur});
+ return Math.max(best,S.bestStreak||0);
+}
+function streakSync(){
+ var n=streakNow(),b=streakBest();
+ if(b>(S.bestStreak||0)){S.bestStreak=b;save()}
+ if(window.streakPush)window.streakPush(n,b,todayLit()?key(tod()):"");
+ return {n:n,b:b};
+}
+/* דרגת האש: ככל שהרצף ארוך יותר הלהבה גדולה וחמה יותר. 0 = כבויה. */
+function fireLevel(n){return n<=0?0:n<3?1:n<7?2:n<14?3:n<30?4:5}
+var FIRE=[
+ {a:"#3A4152",b:"#2A3140",c:"#2A3140",s:.82},
+ {a:"#F2C14E",b:"#E08A3C",c:"#F2C14E",s:.9},
+ {a:"#FFA53C",b:"#FF7A45",c:"#FFD48A",s:1},
+ {a:"#FF8A3C",b:"#FF5A2B",c:"#FFE0A3",s:1.08},
+ {a:"#FF7A45",b:"#E8341F",c:"#FFF0C2",s:1.16},
+ {a:"#7FC4FF",b:"#2E7BE0",c:"#EAF6FF",s:1.24}
+];
+function fireSVG(n,id){
+ var L=fireLevel(n),f=FIRE[L],u="fg"+(id||"m")+L;
+ return '<svg class="fire l'+L+'" viewBox="0 0 48 60" style="transform:scale('+f.s+')" aria-hidden="true">'+
+  '<defs><linearGradient id="'+u+'" x1="0" y1="1" x2="0" y2="0">'+
+  '<stop offset="0" stop-color="'+f.b+'"/><stop offset=".62" stop-color="'+f.a+'"/>'+
+  '<stop offset="1" stop-color="'+f.c+'"/></linearGradient></defs>'+
+  '<g class="fbody"><path d="M24 3c1 8 7 10 10 17 3 6 2 12-2 16-2 2-4 3-4 3s3-6-1-11c-3-4-4-7-4-7s-2 4-5 8c-3 4-2 10-2 10s-4-3-6-8c-3-7 0-13 4-18 4-4 9-6 10-10z" fill="url(#'+u+')"/>'+
+  '<path class="fcore" d="M24 27c1 4 5 6 5 11 0 5-3 8-6 8s-6-3-6-8c0-4 4-6 7-11z" fill="'+f.c+'" opacity="'+(L?.85:.25)+'"/></g></svg>';
+}
+/* כמה מהיום כבר נסגר. האש נדלקת רק על 100%. */
+function todayFuel(){var x=heat[key(tod())];return x&&x.t?Math.min(1,x.d/x.t):0}
+function todayLeft(){var x=heat[key(tod())];return x&&x.t?Math.max(0,x.t-x.d):0}
+function todayLit(){return dayOK(key(tod()))}
+function streakHTML(){
+ var s=streakSync(),rows=(window.streakRows||[]).slice();
+ var me=(window.streakMe||null);
+ var k=key(tod()),lit=todayLit(),fuel=todayFuel();
+ /* הצתה מתנגנת פעם אחת ביום — ביום שבו האש נדלקה */
+ var ignite=lit&&S.stkLitDay!==k;
+ if(lit&&S.stkLitDay!==k){S.stkLitDay=k;save()}
+ if(!lit&&S.stkLitDay===k){S.stkLitDay="";save()}
+ var lvl=lit?fireLevel(s.n):0,left=todayLeft(),near=!lit&&fuel>=.7;
+ var h='<div class="stkTop"><div class="stkFire'+(ignite?" ignite":"")+(lit?" on":(near?" out near":" out"))+'">'+
+   fireSVG(lit?s.n:0)+
+   (!lit?'<div class="fuel"><i style="height:'+Math.round(fuel*100)+'%"></i></div>':'')+
+   '<b class="stkN">'+s.n+'</b></div>'+
+   '<div class="stkBig"><span>'+(s.n===1?"יום ברצף":"ימים ברצף")+'</span>'+
+   '<em>'+(lit?["","ניצוץ","נדלקה","בוערת","להבה גדולה","לבנה מחום"][lvl]:
+     (left?(left===1?"כבויה — נשארה משבצת אחת":"כבויה — נשארו "+left+" משבצות"):"כבויה"))+'</em></div>'+
+   '<div class="stkSm">שיא: <b>'+s.b+'</b></div></div>';
+ var tip;
+ if(lit)tip=(s.n>=s.b&&s.b>0)?"סגרת הכל היום. אתה בשיא שלך.":"סגרת הכל היום. עוד "+(s.b-s.n+1)+" ימים ואתה בשיא.";
+ else if(!left)tip="אין משבצות היום, אז אין מה להדליק — והרצף לא נשבר.";
+ else if(near)tip="נשארה "+(left===1?"משבצת אחת":left+" משבצות")+". האש נדלקת רק על הכל.";
+ else if(s.n>0)tip="הרצף חי, אבל האש נדלקת רק כשכל המשבצות של היום סגורות.";
+ else tip="האש נדלקת ביום הראשון שבו תסגור את כל המשבצות.";
+ h+='<div class="sub" style="margin:8px 0 0">'+tip+'</div>';
+ if(rows.length){
+  rows.sort(function(a,b){return (b.streak||0)-(a.streak||0)||(b.best||0)-(a.best||0)});
+  var med=["🥇","🥈","🥉"];
+  h+='<div class="stkTbl">'+rows.map(function(r,i){
+   var mine=me&&r.uid===me;
+   return '<div class="stkRow'+(mine?" me":"")+'"><span class="stkPos">'+(med[i]||(i+1))+'</span>'+
+    '<span class="grow">'+esc(r.name||"—")+(mine?' <i>אתה</i>':'')+'</span>'+
+    '<span class="stkMini'+(r.litDay===key(tod())?" on":"")+'">'+fireSVG(r.litDay===key(tod())?(r.streak||0):0,"r"+i)+'</span>'+
+    '<span class="stkNum">'+(r.streak||0)+'</span><span class="stkBst">שיא '+(r.best||0)+'</span></div>';
+  }).join("")+'</div>';
+ }else{
+  h+='<div class="sub" style="margin-top:10px">טבלת הרצפים נפתחת כשמצטרפים למשפחה. כל אחד רואה את הרצף של כולם.</div>';
+ }
+ return h;
+}
 
 /* ---------- study methods (evidence-based) ---------- */
 function method(sub,phase){
@@ -430,8 +1011,12 @@ function defs(){return{cap:[60,150,180,60,120,90,120],len:50,hor:21,same:true,ha
  w:{bagrut:14,matkonet:9,hagbara:6,mivchan:4,bochan:2}}}
 function load(){
  S=J("l_s",null)||defs();var d=defs();for(var k in d)if(S[k]===undefined)S[k]=d[k];
+ /* המערכת מגיעה מהפרופיל של המשתמש. TT נשאר כברירת מחדל למי שדילג על האשף. */
+ if(S.tt)TT=S.tt;
  exams=J("l_ex",null);
- if(!Array.isArray(exams)||!exams.length)exams=SEED.map(function(e,i){return{id:"s"+i,sub:e[1],date:e[0],type:e[2],ses:null}});
+ if(!Array.isArray(exams)||!exams.length)
+  exams=S.profile?deriveExams(S.profile)
+       :SEED.map(function(e,i){return{id:"s"+i,sub:e[1],date:e[0],type:e[2],ses:null}});
  /* מיגרציה: נושאים ישנים היו רשימת מחרוזות. עכשיו כל נושא הוא {n:שם,w:היקף חומר 1-3,wk:מרגיש חלש} */
  exams.forEach(function(e){
   if(e.topics&&e.topics.length&&typeof e.topics[0]==="string")e.topics=e.topics.map(function(s){return{n:s,w:2,wk:false}});
@@ -489,7 +1074,8 @@ function busyMin(d){
  busyOn(d).forEach(function(e){var a=Math.max(w.s,m2(e.s)),b=Math.min(S.lateH*60,m2(e.e));if(b>a)t+=Math.min(b,w.e)-a>0?Math.min(b,w.e)-a:0});
  return t;
 }
-function capOfD(d){var w=winFor(d);return Math.max(0,Math.min(S.cap[d.getDay()],Math.max(0,w.e-w.s)-busyMin(d)))}
+function capOfD(d){if(isRest(key(d)))return 0;
+ var w=winFor(d);return Math.max(0,Math.min(S.cap[d.getDay()],Math.max(0,w.e-w.s)-busyMin(d)))}
 function lateCapD(d){var w=winFor(d);return Math.max(0,S.lateH*60-w.s-busyMin(d))}
 /* קטעי הזמן הפנויים באמת ביום — החלון פחות האירועים */
 function gapsFor(d){
@@ -704,6 +1290,13 @@ function col(s){return s.kind==="hw"?"var(--pink)":
 function exById(id){return exams.filter(function(e){return e.id===id})[0]}
 
 /* ---------- render ---------- */
+function renderExtras(){
+ restClean();
+ var sb=document.getElementById("stkBox");if(sb)sb.innerHTML=streakHTML();
+ var rb=document.getElementById("restBtn");
+ if(rb)rb.textContent=isRest(viewK||key(tod()))?"החזרת היום לתוכנית":"אין לי כוח היום";
+ tmBar();
+}
 function render(){
  if(!viewK||pr(viewK)<tod())viewK=key(tod());
  build();hero();alerts();dayView();week();hwView();micro();evView();exView();setView();save();
@@ -892,6 +1485,10 @@ function tlHTML(d){
    (r.act||r.ev?'<div class="tlact">'+
      (r.act?'<button class="btn xs ghost" onclick="'+r.act+'">'+r.actL+'</button>':'')+
      (r.ev?'<button class="btn xs ghost" onclick="openEv(\''+r.ev+'\')">✎ אירוע</button>':'')+
+    '</div>':'')+
+   (r.chk&&!r.on&&r.cls==="study"?'<div class="tlact">'+
+     (TM&&TM.id===r.chk?'<button class="btn xs" onclick="tmStop()">■ עצירה ('+tmElapsed()+' דק\')</button>':
+      '<button class="btn xs ghost" onclick="tmStart(\''+r.chk+'\',\''+encodeURIComponent(r.h.split(" · ")[0])+'\','+(r.e-r.s)+')">▶ התחלה</button>')+
     '</div>':'')+
    (r.cal&&r.on&&r.pace>0?'<div class="tlact"><span class="sub" style="margin:0">כמה זמן לקח?</span>'+
      '<button class="btn xs ghost" onclick="calibLog(\''+encodeURIComponent(r.cal)+'\',.85)">פחות</button>'+
@@ -1412,7 +2009,11 @@ function ics(){
  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([L.join("\r\n")],{type:"text/calendar"}));
  a.download="lomed.ics";document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
-load();render();
+/* עוטף את render כדי שהתוספות יתרעננו בכל ציור, בלי לגעת בגוף הפונקציה */
+(function(){var _r=window.render;window.render=function(){_r.apply(this,arguments);try{renderExtras()}catch(e){}}})();
+tmLoad();tmTick();
+load();
+if(!S.profile&&!ST("l_skip")){setupStart()}else{render();tourMaybe()}
 document.getElementById("tbSub").textContent=heb(key(tod()));
 setInterval(function(){if(viewK===key(tod())&&document.getElementById("p-today").classList.contains("on"))dayView()},60000);
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
@@ -1471,6 +2072,7 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 const cfgRef=doc(db,'lomed','config'),secRef=doc(db,'lomed','secret'),stateRef=doc(db,'lomed','state');
 const membersCol=collection(db,'lomed','app','members'),propsCol=collection(db,'lomed','app','proposals');
+const streaksCol=collection(db,'lomed','app','streaks');
 const DEV=(()=>{try{let d=localStorage.getItem('l_dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('l_dev',d)}return d}catch(e){return 'x'}})();
 const F=window.fb={user:null,role:'none',code:'',ownerName:'',members:[],props:[],err:'',ready:false};
 const STATE_KEYS=['S','exams','hw','done','evts','ovr','prog','seen','calib','heat','pull'];
@@ -1488,6 +2090,8 @@ window.openEv=function(id){if(window.RO)return openPropose();return origOpenEv(i
 
 function snap(){const o={};STATE_KEYS.forEach(k=>o[k]=window[k]);return o}
 function applyState(d){applying=true;try{const st=JSON.parse(d.json);STATE_KEYS.forEach(k=>{if(st[k]!==undefined)window[k]=st[k]});
+ /* המערכת חיה ב-S.tt אבל נקראת דרך TT — בלי השורה הזו שינוי מערכת ממכשיר אחר לא נכנס לתוקף עד רענון */
+ if(window.S&&window.S.tt)window.TT=window.S.tt;
  window.S.updatedAt=d.updatedAt||0;if(!window.RO)origSave();origRender()}finally{applying=false}}
 async function pushState(){if(F.role!=='owner')return;
  try{const t=Date.now();window.S.updatedAt=t;origSave();await setDoc(stateRef,{json:JSON.stringify(snap()),updatedAt:t,dev:DEV});F.err=''}
@@ -1514,6 +2118,7 @@ const origGo=window.go;window.go=function(p){origGo(p);if(window.RO)document.get
 F.cancel=async id=>{try{await deleteDoc(doc(propsCol,id))}catch(e){F.err=e.code||e.message;fbUI()}};
 
 async function ownerStart(){
+ streakStart();
  const st=await getDoc(stateRef);
  if(st.exists()){const d=st.data();if((d.updatedAt||0)>(window.S.updatedAt||0)&&d.dev!==DEV)applyState(d)}
  else pushState();
@@ -1522,7 +2127,7 @@ async function ownerStart(){
  unsubs.push(onSnapshot(query(propsCol,where('status','==','pending')),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
  unsubs.push(onSnapshot(membersCol,s=>{F.members=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
 }
-function memberStart(){window.RO=true;document.body.classList.add('ro');
+function memberStart(){window.RO=true;document.body.classList.add('ro');streakStart();
  unsubs.push(onSnapshot(stateRef,s=>{if(s.exists())applyState(s.data());fbUI()}));
  unsubs.push(onSnapshot(query(propsCol,where('by','==',F.user.uid)),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt-a.createdAt);fbUI()}));
 }
@@ -1601,6 +2206,24 @@ function fbUI(){
   '<button class="btn" style="margin-bottom:12px" onclick="fb.join(document.getElementById(\'famCode\').value)">הצטרפות</button></div>'+
   '<div class="btnrow"><button class="btn xs ghost" onclick="fb.signOut()">התנתקות</button></div>'+err;
  today.innerHTML='<div class="banner">להצטרפות למשפחה: הגדרות → משפחה → הזנת קוד.</div>';
+}
+/* ---- רצפים משותפים ---- */
+window.streakRows=[];window.streakMe=null;
+let stkLast='';
+window.streakPush=(streak,best,litDay)=>{
+ if(!F.user)return;
+ const sig=streak+'/'+best+'/'+(litDay||'');
+ if(sig===stkLast)return; stkLast=sig;
+ setDoc(doc(streaksCol,F.user.uid),
+  {name:F.user.displayName||F.user.email||'—',streak,best,litDay:litDay||'',updatedAt:Date.now()},{merge:true}).catch(()=>{});
+};
+function streakStart(){
+ unsubs.push(onSnapshot(streaksCol,s=>{
+  window.streakRows=s.docs.map(d=>({uid:d.id,...d.data()}));
+  window.streakMe=F.user?F.user.uid:null;
+  try{renderExtras()}catch(e){}
+ }));
+ stkLast='';try{streakSync()}catch(e){}
 }
 window.fbUI=fbUI;
 </script>
