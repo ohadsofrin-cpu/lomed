@@ -640,6 +640,13 @@ var CATEV=[
 var ALLSUB=["מתמטיקה","אנגלית","לשון","ספרות","היסטוריה",'תנ"ך','חנ"ג',"ספרות אנגלית","אזרחות","מדעי המחשב"];
 var ALLHAG=["פיזיקה","כימיה","ביולוגיה","גאוגרפיה","הנדסת תוכנה","מדעי החברה","מדעי המחשב","צילום","דיפלומטיה","אמנות","תיאטרון","מחול","מוזיקה","ספרות אנגלית","אין"];
 var LESSONS=[1,2,3,4,5,6,7,8,9,10,11];
+/* בתי ספר. הקטלוג קיים רק למי שיש לו יומן שכבתי מוטמע. */
+var SCHOOLS={
+ katzir:{name:"קציר / קמפוס משגב",cat:true,
+   bells:{1:"08:35",2:"09:20",3:"09:55",4:"10:40",5:"11:25",6:"12:25",7:"13:10",8:"14:25",9:"15:15",10:"16:10",11:"17:00"}},
+ other:{name:"בית ספר אחר",cat:false,bells:null}
+};
+var GRADES=["י","יא","יב"];
 
 /* ---------- גזירת המבחנים מהקטלוג לפי הפרופיל ---------- */
 function myHag(p){var a=[];if(p.hagS&&p.hagS!=="אין")a.push(p.hagS);if(p.hagC&&p.hagC!=="אין")a.push(p.hagC);return a}
@@ -649,6 +656,7 @@ function resolveSub(sub,p){
  return sub;
 }
 function deriveExams(p){
+ if(!p||!SCHOOLS[p.school||"katzir"]||!SCHOOLS[p.school||"katzir"].cat)return [];
  var mine=(p.subs||[]).concat(myHag(p)),out=[],n=0;
  CAT.forEach(function(c){
   if(c[3]&&c[3].indexOf(p.cls)<0)return;              /* לא הכיתה שלי */
@@ -660,6 +668,7 @@ function deriveExams(p){
  return out;
 }
 function deriveEvents(p){
+ if(!p||!SCHOOLS[p.school||"katzir"]||!SCHOOLS[p.school||"katzir"].cat)return [];
  var mine=myHag(p||{});
  return CATEV.filter(function(e){return !e[3]||mine.indexOf(e[3])>-1})
   .map(function(e,i){
@@ -668,15 +677,17 @@ function deriveEvents(p){
 }
 
 /* ---------- בניית המערכת מהאשף ---------- */
-function ttFromGrid(g){
- var t={},BE={1:"08:37",2:"09:20",3:"09:55",4:"10:40",5:"11:25",6:"12:30",7:"13:10",8:"14:30",9:"15:15",10:"16:10",11:"17:00"};
+function ttFromGrid(g,bells,ends){
+ var t={},BE=bells||SCHOOLS.katzir.bells;
  for(var d=0;d<7;d++){
   var l=[],last=0;
   LESSONS.forEach(function(n){
    var v=(g[d]||{})[n];
    if(v&&v!=="—"){l.push([n,v]);if(n>last)last=n}
   });
-  t[d]={end:last?BE[last]:"",l:l};
+  /* בית ספר בלי לוח צלצולים מוטמע: המשתמש מקליד שעת סיום לכל יום */
+  var e=(ends&&ends[d])?ends[d]:(last?BE[last]:"");
+  t[d]={end:last?(e||BE[last]||"15:00"):"",l:l};
  }
  return t;
 }
@@ -684,12 +695,13 @@ function ttFromGrid(g){
 /* ---------- אשף ההקמה ---------- */
 var WZ={step:0,cls:0,hagS:"",hagC:"",subs:[],grid:{},day:0};
 function setupStart(){
- WZ={step:0,cls:0,hagS:"",hagC:"",subs:ALLSUB.slice(0,7),grid:{},day:0};
+ WZ={step:0,school:"",grade:"יא",cls:0,hagS:"",hagC:"",subs:ALLSUB.slice(0,7),grid:{},ends:{},day:0};
  document.getElementById("wizWrap").style.display="block";
  document.body.classList.add("wizOn");
  wizRender();
 }
 function wizGo(n){
+ if(n===2&&!WZ.school){toast("צריך לבחור בית ספר");return}
  if(n===2&&!WZ.cls){toast("צריך לבחור כיתה");return}
  WZ.step=n;wizRender();window.scrollTo(0,0);
 }
@@ -697,6 +709,8 @@ function wizPick(k,v){WZ[k]=v;if(k==="cls"){SHARE.list=null;SHARE.loaded=""}wizR
 function wizSub(s){var i=WZ.subs.indexOf(s);if(i<0)WZ.subs.push(s);else WZ.subs.splice(i,1);wizRender()}
 function wizDay(d){WZ.day=d;wizRender()}
 function wizSet(n,v){WZ.grid[WZ.day]=WZ.grid[WZ.day]||{};WZ.grid[WZ.day][n]=v;wizRender()}
+function wizEnd(v){WZ.ends[WZ.day]=v;wizRender()}
+function wizBells(){return SCHOOLS[WZ.school||"katzir"].bells}
 function wizCopy(){
  /* העתקת היום הקודם — חוסך הקלדה כשיומיים דומים */
  var prev=(WZ.day+6)%7;
@@ -722,9 +736,16 @@ function wizRender(){
     '<button class="btn ghost wide" onclick="wizSkip()">דלג, אמלא ידנית</button></div>';
  }
  if(S1===1){
-  h='<div class="wizStep">1 מתוך 4</div><h2 class="wizH">באיזו כיתה אתה?</h2>'+
-    '<p class="wizP">חלק מהמבחנים ביומן השכבתי מיועדים לכיתות מסוימות. זה מה שיסנן אותם.</p><div class="wizGrid">'+
-    [1,2,3,4,5,6].map(function(c){return '<button class="wizCard'+(WZ.cls===c?" on":"")+'" onclick="wizPick(\'cls\','+c+')">יא\''+c+'</button>'}).join("")+
+  h='<div class="wizStep">1 מתוך 4</div><h2 class="wizH">איפה אתה לומד?</h2>'+
+    '<div class="wizLbl">בית ספר</div><div class="wizChips">'+
+    Object.keys(SCHOOLS).map(function(k){return '<button class="wizChip'+(WZ.school===k?" on":"")+'" onclick="wizPick(\'school\',\''+k+'\')">'+SCHOOLS[k].name+'</button>'}).join("")+'</div>'+
+    (WZ.school==="other"?'<div class="shBox" style="margin-top:12px"><div class="sub" style="margin:0">'+
+      'ליומן של בית הספר שלך אין קטלוג מוטמע, אז רשימת המבחנים תתחיל ריקה ותוסיף אותם ידנית או תייבא מהיומן. '+
+      'כל השאר — התכנון, השיטות, הרצף — עובד בדיוק אותו דבר.</div></div>':'')+
+    '<div class="wizLbl">שכבה</div><div class="wizChips">'+
+    GRADES.map(function(gr){return '<button class="wizChip'+(WZ.grade===gr?" on":"")+'" onclick="wizPick(\'grade\',\''+gr+'\')">'+gr+'</button>'}).join("")+'</div>'+
+    '<div class="wizLbl">כיתה</div><div class="wizGrid">'+
+    [1,2,3,4,5,6,7,8].map(function(c){return '<button class="wizCard'+(WZ.cls===c?" on":"")+'" onclick="wizPick(\'cls\','+c+')">'+WZ.grade+"'"+c+'</button>'}).join("")+
     '</div><div class="wizNav"><button class="btn pri grow" onclick="wizGo(2)">המשך</button></div>';
  }
  if(S1===2){
@@ -746,16 +767,16 @@ function wizRender(){
   var opts=wizOpts(),g=WZ.grid[WZ.day]||{};
   h='<div class="wizStep">4 מתוך 4</div><h2 class="wizH">המערכת השבועית</h2>'+
     '<p class="wizP">מלא רק שיעורים אמיתיים. השיעור האחרון שתמלא קובע מתי אתה משתחרר, ומזה נגזר כמה זמן פנוי יש לך.</p>'+
-    (SHARE.busy?'<div class="shBox"><div class="scanSpin"></div> <span class="sub" style="margin:0">מחפש מערכת של יא\''+WZ.cls+'...</span></div>':
-     (SHARE.list===null?'<div class="shBox"><button class="btn sm" onclick="shareLook()">חיפוש מערכת של יא\''+WZ.cls+'</button>'+
+    (SHARE.busy?'<div class="shBox"><div class="scanSpin"></div> <span class="sub" style="margin:0">מחפש מערכת של '+clsLabel()+'...</span></div>':
+     (SHARE.list===null?'<div class="shBox"><button class="btn sm" onclick="shareLook()">חיפוש מערכת של '+clsLabel()+'</button>'+
        '<div class="sub" style="margin-top:6px">מישהו מהכיתה שלך אולי כבר העלה אותה.</div></div>':
-     (SHARE.list.length?'<div class="shBox"><div class="sub" style="margin:0 0 8px">מערכות של יא\''+WZ.cls+' שכבר הועלו:</div>'+
+     (SHARE.list.length?'<div class="shBox"><div class="sub" style="margin:0 0 8px">מערכות של '+clsLabel()+' שכבר הועלו:</div>'+
        SHARE.list.slice(0,3).map(function(it,i){
         return '<div class="shRow"><div class="grow"><b>'+esc(it.name||"תלמיד")+'</b>'+
          '<span class="sub" style="margin:0">'+(it.count||0)+' שיעורים</span></div>'+
          '<button class="btn xs" onclick="shareLoad('+i+')">טעינה</button></div>'}).join("")+
        (SHARE.loaded?'<div class="sub" style="margin-top:8px">נטענה מ'+esc(SHARE.loaded)+'. ההגברות הותאמו לשלך — עבור ותקן מה שצריך.</div>':'')+
-      '</div>':'<div class="shBox"><div class="sub" style="margin:0">אף אחד מיא\''+WZ.cls+' עוד לא העלה מערכת. אתה תהיה הראשון.</div></div>')))+
+      '</div>':'<div class="shBox"><div class="sub" style="margin:0">אף אחד מ'+clsLabel()+' עוד לא העלה מערכת. אתה תהיה הראשון.</div></div>')))+
     '<div class="scanBox">'+
      (SCAN.img?'<img class="scanImg" src="'+SCAN.img+'" alt="">':'')+
      '<div class="scanRow">'+
@@ -770,6 +791,11 @@ function wizRender(){
       var cnt=Object.keys(WZ.grid[d]||{}).filter(function(k){return WZ.grid[d][k]&&WZ.grid[d][k]!=="—"}).length;
       return '<button class="wizDay'+(WZ.day===d?" on":"")+'" onclick="wizDay('+d+')">'+DAYS[d].slice(0,3)+
              (cnt?'<i>'+cnt+'</i>':'')+'</button>'}).join("")+'</div>'+
+    (!SCHOOLS[WZ.school||"katzir"].bells?
+      '<div class="wizRow" style="border:1px solid var(--ln);border-radius:12px;margin-bottom:10px;padding:9px 12px">'+
+      '<span class="grow">מתי נגמרים הלימודים ביום '+DAYS[WZ.day]+'?</span>'+
+      '<input type="time" value="'+(WZ.ends[WZ.day]||"")+'" onchange="wizEnd(this.value)" style="background:var(--pn2);border:1px solid var(--ln);border-radius:9px;padding:7px;color:var(--ink)">'+
+      '</div>':'')+
     (WZ.day>0?'<button class="btn xs ghost" style="margin-bottom:8px" onclick="wizCopy()">העתקה מיום '+DAYS[(WZ.day+6)%7]+'</button>':'')+
     '<div class="wizRows">'+LESSONS.map(function(n){
       var v=g[n]||"—";
@@ -780,8 +806,8 @@ function wizRender(){
     '<button class="btn pri grow" onclick="wizGo(5)">סיום</button></div>';
  }
  if(S1===5){
-  var p={cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
-  var ex=deriveExams(p),tt=ttFromGrid(WZ.grid),caps=wizCaps(tt);
+  var p={school:WZ.school||"katzir",grade:WZ.grade,cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
+  var ex=deriveExams(p),tt=ttFromGrid(WZ.grid,wizBells(),WZ.ends),caps=wizCaps(tt);
   var nxt=ex.filter(function(e){return pr(e.date)>=tod()}).sort(function(a,b){return pr(a.date)-pr(b.date)})[0];
   h='<div class="wizStep">מוכן</div><h2 class="wizH">זה מה שיצא</h2>'+
     '<div class="wizSum"><div><b>'+ex.filter(function(e){return pr(e.date)>=tod()}).length+'</b><span>מבחנים שנשארו לך</span></div>'+
@@ -811,14 +837,15 @@ function wizSkip(){
  render();
 }
 function wizFinish(){
- var p={cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
- S.profile=p;S.tt=ttFromGrid(WZ.grid);S.cap=wizCaps(S.tt);
+ var p={school:WZ.school||"katzir",grade:WZ.grade,cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs,
+  bells:wizBells(),ends:WZ.ends};
+ S.profile=p;S.tt=ttFromGrid(WZ.grid,wizBells(),WZ.ends);S.cap=wizCaps(S.tt);
  TT=S.tt;
  exams=deriveExams(p);
  evts=(evts||[]).concat(deriveEvents(p));
  save();
  /* תורם את המערכת לכיתה, עם תגיות במקום ההגברות האישיות */
- if(window.ttPublish&&WZ.cls)window.ttPublish("יא"+WZ.cls,gridGeneric(WZ.grid,p),gridCount(WZ.grid));
+ if(window.ttPublish&&WZ.cls)window.ttPublish(clsKey(),gridGeneric(WZ.grid,p),gridCount(WZ.grid));
  document.getElementById("wizWrap").style.display="none";
  document.body.classList.remove("wizOn");
  render();
@@ -828,7 +855,8 @@ function wizFinish(){
 function setupAgain(){
  if(!confirm("לפתוח מחדש את אשף ההתאמה? המבחנים ייבנו מחדש מהיומן. המטלות וההתקדמות יישמרו."))return;
  setupStart();
- if(S.profile){WZ.cls=S.profile.cls;WZ.hagS=S.profile.hagS;WZ.hagC=S.profile.hagC;WZ.subs=(S.profile.subs||[]).slice()}
+ if(S.profile){WZ.school=S.profile.school||"katzir";WZ.grade=S.profile.grade||"יא";WZ.cls=S.profile.cls;
+  WZ.hagS=S.profile.hagS;WZ.hagC=S.profile.hagC;WZ.subs=(S.profile.subs||[]).slice();WZ.ends=S.profile.ends||{}}
  if(S.tt){var g={};for(var d=0;d<7;d++){g[d]={};(S.tt[d].l||[]).forEach(function(x){g[d][x[0]]=x[1]})}WZ.grid=g}
  wizRender();
 }
@@ -861,10 +889,14 @@ function gridPersonal(g){
  return o;
 }
 function gridCount(g){var n=0;for(var d in g)for(var k in g[d])if(g[d][k])n++;return n}
+/* מפתח הכיתה בענן חייב לכלול בית ספר ושכבה, אחרת יא5 של בית ספר אחד
+   ידרוס את יא5 של בית ספר אחר */
+function clsKey(){return (WZ.school||"katzir")+"-"+(WZ.grade||"יא")+WZ.cls}
+function clsLabel(){return (WZ.grade||"יא")+"'"+WZ.cls}
 function shareLook(){
  if(!WZ.cls||!window.ttFetch){SHARE.list=[];return}
  SHARE.busy=true;wizRender();
- window.ttFetch("יא"+WZ.cls).then(function(l){
+ window.ttFetch(clsKey()).then(function(l){
   SHARE.busy=false;SHARE.list=l;wizRender();
  }).catch(function(){SHARE.busy=false;SHARE.list=[];wizRender()});
 }
@@ -1164,6 +1196,7 @@ function load(){
  S=J("l_s",null)||defs();var d=defs();for(var k in d)if(S[k]===undefined)S[k]=d[k];
  /* המערכת מגיעה מהפרופיל של המשתמש. TT נשאר כברירת מחדל למי שדילג על האשף. */
  if(S.tt)TT=S.tt;
+ if(!S.rest)S.rest={};
  exams=J("l_ex",null);
  if(!Array.isArray(exams)||!exams.length)
   exams=S.profile?deriveExams(S.profile)
