@@ -373,6 +373,25 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
 .impRow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln);font-size:13.5px}
 .impRow:last-child{border-bottom:0}
 .impD{width:44px;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
+
+.newsIt{padding:11px 0 11px 0;border-top:1px solid var(--ln)}
+.newsIt:first-of-type{border-top:0}
+.newsIt b{display:block;font-size:15.5px;margin-bottom:3px}
+.newsIt span{display:block;color:var(--mut);font-size:13.5px;line-height:1.55}
+.newsIt i{display:block;font-style:normal;margin-top:7px;padding-inline-start:9px;
+ border-inline-start:2px solid var(--hot);font-size:13px;color:var(--ink)}
+
+.fbStars{display:flex;gap:6px}
+.fbSt{background:none;border:0;font-size:32px;line-height:1;color:var(--ln);cursor:pointer;padding:2px 0}
+.fbSt.on{color:var(--warm)}
+
+.inbIt{padding:10px 0;border-bottom:1px solid var(--ln)}
+.inbIt:last-child{border-bottom:0}
+.inbTop{display:flex;align-items:center;gap:7px;cursor:pointer}
+.inbR{color:var(--warm);font-size:12px;letter-spacing:-1px}
+.inbTx{font-size:14px;margin-top:6px;line-height:1.5}
+.inbCtx{font-size:11px;color:var(--dim);background:var(--pn2);border-radius:8px;padding:8px;
+ margin-top:8px;word-break:break-all;font-family:ui-monospace,monospace}
 </style>
 </head>
 <body>
@@ -471,8 +490,30 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
  <div class="card" id="ttBox"></div>
  <div class="card">
   <div class="sub" style="margin:0 0 10px">שינית מערכת, כיתה או הגברה? הרצה מחדש של האשף תבנה את רשימת המבחנים מחדש מהיומן השכבתי.</div>
-  <div class="btnrow"><button class="btn sm" onclick="setupAgain()">אשף ההתאמה</button>
-  <button class="btn sm ghost" onclick="tourStart()">הסיור מחדש</button></div>
+  <div class="btnrow"><button class="btn sm" onclick="setupPhoto()">עדכון מערכת מצילום</button>
+  <button class="btn sm ghost" onclick="setupAgain()">אשף ההתאמה</button></div>
+  <div class="btnrow" style="margin-top:8px"><button class="btn sm ghost" onclick="tourStart()">הסיור מחדש</button>
+  <button class="btn sm ghost" onclick="newsAgain()">מה חדש</button></div>
+ </div>
+ <h2 class="sec">טבלת הרצפים</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">הטבלה פתוחה לכל מי שמשתמש באפליקציה. כברירת מחדל מוצג השם הפרטי שלך בלבד.</div>
+  <div class="fld" style="margin:0 0 10px"><label>כינוי בטבלה</label>
+   <input id="nickI" placeholder="השם הפרטי שלך" onchange="setNick(this.value)"></div>
+  <div class="sw"><div>לא להופיע בטבלה<div class="sub">הרצף שלך יישאר פרטי</div></div>
+   <div class="tgl" id="tHide" onclick="tg('stkHide')"><i></i></div></div>
+ </div>
+ <h2 class="sec">עבודה וזמן תפוס</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">משמרות עבודה, חוגים ואימונים. הזמן הזה יורד מחלון הלימוד של אותו יום.</div>
+  <div class="btnrow"><button class="btn sm" onclick="workOpen()">משמרות עבודה</button>
+  <button class="btn sm ghost" onclick="openEv()">אירוע בודד</button></div>
+ </div>
+ <h2 class="sec">חוות דעת</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">מה עובד, מה מעצבן, ומה חסר.</div>
+  <div class="btnrow"><button class="btn sm" onclick="fbOpen()">כתיבת חוות דעת</button>
+  <span id="inbBtn"></span></div>
  </div>
  <h2 class="sec">Google Classroom</h2>
  <div class="card">
@@ -525,9 +566,11 @@ var TT={
 4:{end:"15:15",l:[[1,"פיזיקה"],[2,"פיזיקה"],[4,"הנדסת תוכנה"],[5,"הנדסת תוכנה"],[6,"מתמטיקה"],[7,"מתמטיקה"],[9,'תנ"ך']]},
 5:{end:"",l:[]},6:{end:"",l:[]}};
 /* צלצולים. שיעור 3 = בוקר טוב חינוך (15 דק') */
-var BELL={1:["07:55","08:37"],2:["08:38","09:20"],3:["09:40","09:55"],4:["09:55","10:40"],5:["10:40","11:25"],
- 6:["11:45","12:30"],7:["12:30","13:10"],8:["13:45","14:30"],9:["14:30","15:15"],10:["15:25","16:10"],11:["16:15","17:00"]};
-var BRK=[["09:20","09:40"],["11:25","11:45"]];
+/* לוח הצלצולים של קמפוס משגב. שיעור 3 הוא "בוקר טוב חינוך", 09:45-10:00.
+   זהו מקור האמת היחיד לזמנים — SCHOOLS.katzir.bells נגזר ממנו. */
+var BELL={1:["07:55","08:35"],2:["08:40","09:20"],3:["09:45","10:00"],4:["10:00","10:40"],5:["10:45","11:25"],
+ 6:["11:45","12:25"],7:["12:30","13:10"],8:["13:40","14:25"],9:["14:30","15:15"],10:["15:25","16:10"],11:["16:15","17:00"]};
+var BRK=[["09:20","09:45"],["11:25","11:45"],["13:10","13:40"]];
 var TYPE={bagrut:{l:"בגרות",c:"bag",w:14},matkonet:{l:"מתכונת",c:"mat",w:9},
  hagbara:{l:"הגברה",c:"hag",w:6},mivchan:{l:"מבחן",c:"",w:4},bochan:{l:"בוחן",c:"",w:2}};
 var HARD=["מתמטיקה","פיזיקה","הנדסת תוכנה"];
@@ -649,7 +692,7 @@ var LESSONS=[1,2,3,4,5,6,7,8,9,10,11];
 /* בתי ספר. הקטלוג קיים רק למי שיש לו יומן שכבתי מוטמע. */
 var SCHOOLS={
  katzir:{name:"קציר / קמפוס משגב",cat:true,
-   bells:{1:"08:35",2:"09:20",3:"09:55",4:"10:40",5:"11:25",6:"12:25",7:"13:10",8:"14:25",9:"15:15",10:"16:10",11:"17:00"}},
+   bells:(function(){var o={};for(var k in BELL)o[k]=BELL[k][1];return o})()},
  other:{name:"בית ספר אחר",cat:false,bells:null}
 };
 var GRADES=["י","יא","יב"];
@@ -857,13 +900,27 @@ function wizFinish(){
  render();
  setTimeout(tourStart,350);
 }
+/* קפיצה ישר למסך המערכת עם הצילום — בלי לעבור על כל האשף */
+function setupPhoto(){
+ setupPrefill();
+ WZ.step=4;
+ document.getElementById("wizWrap").style.display="block";
+ document.body.classList.add("wizOn");
+ wizRender();
+ setTimeout(function(){var el=document.getElementById("ttPhoto");if(el)el.click()},250);
+}
+function setupPrefill(){
+ SCAN={busy:false,img:"",msg:"",model:""};
+ if(S.profile){WZ.school=S.profile.school||"katzir";WZ.grade=S.profile.grade||"יא";WZ.cls=S.profile.cls;
+  WZ.hagS=S.profile.hagS;WZ.hagC=S.profile.hagC;WZ.subs=(S.profile.subs||[]).slice();WZ.ends=S.profile.ends||{}}
+ if(S.tt){var g={};for(var d=0;d<7;d++){g[d]={};(S.tt[d].l||[]).forEach(function(x){g[d][x[0]]=x[1]})}WZ.grid=g}
+ SHARE={list:null,busy:false,msg:"",loaded:""};
+}
 /* הרצה מחדש של האשף מההגדרות, בלי לאבד מטלות והתקדמות */
 function setupAgain(){
  if(!confirm("לפתוח מחדש את אשף ההתאמה? המבחנים ייבנו מחדש מהיומן. המטלות וההתקדמות יישמרו."))return;
  setupStart();
- if(S.profile){WZ.school=S.profile.school||"katzir";WZ.grade=S.profile.grade||"יא";WZ.cls=S.profile.cls;
-  WZ.hagS=S.profile.hagS;WZ.hagC=S.profile.hagC;WZ.subs=(S.profile.subs||[]).slice();WZ.ends=S.profile.ends||{}}
- if(S.tt){var g={};for(var d=0;d<7;d++){g[d]={};(S.tt[d].l||[]).forEach(function(x){g[d][x[0]]=x[1]})}WZ.grid=g}
+ setupPrefill();
  wizRender();
 }
 
@@ -1088,6 +1145,269 @@ function deriveFromCat(cat,p){
  return out;
 }
 
+
+/* ============================================================
+   הודעת "מה חדש" — נראית פעם אחת לכל גרסה, ורק למשתמשים קיימים
+   ============================================================ */
+var VER=8;
+/* v = הגרסה שבה השינוי נכנס · t = מה השתנה · a = מה המשתמש צריך לעשות (ריק = כלום) */
+var NEWS=[
+ {v:2,t:"רזרבה לשיעורי בית",d:"נשמר זמן מראש למטלות שעוד לא קיבלת, כדי שהן לא ידחפו את הלמידה למבחנים.",a:""},
+ {v:3,t:"חלון לימוד אמיתי",d:"הקיבולת מחושבת מסיום הלימודים בפועל ועד שעת הסיום שקבעת, במקום מספר קבוע.",a:"בהגדרות: בדוק את שעת הסיום וזמן הנסיעה."},
+ {v:4,t:"דף מטרים",d:"אפשר להזין לכל מבחן את הנושאים ומאיפה מתרגלים. הנושאים נפרסים על המשבצות.",a:"פתח מבחן קרוב והזן את הנושאים שלו."},
+ {v:5,t:"טיימר ויום מנוחה",d:"כפתור התחלה בכל משבצת מודד זמן אמיתי ומכייל את הקצב. וכפתור \"אין לי כוח היום\" מפזר את היום מחדש.",a:""},
+ {v:6,t:"רצף ולהבה",d:"האש נדלקת כשסוגרים את כל משבצות היום, ונכבית בכל לילה. הצבע מתחזק עם אורך הרצף.",a:""},
+ {v:7,t:"התאמה אישית",d:"בית ספר, שכבה, כיתה, הגברות ומערכת — הכול נקבע באשף ולא מקובע בקוד.",a:"הרץ את אשף ההתאמה בהגדרות כדי שרשימת המבחנים תתאים לך."},
+ {v:8,t:"צילום מערכת וייבוא לוח מבחנים",d:"אפשר לצלם את המערכת והיא תתמלא לבד, לייבא לוח מבחנים מיומן גוגל ציבורי, ולטעון מערכת שכבר הועלתה בכיתה שלך. גם לוח הצלצולים תוקן: שיעור 3 הוא 09:45-10:00.",a:"בהגדרות: \"עדכון מערכת מצילום\". שעות הסיום התעדכנו אוטומטית."}
+];
+function newsCheck(){
+ /* משתמש חדש לגמרי — לא מציקים לו, הוא בדיוק סיים אשף */
+ if(!S.profile){if(S.ver!==VER){S.ver=VER;save()}return}
+ var seenV=(S.ver===undefined)?0:S.ver;
+ if(seenV>=VER)return;
+ var items=NEWS.filter(function(n){return n.v>seenV});
+ S.ver=VER;save();
+ if(!items.length)return;
+ setTimeout(function(){newsShow(items)},600);
+}
+function newsShow(items){
+ var todo=items.filter(function(n){return n.a});
+ openS('<h3>מה השתנה</h3>'+
+  '<div class="sub" style="margin:-8px 0 14px">'+items.length+
+   (items.length===1?" עדכון מאז הפעם האחרונה":" עדכונים מאז הפעם האחרונה")+'</div>'+
+  items.map(function(n){
+   return '<div class="newsIt"><b>'+esc(n.t)+'</b><span>'+esc(n.d)+'</span>'+
+    (n.a?'<i>'+esc(n.a)+'</i>':'')+'</div>'}).join("")+
+  (todo.length?'<div class="warn" style="margin-top:12px"><b>'+
+    (todo.length===1?"דבר אחד דורש ממך פעולה":todo.length+" דברים דורשים ממך פעולה")+
+    '</b><div class="sub" style="color:inherit;opacity:.85">מסומנים למעלה בקו צד.</div></div>':'')+
+  '<div class="btnrow" style="margin-top:16px">'+
+  (todo.length?'<button class="btn pri grow" onclick="closeS();go(\'set\')">להגדרות</button>'+
+    '<button class="btn" onclick="closeS()">אחר כך</button>':
+   '<button class="btn pri grow" onclick="closeS()">הבנתי</button>')+
+  '</div>');
+}
+function newsAgain(){newsShow(NEWS.slice().reverse().slice(0,4))}
+
+
+/* ============================================================
+   משמרות עבודה · חוות דעת
+   ============================================================ */
+
+/* ---- משמרות ----
+   נשמרות כאירועים רגילים עם work:true, כדי שהסקדולר, ציר הזמן וחישוב
+   הקיבולת יטפלו בהן בלי קוד נוסף. שבועי = תבנית קבועה, חד-פעמי = משמרת בתאריך. */
+var WK={days:[],s:"17:00",e:"21:00",title:"עבודה"};
+function workList(){return (evts||[]).filter(function(e){return e.work})}
+function workOpen(){
+ WK={days:[],s:WK.s||"17:00",e:WK.e||"21:00",title:WK.title||"עבודה"};
+ workRender();
+}
+function wkDay(d){var i=WK.days.indexOf(d);if(i<0)WK.days.push(d);else WK.days.splice(i,1);workRender()}
+function wkSet(f,v){WK[f]=v;workRender()}
+function workRender(){
+ var l=workList(),wk=l.filter(function(e){return e.rep==="weekly"}),on=l.filter(function(e){return e.rep==="once"});
+ var mins=WK.days.length*Math.max(0,m2(WK.e)-m2(WK.s));
+ openS('<h3>משמרות עבודה</h3>'+
+  '<div class="sub" style="margin:-8px 0 14px">שעות עבודה יורדות מזמן הלימוד של אותו יום, והתוכנית מתפרסת מחדש סביבן.</div>'+
+  '<div class="fld"><label>שם</label><input id="wT" value="'+esc(WK.title)+'" onchange="wkSet(\'title\',this.value)"></div>'+
+  '<div class="wizLbl">באילו ימים</div><div class="wizDays">'+
+   [0,1,2,3,4,5,6].map(function(d){return '<button class="wizDay'+(WK.days.indexOf(d)>-1?" on":"")+
+     '" onclick="wkDay('+d+')">'+DAYS[d].slice(0,3)+'</button>'}).join("")+'</div>'+
+  '<div class="row" style="gap:10px;margin-top:12px">'+
+   '<div class="fld grow" style="margin:0"><label>משעה</label><input type="time" value="'+WK.s+'" onchange="wkSet(\'s\',this.value)"></div>'+
+   '<div class="fld grow" style="margin:0"><label>עד שעה</label><input type="time" value="'+WK.e+'" onchange="wkSet(\'e\',this.value)"></div>'+
+  '</div>'+
+  (mins>0?'<div class="shBox" style="margin-top:12px"><div class="sub" style="margin:0">'+
+    WK.days.length+' משמרות בשבוע · '+Math.round(mins/6)/10+' שעות שיירדו מזמן הלימוד</div></div>':'')+
+  '<div class="btnrow" style="margin-top:12px">'+
+   '<button class="btn pri grow" onclick="workAddWeekly()">הוספה כתבנית שבועית</button>'+
+   '<button class="btn" onclick="workAddOnce()">משמרת בתאריך</button></div>'+
+  ((wk.length||on.length)?'<div class="wizLbl">המשמרות שלי</div><div class="impList">'+
+    wk.map(function(e){return '<div class="impRow"><span class="grow"><b>'+esc(e.title)+'</b> '+
+      '<span class="sub" style="margin:0">כל יום '+DAYS[e.dow]+' · '+e.s+'–'+e.e+'</span></span>'+
+      '<button class="btn xs ghost" onclick="workDel(\''+e.id+'\')">הסרה</button></div>'}).join("")+
+    on.map(function(e){return '<div class="impRow"><span class="grow"><b>'+esc(e.title)+'</b> '+
+      '<span class="sub" style="margin:0">'+heb(e.date)+' · '+e.s+'–'+e.e+'</span></span>'+
+      '<button class="btn xs ghost" onclick="workDel(\''+e.id+'\')">הסרה</button></div>'}).join("")+
+   '</div>':'')+
+  '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">סגירה</button></div>');
+}
+function workValid(){
+ if(window.RO){toast("מצב צפייה");return false}
+ if(m2(WK.e)<=m2(WK.s)){toast("שעת הסיום צריכה להיות אחרי ההתחלה");return false}
+ return true;
+}
+function workAddWeekly(){
+ if(!workValid())return;
+ if(!WK.days.length){toast("בחר לפחות יום אחד");return}
+ WK.days.forEach(function(d){
+  evts.push({id:"w"+Date.now()+d,title:WK.title||"עבודה",rep:"weekly",date:null,dow:d,
+   from:key(tod()),s:WK.s,e:WK.e,blocks:true,work:true});
+ });
+ var n=WK.days.length;WK.days=[];
+ save();render();workRender();
+ toast(n+" משמרות שבועיות נוספו");
+}
+function workAddOnce(){
+ if(!workValid())return;
+ var d=prompt("תאריך המשמרת (YYYY-MM-DD)",key(ad(tod(),1)));
+ if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d)){if(d)toast("תאריך לא תקין");return}
+ evts.push({id:"w"+Date.now(),title:WK.title||"עבודה",rep:"once",date:d,dow:null,
+  from:null,s:WK.s,e:WK.e,blocks:true,work:true});
+ save();render();workRender();toast("המשמרת נוספה");
+}
+function workDel(id){
+ evts=evts.filter(function(e){return e.id!==id});
+ save();render();workRender();
+}
+
+
+/* ---- תיבת חוות הדעת (בעלים בלבד) ---- */
+var INB={busy:false,rows:null,msg:"",open:{}};
+function inbOpen(){INB={busy:true,rows:null,msg:"",open:{}};inbRender();
+ window.fbRead().then(function(r){INB.busy=false;INB.rows=r;inbRender()})
+  .catch(function(e){INB.busy=false;INB.msg=(e&&e.message)||"לא הצלחתי";inbRender()})}
+function inbToggle(i){INB.open[i]=!INB.open[i];inbRender()}
+function inbDel(id){
+ if(!confirm("למחוק את חוות הדעת?"))return;
+ window.fbDel(id).then(function(){INB.rows=(INB.rows||[]).filter(function(x){return x.id!==id});inbRender()});
+}
+function inbRender(){
+ var r=INB.rows;
+ openS('<h3>חוות דעת שהתקבלו</h3>'+
+  (INB.busy?'<div class="scanRow"><div class="scanSpin"></div><span class="sub" style="margin:0">טוען...</span></div>':
+   INB.msg?'<div class="warn">'+esc(INB.msg)+'</div>':
+   (r&&r.length?
+    '<div class="sub" style="margin:-8px 0 12px">'+r.length+' הודעות · '+
+     (function(){var w=r.filter(function(x){return x.rating});return w.length?
+       "דירוג ממוצע "+(Math.round(w.reduce(function(a,x){return a+x.rating},0)/w.length*10)/10)+"/5":"בלי דירוגים"})()+'</div>'+
+    '<div class="impList">'+r.map(function(x,i){
+      var d=new Date(x.createdAt||0);
+      return '<div class="inbIt"><div class="inbTop" onclick="inbToggle('+i+')">'+
+       '<span class="tag">'+esc(x.cat||"כללי")+'</span>'+
+       (x.rating?'<span class="inbR">'+"★".repeat(x.rating)+'</span>':'')+
+       '<span class="grow sub" style="margin:0">'+esc(x.name||"אנונימי")+' · '+
+        d.getDate()+"."+(d.getMonth()+1)+'</span>'+
+       '<span class="sub" style="margin:0">'+(INB.open[i]?"▲":"▼")+'</span></div>'+
+       '<div class="inbTx">'+esc(x.text||"—")+'</div>'+
+       (INB.open[i]?'<div class="inbCtx">'+esc(x.ctx||"{}")+'</div>'+
+         '<button class="btn xs ghost" onclick="inbDel(\''+x.id+'\')">מחיקה</button>':'')+
+      '</div>'}).join("")+'</div>'
+    :'<div class="empty">עוד לא התקבלו חוות דעת.</div>'))+
+  '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">סגירה</button></div>');
+}
+
+/* ---- חוות דעת ---- */
+var FB={r:0,txt:"",cat:"כללי",sent:false,msg:""};
+function fbOpen(){FB={r:0,txt:"",cat:"כללי",sent:false,msg:""};fbRender()}
+function fbRender(){
+ var cats=["כללי","באג","רעיון","עיצוב","התכנון לא מדויק"];
+ if(FB.sent){
+  openS('<h3>תודה</h3><div class="shBox"><div class="sub" style="margin:0">'+esc(FB.msg)+'</div></div>'+
+   '<div class="btnrow" style="margin-top:14px"><button class="btn pri grow" onclick="closeS()">סגירה</button></div>');
+  return;
+ }
+ openS('<h3>חוות דעת</h3>'+
+  '<div class="sub" style="margin:-8px 0 14px">מה עובד, מה מעצבן, ומה חסר. זה מה שקובע מה נבנה אחר כך.</div>'+
+  '<div class="wizLbl">כמה האפליקציה עוזרת לך</div>'+
+  '<div class="fbStars">'+[1,2,3,4,5].map(function(n){
+    return '<button class="fbSt'+(FB.r>=n?" on":"")+'" onclick="FB.r='+n+';fbRender()">★</button>'}).join("")+'</div>'+
+  '<div class="wizLbl">על מה מדובר</div><div class="wizChips">'+
+   cats.map(function(c){return '<button class="wizChip'+(FB.cat===c?" on":"")+
+     '" onclick="FB.cat=\''+c+'\';fbRender()">'+c+'</button>'}).join("")+'</div>'+
+  '<div class="fld" style="margin-top:14px"><label>מה תרצה לכתוב</label>'+
+   '<textarea id="fbT" placeholder="למשל: התוכנית נותנת לי יותר מדי ביום רביעי" oninput="FB.txt=this.value">'+esc(FB.txt)+'</textarea></div>'+
+  (FB.msg?'<div class="warn">'+esc(FB.msg)+'</div>':'')+
+  '<div class="btnrow" style="margin-top:8px">'+
+   '<button class="btn pri grow" onclick="fbSend()">שליחה</button>'+
+   '<button class="btn" onclick="fbCopy()">העתקה</button>'+
+   '<button class="btn ghost" onclick="closeS()">ביטול</button></div>');
+}
+/* הקשר טכני נשלח אוטומטית — בלעדיו רוב הדיווחים לא ניתנים לשחזור */
+function fbCtx(){
+ var p=S.profile||{};
+ return {ver:VER,school:p.school||"",grade:p.grade||"",cls:p.cls||0,
+  exams:(exams||[]).length,hw:(hw||[]).length,
+  cap:(S.cap||[]).join(","),len:S.len,endH:S.endH,
+  ua:(navigator.userAgent||"").slice(0,120)};
+}
+function fbText(){
+ return "["+FB.cat+"] "+(FB.r?FB.r+"/5 · ":"")+FB.txt+"\n\n"+JSON.stringify(fbCtx());
+}
+function fbSend(){
+ if(!FB.txt.trim()&&!FB.r){FB.msg="כתוב משהו או דרג";fbRender();return}
+ if(!window.fbPush){FB.msg="אין חיבור לענן. לחץ העתקה ושלח את הטקסט בוואטסאפ.";fbRender();return}
+ window.fbPush({rating:FB.r,cat:FB.cat,text:FB.txt.trim(),ctx:fbCtx()})
+  .then(function(){FB.sent=true;FB.msg="החוות דעת נשלחה. אם זה באג, ההקשר הטכני נשלח יחד איתה.";fbRender()})
+  .catch(function(e){FB.msg="השליחה נכשלה: "+((e&&e.message)||"")+". לחץ העתקה במקום.";fbRender()});
+}
+function fbCopy(){
+ var t=fbText();
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   navigator.clipboard.writeText(t).then(function(){toast("הועתק")},function(){fbFall(t)});
+  }else fbFall(t);
+ }catch(e){fbFall(t)}
+}
+function fbFall(t){
+ var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);
+ a.select();try{document.execCommand("copy");toast("הועתק")}catch(e){toast("לא הצלחתי להעתיק")}
+ document.body.removeChild(a);
+}
+
+
+/* ---- דחיית משבצת ליום אחר ----
+   נשמר כהחלטה מפורשת: משבצת אחת של מבחן X עוברת מיום A ליום B.
+   הסקדולר מוריד אחת מיום המקור ומצמיד אחת ליום היעד. */
+function movedList(){return (S.moved||[]).filter(function(m){return m.to>=key(ad(tod(),-1))})}
+function moveClean(){
+ if(!S.moved)return;
+ var cut=key(ad(tod(),-7));
+ S.moved=S.moved.filter(function(m){return m.to>=cut});
+}
+function movePick(exId,fromK){
+ if(window.RO)return toast("מצב צפייה");
+ var e=exById(exId);
+ var last=e?pr(e.date):ad(tod(),21);
+ var opts=[];
+ for(var i=0;i<10;i++){
+  var d=ad(tod(),i),k=key(d);
+  if(k===fromK)continue;
+  if(d>last)break;                      /* אין טעם לדחות לאחרי המבחן */
+  var free=capOfD(d),used=0;
+  ((plan||{})[k]||[]).forEach(function(s){used+=s.min||S.len});
+  opts.push({k:k,d:d,free:Math.max(0,free-used),n:((plan||{})[k]||[]).length});
+ }
+ openS('<h3>דחיית משבצת</h3>'+
+  '<div class="sub" style="margin:-8px 0 14px">'+esc(e?e.sub:"משבצת")+
+   (e?' · '+TYPE[e.type].l+' '+heb(e.date):'')+'</div>'+
+  (opts.length?'<div class="impList">'+opts.map(function(o){
+    var tight=o.free<S.len;
+    return '<div class="impRow"><span class="grow"><b>'+DAYS[o.d.getDay()]+' '+o.d.getDate()+'.'+(o.d.getMonth()+1)+'</b> '+
+     '<span class="sub" style="margin:0">'+o.n+' משבצות · '+(tight?"אין מקום פנוי":o.free+" דק' פנויות")+'</span></span>'+
+     '<button class="btn xs'+(tight?" ghost":"")+'" onclick="moveDo(\''+exId+'\',\''+fromK+'\',\''+o.k+'\')">'+
+     (tight?"בכל זאת":"דחייה")+'</button></div>'}).join("")+'</div>'
+   :'<div class="empty">אין יום פנוי לפני המבחן. אפשר להוריד משבצות למבחן הזה בעריכה שלו.</div>')+
+  (movedList().length?'<div class="wizLbl">דחיות פעילות</div><div class="impList">'+
+    movedList().map(function(m,i){var me=exById(m.ex);
+     return '<div class="impRow"><span class="grow">'+esc(me?me.sub:"מבחן")+' · '+
+      m.from.slice(5).replace("-",".")+' → '+m.to.slice(5).replace("-",".")+'</span>'+
+      '<button class="btn xs ghost" onclick="moveUndo('+i+')">ביטול</button></div>'}).join("")+'</div>':'')+
+  '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">סגירה</button></div>');
+}
+function moveDo(exId,fromK,toK){
+ S.moved=S.moved||[];
+ S.moved.push({ex:exId,from:fromK,to:toK});
+ save();closeS();render();
+ toast("המשבצת נדחתה ל"+heb(toK));
+}
+function moveUndo(i){
+ var l=movedList(),m=l[i];if(!m)return;
+ S.moved=(S.moved||[]).filter(function(x){return !(x.ex===m.ex&&x.from===m.from&&x.to===m.to)});
+ save();render();movePick(m.ex,m.from);
+}
+
 /* ---------- סיור פתיחה ---------- */
 var TOUR=[
  {t:"today",h:"המסך הזה עונה על שאלה אחת",b:"מה ללמוד עכשיו. הספירה למעלה היא למבחן הקרוב, ומתחתיה המשבצות של היום לפי סדר — כולל באיזו שיטה ללמוד, לא רק מה."},
@@ -1159,20 +1479,62 @@ function tmTick(){clearInterval(window._tmI);if(TM){tmBar();window._tmI=setInter
 
 /* ---------- יום מנוחה ---------- */
 function isRest(k){return !!(S.rest&&S.rest[k])}
+/* כמה ימי מנוחה בחלון הימים האחרונים, וכמה זמן לימוד הם מחקו */
+function restStats(win){
+ win=win||14;
+ var from=key(ad(tod(),-win)),n=0,mins=0;
+ for(var k in (S.rest||{})){
+  if(k<from)continue;
+  n++;mins+=capWd(pr(k).getDay());
+ }
+ return {n:n,mins:mins,win:win};
+}
 function restToggle(k){
  if(window.RO)return toast("מצב צפייה");
  S.rest=S.rest||{};
- if(S.rest[k]){delete S.rest[k];toast("היום חזר לתוכנית")}
- else{S.rest[k]=1;toast("היום פונה — התוכנית התפרסה מחדש")}
- save();render();
+ if(S.rest[k]){delete S.rest[k];save();render();toast("היום חזר לתוכנית");return}
+ S.rest[k]=1;save();render();
+ var st=restStats(14);
+ if(st.n>=3)restWarn(st);
+ else toast("היום פונה — התוכנית התפרסה מחדש");
+}
+/* לא נועלים ולא מטיפים — מראים את המספרים ואת ההשלכה, ומציעים חלופה */
+function restWarn(st){
+ var t=tod(),soon=exams.filter(function(e){var d=df(e.date,t);return d>=0&&d<=14})
+  .sort(function(a,b){return pr(a.date)-pr(b.date)});
+ var slots=Math.round(st.mins/S.len);
+ openS('<h3>זה היום ה'+st.n+' שפינית</h3>'+
+  '<div class="warn" style="margin-bottom:12px">'+
+   '<b>'+Math.round(st.mins/6)/10+' שעות לימוד ירדו מהתוכנית ב-'+st.win+' הימים האחרונים</b>'+
+   '<div class="sub" style="color:inherit;opacity:.85">כ-'+slots+' משבצות נדחפו לימים אחרים. '+
+   'הן לא נעלמו — הן הצטברו, והימים שנשארו עד המבחנים נעשים צפופים יותר.</div></div>'+
+  (soon.length?'<div class="wizLbl">מה מחכה בשבועיים הקרובים</div><div class="impList">'+
+    soon.slice(0,5).map(function(e){
+     return '<div class="impRow"><span class="impD">'+df(e.date,t)+' י\'</span>'+
+      '<span class="grow">'+esc(e.sub)+'</span>'+
+      '<span class="tag '+TYPE[e.type].c+'">'+TYPE[e.type].l+'</span></div>'}).join("")+'</div>':'')+
+  '<div class="sub" style="margin-top:12px">שלושה ימי מנוחה בשבועיים זה סימן שהתוכנית לא מתאימה למציאות, '+
+   'ולא שאתה לא מתאמץ. עדיף להוריד את הקיבולת היומית בהגדרות מלפנות ימים שלמים — '+
+   'תוכנית קטנה שמתקיימת שווה יותר מתוכנית גדולה שנדחית.</div>'+
+  '<div class="btnrow" style="margin-top:16px">'+
+   '<button class="btn pri grow" onclick="closeS();go(\'set\')">כיוונון הקיבולת</button>'+
+   '<button class="btn" onclick="closeS()">הבנתי</button></div>');
 }
 /* ניקוי ימי מנוחה ישנים כדי שהאובייקט לא יתנפח */
 function restClean(){if(!S.rest)return;var cut=key(ad(tod(),-14));for(var k in S.rest)if(k<cut)delete S.rest[k]}
 
 /* ---------- רצפים ---------- */
 /* יום נספר ברצף רק אם סגרת את כל מה שתוכנן. יום בלי תוכנית לא שובר ולא מוסיף. */
-function dayOK(k){var x=heat[k];return !!(x&&x.t>0&&x.d>=x.t)}
-function dayPlanned(k){var x=heat[k];return !!(x&&x.t>0)}
+/* heat נכתב רק ב-rollover, כלומר לימים שעברו. ליום הנוכחי אין בו רשומה בכלל,
+   ולכן הרצף והלהבה חייבים לחשב את היום מהתוכנית החיה. זה היה הבאג. */
+function todayStat(){
+ var k=key(tod()),arr=(plan&&plan[k])||[],t=0,d=0;
+ arr.forEach(function(s,i){var m=s.min||S.len;t+=m;if(done[sid(k,s,i)])d+=m});
+ return {t:t,d:d};
+}
+function statFor(k){return k===key(tod())?todayStat():(heat[k]||{t:0,d:0})}
+function dayOK(k){var x=statFor(k);return !!(x.t>0&&x.d>=x.t)}
+function dayPlanned(k){var x=statFor(k);return !!(x.t>0)}
 function streakNow(){
  var n=0,d=tod();
  /* היום עדיין פתוח — אם לא הושלם, מתחילים לספור מאתמול */
@@ -1193,7 +1555,7 @@ function streakBest(){
 function streakSync(){
  var n=streakNow(),b=streakBest();
  if(b>(S.bestStreak||0)){S.bestStreak=b;save()}
- if(window.streakPush)window.streakPush(n,b,todayLit()?key(tod()):"");
+ if(window.streakPush)window.streakPush(n,b,todayLit()?key(tod()):"",S.nick||"",!!S.stkHide);
  return {n:n,b:b};
 }
 /* דרגת האש: ככל שהרצף ארוך יותר הלהבה גדולה וחמה יותר. 0 = כבויה. */
@@ -1216,8 +1578,8 @@ function fireSVG(n,id){
   '<path class="fcore" d="M24 27c1 4 5 6 5 11 0 5-3 8-6 8s-6-3-6-8c0-4 4-6 7-11z" fill="'+f.c+'" opacity="'+(L?.85:.25)+'"/></g></svg>';
 }
 /* כמה מהיום כבר נסגר. האש נדלקת רק על 100%. */
-function todayFuel(){var x=heat[key(tod())];return x&&x.t?Math.min(1,x.d/x.t):0}
-function todayLeft(){var x=heat[key(tod())];return x&&x.t?Math.max(0,x.t-x.d):0}
+function todayFuel(){var x=todayStat();return x.t?Math.min(1,x.d/x.t):0}
+function todayLeft(){var x=todayStat();return x.t?Math.max(0,Math.ceil((x.t-x.d)/S.len)):0}
 function todayLit(){return dayOK(key(tod()))}
 function streakHTML(){
  var s=streakSync(),rows=(window.streakRows||[]).slice();
@@ -1244,6 +1606,7 @@ function streakHTML(){
  else tip="האש נדלקת ביום הראשון שבו תסגור את כל המשבצות.";
  h+='<div class="sub" style="margin:8px 0 0">'+tip+'</div>';
  if(rows.length){
+  h+='<div class="sub" style="margin-top:12px">'+rows.length+' משתמשים בטבלה</div>';
   rows.sort(function(a,b){return (b.streak||0)-(a.streak||0)||(b.best||0)-(a.best||0)});
   var med=["🥇","🥈","🥉"];
   h+='<div class="stkTbl">'+rows.map(function(r,i){
@@ -1254,7 +1617,10 @@ function streakHTML(){
     '<span class="stkNum">'+(r.streak||0)+'</span><span class="stkBst">שיא '+(r.best||0)+'</span></div>';
   }).join("")+'</div>';
  }else{
-  h+='<div class="sub" style="margin-top:10px">טבלת הרצפים נפתחת כשמצטרפים למשפחה. כל אחד רואה את הרצף של כולם.</div>';
+  h+='<div class="sub" style="margin-top:10px">'+
+   (S.stkHide?"בחרת לא להופיע בטבלה. אפשר לשנות בהגדרות.":
+    window.streakMe?"אתה בטבלה. עוד אין משתמשים אחרים שסגרו יום.":
+    "הטבלה משותפת לכל מי שמשתמש באפליקציה. התחבר בהגדרות כדי להופיע בה.")+'</div>';
  }
  return h;
 }
@@ -1519,10 +1885,28 @@ function build(){
   });
  });
 
+ /* 1.5 דחיות שהמשתמש ביקש.
+    שתי הפעולות הכרחיות: להצמיד משבצת ליום היעד, ולגרוע את הזמן מיום המקור.
+    בלי הגריעה השנייה הסקדולר ממלא מיד את החור מאותו מבחן, והדחייה חסרת משמעות. */
+ moveClean();
+ (S.moved||[]).forEach(function(m){
+  if(m.to<key(t))return;
+  var e=exById(m.ex);if(!e)return;
+  var fd=pr(m.from);
+  if(fd>=t){var fk=key(fd);free(fd);left[fk]=Math.max(0,left[fk]-S.len)}
+  var td=pr(m.to);if(td<t)return;
+  var tk=key(td);
+  free(td);
+  if(left[tk]<S.len)left[tk]=S.len;                /* דחייה מפורשת גוברת על הקיבולת */
+  push(tk,{kind:"ex",id:e.id,sub:e.sub,type:e.type,date:e.date,min:S.len,moved:true});
+  left[tk]-=S.len;
+ });
+
  /* 2. לימוד למבחנים — רק לתוך מה שנשאר אחרי הרזרבה */
  exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).forEach(function(e){
   var n=need(e);if(n<=0)return;
   var ed=pr(e.date),placed=pulled[e.id]||0;
+  (S.moved||[]).forEach(function(m){if(m.ex===e.id&&m.to>=key(t))placed++});
   for(var pass=0;pass<3&&placed<n;pass++){
    var hor=pass===0?S.hor:(pass===1?S.hor:60), onlyMatch=(pass===0&&S.same);
    for(var i=1;i<=hor&&placed<n;i++){
@@ -1593,6 +1977,9 @@ function exById(id){return exams.filter(function(e){return e.id===id})[0]}
 function renderExtras(){
  restClean();
  var sb=document.getElementById("stkBox");if(sb)sb.innerHTML=streakHTML();
+ var ib=document.getElementById("inbBtn");
+ if(ib)ib.innerHTML=(window.fbRole&&window.fbRole()==="owner")?
+  '<button class="btn sm ghost" onclick="inbOpen()">חוות דעת שהתקבלו</button>':"";
  var rb=document.getElementById("restBtn");
  if(rb)rb.textContent=isRest(viewK||key(tod()))?"החזרת היום לתוכנית":"אין לי כוח היום";
  tmBar();
@@ -1627,6 +2014,11 @@ function alerts(){
  if(S.carry>0)h+='<div class="warn" style="border-right-color:var(--deep);background:var(--deep-soft)"><b>↪ '+S.carry+' משבצות שלא בוצעו נפרסו מחדש קדימה</b>'+
   '<div class="sub" style="color:inherit;opacity:.85">התוכנית לא שכחה אותן — הן חזרו לתוך הימים הבאים.</div>'+
   '<div class="btnrow" style="margin-top:8px"><button class="btn sm" onclick="S.carry=0;render()">הבנתי</button></div></div>';
+ var rs=restStats(14);
+ if(rs.n>=3)h+='<div class="warn"><b>'+rs.n+' ימים פונו בשבועיים האחרונים</b>'+
+  '<div class="sub" style="color:inherit;opacity:.85">'+Math.round(rs.mins/6)/10+
+  ' שעות לימוד נדחפו קדימה. שווה להוריד את הקיבולת היומית במקום לפנות ימים.'+
+  '<div class="btnrow" style="margin-top:8px"><button class="btn sm" onclick="go(\'set\')">להגדרות</button></div></div></div>';
  if(over.length)h+='<div class="warn"><b>לחץ ביומן</b><div class="sub" style="color:inherit;opacity:.85">'+
   over.map(esc).join("<br>")+'</div></div>';
  hw.filter(function(x){return !x.done&&pr(x.due)<t}).forEach(function(x){
@@ -1737,9 +2129,10 @@ function tlRows(d){
   }else{
    var e=exById(s.id)||{sub:s.sub,type:s.type,date:s.date},left=df(s.date,tod());
    rows.push({s:s.t0,e:s.t1,cls:"study",h:s.sub+(s.topic?" · "+s.topic:""),
-    t:TYPE[s.type].l+" בעוד "+left+" ימים"+(s.pulled?" · הוקדמה":""),
+    t:TYPE[s.type].l+" בעוד "+left+" ימים"+(s.pulled?" · הוקדמה":"")+(s.moved?" · נדחתה לכאן":""),
     m:recipe(e,left,s.min||S.len,s.topic),cal:s.sub,pace:paceFor(e),
-    chk:id,on:on,act:"openEx('"+s.id+"')",actL:"✎ חומר"});
+    chk:id,on:on,act:"openEx('"+s.id+"')",actL:"✎ חומר",
+    mv:s.id,mvK:key(d),moved:!!s.moved});
   }
  });
  rows.sort(function(a,b){return a.s-b.s||a.e-b.e});
@@ -1787,6 +2180,7 @@ function tlHTML(d){
      (r.ev?'<button class="btn xs ghost" onclick="openEv(\''+r.ev+'\')">✎ אירוע</button>':'')+
     '</div>':'')+
    (r.chk&&!r.on&&r.cls==="study"?'<div class="tlact">'+
+     (r.mv?'<button class="btn xs ghost" onclick="movePick(\''+r.mv+'\',\''+r.mvK+'\')">↦ דחייה</button>':'')+
      (TM&&TM.id===r.chk?'<button class="btn xs" onclick="tmStop()">■ עצירה ('+tmElapsed()+' דק\')</button>':
       '<button class="btn xs ghost" onclick="tmStart(\''+r.chk+'\',\''+encodeURIComponent(r.h.split(" · ")[0])+'\','+(r.e-r.s)+')">▶ התחלה</button>')+
     '</div>':'')+
@@ -1892,7 +2286,9 @@ function evView(){
 function micro(){
  var t=tod(),nx=exams.filter(function(e){return pr(e.date)>=t}).sort(function(a,b){return pr(a.date)-pr(b.date)}).slice(0,2);
  var h='<div class="sub" style="margin-bottom:8px">40 דקות ביום שאתה כבר בבית הספר. שליפה מהזיכרון בלבד — בלי לפתוח חומר חדש.</div>';
- ["09:20–09:40","11:25–11:45"].forEach(function(tm,i){
+ /* ההפסקות הארוכות בלבד — 15 דקות ומעלה שווה שליפה מהזיכרון */
+ var LONG=BRK.filter(function(b){return m2(b[1])-m2(b[0])>=15}).map(function(b){return b[0]+"–"+b[1]});
+ LONG.forEach(function(tm,i){
   var e=nx[i]||nx[0];
   h+='<div class="mic"><b>'+tm+'</b><div class="grow">'+(e?
    '<div style="font-weight:600">'+esc(e.sub)+'</div><div class="sub">'+esc(method(e.sub,"far"))+'</div>':
@@ -1933,6 +2329,8 @@ function setView(){
  document.getElementById("tSame").className="tgl"+(S.same?" on":"");
  document.getElementById("tHard").className="tgl"+(S.hard?" on":"");
  document.getElementById("tRes").className="tgl"+(S.resAuto?" on":"");
+ var nk=document.getElementById("nickI");if(nk)nk.value=S.nick||"";
+ var th=document.getElementById("tHide");if(th)th.className="tgl"+(S.stkHide?" on":"");
  document.getElementById("resBox").innerHTML=[0,1,2,3,4,5,6].map(function(i){
   var v=S.resAuto?learned(i):S.res[i];
   return '<div class="dayline"><div class="dn">'+DAYS[i]+'</div>'+
@@ -2005,6 +2403,7 @@ function evImpact(){
 }
 function fm(m){return m===0?"—":(m>=60?Math.floor(m/60)+"ש'"+(m%60?" "+m%60+"ד'":""):m+" ד'")}
 function cp(i,v){S.cap[i]=+v;document.getElementById("m"+i).textContent=fm(+v);clearTimeout(window._t);window._t=setTimeout(render,260)}
+function setNick(v){S.nick=(v||"").trim().slice(0,20);save();render()}
 function rs(i,v){S.res[i]=+v;document.getElementById("r"+i).textContent=fm(+v);clearTimeout(window._r);window._r=setTimeout(render,260)}
 function wc(t,v){S.w[t]=+v;render()}
 function tg(k){S[k]=!S[k];render()}
@@ -2313,7 +2712,7 @@ function ics(){
 (function(){var _r=window.render;window.render=function(){_r.apply(this,arguments);try{renderExtras()}catch(e){}}})();
 tmLoad();tmTick();
 load();
-if(!S.profile&&!ST("l_skip")){setupStart()}else{render();tourMaybe()}
+if(!S.profile&&!ST("l_skip")){setupStart()}else{render();tourMaybe();newsCheck()}
 document.getElementById("tbSub").textContent=heb(key(tod()));
 setInterval(function(){if(viewK===key(tod())&&document.getElementById("p-today").classList.contains("on"))dayView()},60000);
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
@@ -2419,7 +2818,6 @@ const origGo=window.go;window.go=function(p){origGo(p);if(window.RO)document.get
 F.cancel=async id=>{try{await deleteDoc(doc(propsCol,id))}catch(e){F.err=e.code||e.message;fbUI()}};
 
 async function ownerStart(){
- streakStart();
  const st=await getDoc(stateRef);
  if(st.exists()){const d=st.data();if((d.updatedAt||0)>(window.S.updatedAt||0)&&d.dev!==DEV)applyState(d)}
  else pushState();
@@ -2428,7 +2826,7 @@ async function ownerStart(){
  unsubs.push(onSnapshot(query(propsCol,where('status','==','pending')),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
  unsubs.push(onSnapshot(membersCol,s=>{F.members=s.docs.map(d=>({id:d.id,...d.data()}));fbUI()}));
 }
-function memberStart(){window.RO=true;document.body.classList.add('ro');streakStart();
+function memberStart(){window.RO=true;document.body.classList.add('ro');
  unsubs.push(onSnapshot(stateRef,s=>{if(s.exists())applyState(s.data());fbUI()}));
  unsubs.push(onSnapshot(query(propsCol,where('by','==',F.user.uid)),s=>{F.props=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt-a.createdAt);fbUI()}));
 }
@@ -2437,6 +2835,7 @@ onAuthStateChanged(auth,async user=>{
  unsubs.forEach(u=>u());unsubs=[];F.user=user;F.role='none';F.props=[];F.members=[];F.err='';
  window.RO=false;document.body.classList.remove('ro');F.ready=true;
  if(!user){fbUI();return}
+ streakStart();                       /* טבלת הרצפים גלובלית — לכל מי שמחובר, גם אורח */
  try{let cfg=await getDoc(cfgRef);
   if(!cfg.exists()){await setDoc(cfgRef,{ownerUid:user.uid,ownerName:user.displayName||'',createdAt:Date.now()});cfg=await getDoc(cfgRef)}
   const c=cfg.data();F.ownerName=c.ownerName||'';
@@ -2511,12 +2910,15 @@ function fbUI(){
 /* ---- רצפים משותפים ---- */
 window.streakRows=[];window.streakMe=null;
 let stkLast='';
-window.streakPush=(streak,best,litDay)=>{
+window.streakPush=(streak,best,litDay,nick,hide)=>{
  if(!F.user)return;
- const sig=streak+'/'+best+'/'+(litDay||'');
+ if(hide){deleteDoc(doc(streaksCol,F.user.uid)).catch(()=>{});stkLast='hidden';return}
+ /* שם פרטי בלבד כברירת מחדל — הטבלה פתוחה לכל המשתמשים, לא רק למשפחה */
+ const nm=(nick||'').trim()||String(F.user.displayName||'').split(' ')[0]||'תלמיד';
+ const sig=streak+'/'+best+'/'+(litDay||'')+'/'+nm;
  if(sig===stkLast)return; stkLast=sig;
  setDoc(doc(streaksCol,F.user.uid),
-  {name:F.user.displayName||F.user.email||'—',streak,best,litDay:litDay||'',updatedAt:Date.now()},{merge:true}).catch(()=>{});
+  {name:nm.slice(0,20),streak,best,litDay:litDay||'',updatedAt:Date.now()},{merge:true}).catch(()=>{});
 };
 function streakStart(){
  unsubs.push(onSnapshot(streaksCol,s=>{
@@ -2689,6 +3091,20 @@ window.aiCatalogPhoto=async(b64,mime)=>{
 };
 /* שיתוף הקטלוג לשכבה, באותה תבנית של המערכות */
 const catCol=collection(db,'lomed','app','catalogs');
+const fbCol=collection(db,'lomed','app','feedback');
+/* חוות דעת: כל מי שמחובר יכול לכתוב, רק הבעלים קורא */
+window.fbRead=async()=>{
+ if(F.role!=='owner')throw new Error('רק הבעלים קורא חוות דעת');
+ const s=await getDocs(fbCol);
+ return s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+};
+window.fbDel=async(id)=>{if(F.role==='owner')await deleteDoc(doc(fbCol,id))};
+window.fbPush=async(d)=>{
+ if(!F.user)throw new Error('לא מחובר');
+ await addDoc(fbCol,{rating:d.rating|0,cat:String(d.cat||''),text:String(d.text||'').slice(0,2000),
+  ctx:JSON.stringify(d.ctx||{}).slice(0,2000),
+  by:F.user.uid,name:F.user.displayName||F.user.email||'',createdAt:Date.now()});
+};
 window.catPublish=async(gradeKey,cat)=>{
  if(!F.user||!gradeKey)return;
  try{
@@ -2705,6 +3121,7 @@ window.catFetch=async(gradeKey)=>{
    .sort((a,b)=>(b.count||0)-(a.count||0)||(b.updatedAt||0)-(a.updatedAt||0));
  }catch(e){return []}
 };
+window.fbRole=()=>F.role||'';
 window.fbUI=fbUI;
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
