@@ -459,7 +459,7 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
   <div class="sw"><div>אורך משבצת<div class="sub">דקות</div></div><input class="num" type="number" id="sLen" min="20" max="120" step="5"></div>
   <div class="sw"><div>חלון לימוד מקסימלי<div class="sub">כמה ימים לפני מבחן מתחילים</div></div><input class="num" type="number" id="sHor" min="3" max="60"></div>
   <div class="sw"><div>חוק היום הצמוד<div class="sub">להעדיף ללמוד מקצוע ביום שיש אותו במערכת. שישי-שבת תמיד פתוחים.</div></div><div class="tgl" id="tSame" onclick="tg('same')"><i></i></div></div>
-  <div class="sw"><div>משקל כפול למקצועות הקשים<div class="sub">מתמטיקה, פיזיקה, הנדסת תוכנה</div></div><div class="tgl" id="tHard" onclick="tg('hard')"><i></i></div></div>
+  <div class="sw"><div>משקל כפול למקצועות הקשים<div class="sub" id="hardLbl">מתמטיקה, פיזיקה, הנדסת תוכנה</div></div><div class="tgl" id="tHard" onclick="tg('hard')"><i></i></div></div>
   <div class="sw"><div>עד איזו שעה ללמוד<div class="sub">ברירת מחדל 19:00</div></div><input class="num" type="number" id="sEnd" min="15" max="23"></div>
   <div class="sw"><div>גבול חירום<div class="sub">רק לדדליין אמיתי, ותמיד מסומן</div></div><input class="num" type="number" id="sLate" min="16" max="24"></div>
   <div class="sw"><div>נסיעה והתאוששות<div class="sub">דקות מסיום הלימודים עד שאתה מתיישב</div></div><input class="num" type="number" id="sTrv" min="0" max="180" step="15"></div>
@@ -574,6 +574,15 @@ var BRK=[["09:20","09:45"],["11:25","11:45"],["13:10","13:40"]];
 var TYPE={bagrut:{l:"בגרות",c:"bag",w:14},matkonet:{l:"מתכונת",c:"mat",w:9},
  hagbara:{l:"הגברה",c:"hag",w:6},mivchan:{l:"מבחן",c:"",w:4},bochan:{l:"בוחן",c:"",w:2}};
 var HARD=["מתמטיקה","פיזיקה","הנדסת תוכנה"];
+/* מקצוע "קשה" = מהרשימה הבסיסית, או הגברה של המשתמש.
+   בלי זה תלמיד בהגברת כימיה קיבל אותו משקל כמו לבוחן בתנ"ך. */
+function hardList(){
+ var p=(typeof S!=="undefined"&&S&&S.profile)||{};
+ var l=HARD.slice();
+ [p.hagS,p.hagC].forEach(function(x){if(x&&x!=="אין"&&l.indexOf(x)<0)l.push(x)});
+ return l;
+}
+function isHard(sub){return hardList().some(function(x){return sub.indexOf(x)>-1})}
 /* דקות לשאלה אחת — לחישוב מנת התרגול לכל משבצת */
 var PACE={"מתמטיקה":8,"פיזיקה":13,"הנדסת תוכנה":16,"אנגלית":10,"לשון":9};
 /* מהיומן הבית ספרי, מסונן לכיתה ולמקצועות שלך. הגברות תורגמו: בי"ס=פיזיקה, קמפוסי=הנדסת תוכנה */
@@ -754,7 +763,17 @@ function wizGo(n){
  if(n===2&&!WZ.cls){toast("צריך לבחור כיתה");return}
  WZ.step=n;wizRender();window.scrollTo(0,0);
 }
-function wizPick(k,v){WZ[k]=v;if(k==="cls"){SHARE.list=null;SHARE.loaded=""}wizRender()}
+function wizPick(k,v){
+ /* החלפת הגברה חייבת להחליף גם את התאים במערכת, אחרת נשאר שם המקצוע הקודם */
+ if((k==="hagS"||k==="hagC")&&WZ[k]&&WZ[k]!==v&&WZ[k]!=="אין"){
+  var from=WZ[k],to=v;
+  for(var d in WZ.grid)for(var n in WZ.grid[d])if(WZ.grid[d][n]===from)WZ.grid[d][n]=(to==="אין"?"—":to);
+  var i=WZ.subs.indexOf(from);if(i>-1)WZ.subs.splice(i,1);
+ }
+ WZ[k]=v;
+ if(k==="cls"){SHARE.list=null;SHARE.loaded=""}
+ wizRender();
+}
 function wizSub(s){var i=WZ.subs.indexOf(s);if(i<0)WZ.subs.push(s);else WZ.subs.splice(i,1);wizRender()}
 function wizDay(d){WZ.day=d;wizRender()}
 function wizSet(n,v){WZ.grid[WZ.day]=WZ.grid[WZ.day]||{};WZ.grid[WZ.day][n]=v;wizRender()}
@@ -1010,7 +1029,7 @@ function scanApply(d){
   (day.lessons||[]).forEach(function(l){
    var num=+l.n,sub=(l.subject||"").trim();
    if(!num||num<1||num>11||!sub)return;
-   sub=scanMap(sub);
+   sub=scanMap(sub).slice(0,24);
    /* תא ריק בפועל — מקף, קו, "אין". חייב להיפסל, אחרת שעת הסיום של היום זזה והכול נשבר. */
    if(!sub||/^[-–—_.\s]+$/.test(sub)||sub.length<2||/^(אין|ריק|חופשי|null|none)$/i.test(sub))return;
    WZ.grid[di][num]=sub;n++;
@@ -1123,7 +1142,7 @@ function impApply(){
  S.cat=IMP.rows;
  var p=S.profile||{};
  exams=deriveFromCat(IMP.rows,p);
- var evs=IMP.rows.filter(function(r){return r.type==="event"}).map(function(r,i){
+ var evs=IMP.rows.filter(function(r){return r.type==="event"&&goodDate(r.date)}).map(function(r,i){
   return {id:"ic"+i,title:r.title||"אירוע",date:r.date,days:r.days||1,allDay:true,from:"",to:"",school:true};
  });
  evts=(evts||[]).filter(function(e){return String(e.id).indexOf("ic")!==0}).concat(evs);
@@ -1132,10 +1151,19 @@ function impApply(){
  toast(exams.length+" מבחנים נכנסו לתוכנית");
 }
 /* אותו סינון של הקטלוג המוטמע, על נתונים מיובאים */
+/* תאריך תקין באמת: גם הפורמט וגם שהחודש והיום קיימים */
+function goodDate(s){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(s||""))return false;
+ var a=s.split("-"),y=+a[0],m=+a[1],d=+a[2];
+ if(y<2000||y>2100||m<1||m>12||d<1||d>31)return false;
+ var dt=new Date(y,m-1,d);
+ return dt.getFullYear()===y&&dt.getMonth()===m-1&&dt.getDate()===d;
+}
 function deriveFromCat(cat,p){
  var mine=(p.subs||[]).concat(myHag(p)),out=[],n=0;
  cat.forEach(function(c){
   if(c.type==="event")return;
+  if(!goodDate(c.date))return;
   if(c.classes&&c.classes.length&&c.classes.indexOf(p.cls)<0)return;
   var sub=resolveSub(c.subject,p);
   if(!sub)return;
@@ -1396,8 +1424,14 @@ function movePick(exId,fromK){
       '<button class="btn xs ghost" onclick="moveUndo('+i+')">ביטול</button></div>'}).join("")+'</div>':'')+
   '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">סגירה</button></div>');
 }
+var MOVE_MAX=3;   /* כמה משבצות דחויות מותר לצבור ליום אחד */
 function moveDo(exId,fromK,toK){
  S.moved=S.moved||[];
+ /* אותה דחייה פעמיים היא כנראה לחיצה כפולה */
+ var dup=S.moved.some(function(m){return m.ex===exId&&m.from===fromK&&m.to===toK});
+ if(dup){closeS();return toast("הדחייה הזאת כבר קיימת")}
+ var atTarget=S.moved.filter(function(m){return m.to===toK}).length;
+ if(atTarget>=MOVE_MAX){closeS();return toast("אפשר לדחות עד "+MOVE_MAX+" משבצות ליום אחד")}
  S.moved.push({ex:exId,from:fromK,to:toK});
  save();closeS();render();
  toast("המשבצת נדחתה ל"+heb(toK));
@@ -1646,6 +1680,11 @@ function method(sub,phase){
   if(phase==="mid")return"אנסין אחד עם שעון. סמן כל מילה שעצרה אותך.";
   return"אנסין + כתיבה בתנאי זמן מלאים.";}
  if(has("חנ"))return"אימון בפועל לפי דרישות המבחן המעשי.";
+ if(has("כימיה")||has("ביולוגיה")||has("גאוגרפיה")||has("מדעי")){
+  if(phase==="far")return"מוח ריק על הנושא, ואז תרשים או משוואה מהזיכרון לפני שפותחים חומר.";
+  if(phase==="mid")return"שאלת בגרות מלאה. כתוב את התהליך ולא רק את התשובה.";
+  return"סימולציה בתנאי מבחן, כולל שאלות החישוב והתרשימים.";
+ }
  if(phase==="far")return"מוח ריק: כתוב כל מה שאתה זוכר על הנושא, ורק אז פתח מחברת וסמן חורים.";
  if(phase==="mid")return"ענה על שאלת בגרות בכתב, 25 דקות, מחברת סגורה.";
  return"שחזור בעל פה: הסבר את הנושא בקול רם כאילו אתה מלמד.";
@@ -1704,7 +1743,13 @@ function tod(){var d=new Date();d.setHours(0,0,0,0);return d}
 function ad(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x}
 function df(s,b){return Math.round((pr(s)-b)/864e5)}
 function heb(s){var d=pr(s);return"יום "+DAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)}
-function m2(s){var a=String(s).split(":");return (+a[0])*60+(+a[1]||0)}
+/* NaN אחד מכאן מזהם את כל חישובי הקיבולת ומאפס יום שלם בשקט */
+function m2(s){
+ var a=String(s==null?"":s).split(":");
+ var hh=parseInt(a[0],10),mm=parseInt(a[1],10);
+ if(isNaN(hh))hh=0;if(isNaN(mm))mm=0;
+ return Math.max(0,Math.min(24*60,hh*60+mm));
+}
 function hhmm(m){return p2(Math.floor(m/60)%24)+":"+p2(Math.round(m)%60)}
 function nowMin(){var n=new Date();return n.getHours()*60+n.getMinutes()}
 
@@ -1736,9 +1781,22 @@ function evtsOn(d){
 function busyOn(d){return evtsOn(d).filter(function(e){return e.blocks!==false})}
 /* כמה מהחלון נאכל על ידי אירועים */
 function busyMin(d){
- var w=winFor(d),t=0;
- busyOn(d).forEach(function(e){var a=Math.max(w.s,m2(e.s)),b=Math.min(S.lateH*60,m2(e.e));if(b>a)t+=Math.min(b,w.e)-a>0?Math.min(b,w.e)-a:0});
- return t;
+ var w=winFor(d);
+ /* חייב למזג קטעים חופפים. אירוע 17:00-19:00 ועוד אחד 17:30-19:00 הם 120 דקות
+    תפוסות, לא 210 — ובלי המיזוג הקיבולת נגרעת פעמיים ונעלם זמן לימוד אמיתי. */
+ var segs=[];
+ busyOn(d).forEach(function(e){
+  var a=Math.max(w.s,m2(e.s)),b=Math.min(w.e,m2(e.e));
+  if(b>a)segs.push([a,b]);
+ });
+ if(!segs.length)return 0;
+ segs.sort(function(x,y){return x[0]-y[0]});
+ var t=0,cs=segs[0][0],ce=segs[0][1];
+ for(var i=1;i<segs.length;i++){
+  if(segs[i][0]<=ce){if(segs[i][1]>ce)ce=segs[i][1]}
+  else{t+=ce-cs;cs=segs[i][0];ce=segs[i][1]}
+ }
+ return t+(ce-cs);
 }
 function capOfD(d){if(isRest(key(d)))return 0;
  var w=winFor(d);return Math.max(0,Math.min(S.cap[d.getDay()],Math.max(0,w.e-w.s)-busyMin(d)))}
@@ -1773,7 +1831,7 @@ function rawNeed(e){
  if(e.tex&&pace)n=Math.max(2,Math.ceil((e.tex*pace)/S.len));
  else{
   n=S.w[e.type]||4;
-  if(S.hard&&HARD.some(function(h){return e.sub.indexOf(h)>-1}))n=Math.round(n*1.6);
+  if(S.hard&&isHard(e.sub))n=Math.round(n*1.6);
  }
  if(e.topics&&e.topics.some(function(t){return t.wk}))n=Math.ceil(n*1.25);
  return n;
@@ -1786,7 +1844,7 @@ function need(e){return Math.max(0,rawNeed(e)-(prog[e.id]||0))}
 function priority(e){
  var d=Math.max(0.5,df(e.date,tod())),urgency=1/d;
  var imp=(TYPE[e.type]||{w:4}).w;
- var hard=S.hard&&HARD.some(function(h){return e.sub.indexOf(h)>-1})?1.6:1;
+ var hard=S.hard&&isHard(e.sub)?1.6:1;
  var weak=e.topics&&e.topics.some(function(t){return t.wk})?1.3:1;
  return urgency*imp*hard*weak;
 }
@@ -1889,8 +1947,12 @@ function build(){
     שתי הפעולות הכרחיות: להצמיד משבצת ליום היעד, ולגרוע את הזמן מיום המקור.
     בלי הגריעה השנייה הסקדולר ממלא מיד את החור מאותו מבחן, והדחייה חסרת משמעות. */
  moveClean();
+ var mvCount={};
  (S.moved||[]).forEach(function(m){
   if(m.to<key(t))return;
+  if(!goodDate(m.to)||!goodDate(m.from))return;
+  mvCount[m.to]=(mvCount[m.to]||0)+1;
+  if(mvCount[m.to]>MOVE_MAX)return;          /* תקרה גם אם הנתונים הגיעו מהענן */
   var e=exById(m.ex);if(!e)return;
   var fd=pr(m.from);
   if(fd>=t){var fk=key(fd);free(fd);left[fk]=Math.max(0,left[fk]-S.len)}
@@ -2329,6 +2391,7 @@ function setView(){
  document.getElementById("tSame").className="tgl"+(S.same?" on":"");
  document.getElementById("tHard").className="tgl"+(S.hard?" on":"");
  document.getElementById("tRes").className="tgl"+(S.resAuto?" on":"");
+ var hl=document.getElementById("hardLbl");if(hl)hl.textContent=hardList().join(", ");
  var nk=document.getElementById("nickI");if(nk)nk.value=S.nick||"";
  var th=document.getElementById("tHide");if(th)th.className="tgl"+(S.stkHide?" on":"");
  document.getElementById("resBox").innerHTML=[0,1,2,3,4,5,6].map(function(i){
