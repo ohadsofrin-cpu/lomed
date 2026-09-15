@@ -368,6 +368,11 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
 .shRow{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--ln)}
 .shRow:first-of-type{border-top:0}
 .shRow b{display:block;font-size:14.5px}
+
+.impList{max-height:46vh;overflow:auto;border-top:1px solid var(--ln);margin-top:4px}
+.impRow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln);font-size:13.5px}
+.impRow:last-child{border-bottom:0}
+.impD{width:44px;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -421,6 +426,7 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
 <section class="pane" id="p-ex">
  <div class="chips" id="chips"></div>
  <div id="lEx"></div>
+ <button class="btn wide ghost" onclick="impOpen()">ייבוא לוח מבחנים מיומן או מצילום</button>
  <button class="btn wide ghost" onclick="ics()">ייצוא ליומן (ICS)</button>
 </section>
 
@@ -807,7 +813,7 @@ function wizRender(){
  }
  if(S1===5){
   var p={school:WZ.school||"katzir",grade:WZ.grade,cls:WZ.cls,hagS:WZ.hagS,hagC:WZ.hagC,subs:WZ.subs};
-  var ex=deriveExams(p),tt=ttFromGrid(WZ.grid,wizBells(),WZ.ends),caps=wizCaps(tt);
+  var ex=(S.cat&&S.cat.length)?deriveFromCat(S.cat,p):deriveExams(p),tt=ttFromGrid(WZ.grid,wizBells(),WZ.ends),caps=wizCaps(tt);
   var nxt=ex.filter(function(e){return pr(e.date)>=tod()}).sort(function(a,b){return pr(a.date)-pr(b.date)})[0];
   h='<div class="wizStep">מוכן</div><h2 class="wizH">זה מה שיצא</h2>'+
     '<div class="wizSum"><div><b>'+ex.filter(function(e){return pr(e.date)>=tod()}).length+'</b><span>מבחנים שנשארו לך</span></div>'+
@@ -841,7 +847,7 @@ function wizFinish(){
   bells:wizBells(),ends:WZ.ends};
  S.profile=p;S.tt=ttFromGrid(WZ.grid,wizBells(),WZ.ends);S.cap=wizCaps(S.tt);
  TT=S.tt;
- exams=deriveExams(p);
+ exams=(S.cat&&S.cat.length)?deriveFromCat(S.cat,p):deriveExams(p);
  evts=(evts||[]).concat(deriveEvents(p));
  save();
  /* תורם את המערכת לכיתה, עם תגיות במקום ההגברות האישיות */
@@ -973,6 +979,114 @@ function scanMap(s){
  return s;
 }
 function scanClear(){SCAN={busy:false,img:"",msg:"",model:""};wizRender()}
+
+
+/* ---- ייבוא לוח מבחנים: יומן ציבורי או צילום ---- */
+var IMP={busy:false,msg:"",rows:null,src:"",list:null};
+/* קטלוג פעיל: מיובא אם קיים, אחרת המוטמע של קציר */
+function activeCat(p){
+ p=p||S.profile||{};
+ if(S.cat&&S.cat.length)return S.cat;
+ return (SCHOOLS[p.school||"katzir"]&&SCHOOLS[p.school||"katzir"].cat)?
+  CAT.map(function(c){return {date:c[0],subject:c[1],type:c[2],classes:c[3]||[],days:1}}):[];
+}
+function gradeKey(p){p=p||S.profile||{};return (p.school||"katzir")+"-"+(p.grade||"יא")}
+function impOpen(){
+ IMP={busy:false,msg:"",rows:null,src:"",list:null};
+ impRender();
+ if(window.catFetch)window.catFetch(gradeKey()).then(function(l){IMP.list=l;impRender()});
+}
+function impRender(){
+ var n=IMP.rows?IMP.rows.length:0,ex=IMP.rows?IMP.rows.filter(function(r){return r.type!=="event"}).length:0;
+ openS('<h3>ייבוא לוח מבחנים</h3>'+
+  (IMP.rows?
+   '<div class="shBox"><div class="sub" style="margin:0 0 8px">זוהו '+n+' אירועים, מהם '+ex+' מבחנים. '+
+    'הסינון לפי הכיתה וההגברות שלך יתבצע בשמירה.</div>'+
+    '<div class="impList">'+IMP.rows.slice(0,40).map(function(r){
+      return '<div class="impRow"><span class="impD">'+r.date.slice(5).replace("-",".")+'</span>'+
+       '<span class="grow">'+esc(r.subject==="@S"?"הגברה בית ספרית":r.subject==="@C"?"הגברה קמפוסית":(r.subject||r.title))+'</span>'+
+       '<span class="tag '+((TYPE[r.type]||{}).c||"")+'">'+((TYPE[r.type]||{}).l||"אירוע")+'</span>'+
+       (r.classes&&r.classes.length?'<span class="sub" style="margin:0">יא\''+r.classes.join(",")+'</span>':'')+
+      '</div>'}).join("")+(n>40?'<div class="sub">ועוד '+(n-40)+'...</div>':'')+'</div></div>'+
+    '<div class="btnrow"><button class="btn pri grow" onclick="impApply()">שמירה</button>'+
+    '<button class="btn" onclick="IMP.rows=null;impRender()">חזרה</button></div>'
+  :
+   (IMP.busy?'<div class="shBox"><div class="scanRow"><div class="scanSpin"></div>'+
+     '<span class="grow sub" style="margin:0">'+esc(IMP.msg)+'</span></div></div>'
+    :
+    (IMP.list&&IMP.list.length?'<div class="shBox"><div class="sub" style="margin:0 0 8px">לוחות שכבר הועלו ל'+esc((S.profile&&S.profile.grade)||"יא")+':</div>'+
+      IMP.list.slice(0,3).map(function(it,i){
+       return '<div class="shRow"><div class="grow"><b>'+esc(it.name||"תלמיד")+'</b>'+
+        '<span class="sub" style="margin:0">'+(it.count||0)+' אירועים</span></div>'+
+        '<button class="btn xs" onclick="impShared('+i+')">טעינה</button></div>'}).join("")+'</div>':'')+
+    '<div class="fld"><label>קישור ליומן גוגל ציבורי</label>'+
+    '<input id="impUrl" placeholder="https://calendar.google.com/calendar/embed?src=...">'+
+    '<div class="sub">קישור embed, קישור ICS, או מזהה היומן. היומן חייב להיות ציבורי.</div></div>'+
+    '<button class="btn wide" onclick="impCal()">קריאת היומן</button>'+
+    '<div class="sub" style="text-align:center;margin:12px 0">או</div>'+
+    '<button class="btn wide ghost" onclick="document.getElementById(\'impPhoto\').click()">צילום לוח המבחנים</button>'+
+    '<input type="file" id="impPhoto" accept="image/*" capture="environment" style="display:none" onchange="impFile(this)">'+
+    (IMP.msg?'<div class="warn" style="margin-top:12px">'+esc(IMP.msg)+'</div>':'')+
+    '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">ביטול</button></div>'
+   )));
+}
+function impCal(){
+ var v=document.getElementById("impUrl").value;
+ if(!v)return toast("צריך קישור");
+ IMP.busy=true;IMP.msg="קורא את היומן...";impRender();
+ window.calFetch(v).then(function(evs){
+  if(!evs.length)throw new Error("היומן ריק בטווח הזה");
+  IMP.msg="מתייג "+evs.length+" אירועים...";impRender();
+  return window.aiCatalog(evs);
+ }).then(function(rows){
+  IMP.busy=false;IMP.rows=rows;IMP.src="calendar";impRender();
+ }).catch(function(e){
+  IMP.busy=false;IMP.msg=(e&&e.message)||"לא הצלחתי";impRender();
+ });
+}
+function impFile(inp){
+ var f=inp.files&&inp.files[0];if(!f)return;
+ if(f.size>8e6){toast("התמונה גדולה מדי");return}
+ var fr=new FileReader();
+ fr.onload=function(){
+  IMP.busy=true;IMP.msg="קורא את הלוח...";impRender();
+  window.aiCatalogPhoto(String(fr.result).split(",")[1],f.type||"image/jpeg").then(function(rows){
+   IMP.busy=false;IMP.rows=rows;IMP.src="photo";impRender();
+  }).catch(function(e){IMP.busy=false;IMP.msg=(e&&e.message)||"לא הצלחתי";impRender()});
+ };
+ fr.readAsDataURL(f);inp.value="";
+}
+function impShared(i){
+ var it=(IMP.list||[])[i];if(!it)return;
+ try{IMP.rows=JSON.parse(it.cat);IMP.src="shared";impRender()}catch(e){toast("הקובץ פגום")}
+}
+/* שמירה: הקטלוג נשמר גלמי, והמבחנים נגזרים ממנו לפי הפרופיל */
+function impApply(){
+ if(!IMP.rows)return;
+ S.cat=IMP.rows;
+ var p=S.profile||{};
+ exams=deriveFromCat(IMP.rows,p);
+ var evs=IMP.rows.filter(function(r){return r.type==="event"}).map(function(r,i){
+  return {id:"ic"+i,title:r.title||"אירוע",date:r.date,days:r.days||1,allDay:true,from:"",to:"",school:true};
+ });
+ evts=(evts||[]).filter(function(e){return String(e.id).indexOf("ic")!==0}).concat(evs);
+ save();closeS();render();
+ if(window.catPublish&&IMP.src!=="shared")window.catPublish(gradeKey(p),IMP.rows);
+ toast(exams.length+" מבחנים נכנסו לתוכנית");
+}
+/* אותו סינון של הקטלוג המוטמע, על נתונים מיובאים */
+function deriveFromCat(cat,p){
+ var mine=(p.subs||[]).concat(myHag(p)),out=[],n=0;
+ cat.forEach(function(c){
+  if(c.type==="event")return;
+  if(c.classes&&c.classes.length&&c.classes.indexOf(p.cls)<0)return;
+  var sub=resolveSub(c.subject,p);
+  if(!sub)return;
+  if(String(c.subject).charAt(0)!=="@"&&mine.indexOf(sub)<0)return;
+  out.push({id:"i"+(n++),sub:sub,date:c.date,type:c.type,ses:null,topics:[],sheet:""});
+ });
+ return out;
+}
 
 /* ---------- סיור פתיחה ---------- */
 var TOUR=[
@@ -1198,9 +1312,11 @@ function load(){
  if(S.tt)TT=S.tt;
  if(!S.rest)S.rest={};
  exams=J("l_ex",null);
- if(!Array.isArray(exams)||!exams.length)
-  exams=S.profile?deriveExams(S.profile)
-       :SEED.map(function(e,i){return{id:"s"+i,sub:e[1],date:e[0],type:e[2],ses:null}});
+ if(!Array.isArray(exams)||!exams.length){
+  if(S.cat&&S.cat.length&&S.profile)exams=deriveFromCat(S.cat,S.profile);
+  else if(S.profile)exams=deriveExams(S.profile);
+  else exams=SEED.map(function(e,i){return{id:"s"+i,sub:e[1],date:e[0],type:e[2],ses:null}});
+ }
  /* מיגרציה: נושאים ישנים היו רשימת מחרוזות. עכשיו כל נושא הוא {n:שם,w:היקף חומר 1-3,wk:מרגיש חלש} */
  exams.forEach(function(e){
   if(e.topics&&e.topics.length&&typeof e.topics[0]==="string")e.topics=e.topics.map(function(s){return{n:s,w:2,wk:false}});
@@ -2487,6 +2603,105 @@ window.ttFetch=async(cls)=>{
   const s=await getDocs(query(ttCol,where('cls','==',String(cls))));
   return s.docs.map(d=>d.data())
    .filter(x=>x.by!==F.user.uid&&x.grid)
+   .sort((a,b)=>(b.count||0)-(a.count||0)||(b.updatedAt||0)-(a.updatedAt||0));
+ }catch(e){return []}
+};
+/* ---- ייבוא לוח מבחנים מיומן גוגל ציבורי ----
+   דף סטטי לא יכול למשוך ICS (CORS), אבל Calendar API עם מפתח קורא יומן ציבורי
+   ומחזיר CORS תקין. המפתח הוא זה של Firebase — צריך להפעיל Calendar API באותו פרויקט. */
+window.calParse=(s)=>{
+ s=(s||'').trim();
+ const m=s.match(/[?&]src=([^&]+)/);            /* קישור embed */
+ if(m)return decodeURIComponent(m[1]);
+ const m2=s.match(/calendar\/ical\/([^/]+)\//); /* קישור ICS */
+ if(m2)return decodeURIComponent(m2[1]);
+ if(s.indexOf('@')>-1)return s;                 /* מזהה גולמי */
+ return '';
+};
+window.calFetch=async(raw)=>{
+ const id=window.calParse(raw);
+ if(!id)throw new Error('לא הצלחתי לזהות מזהה יומן בקישור');
+ const now=new Date(),from=new Date(now.getFullYear(),now.getMonth()-1,1);
+ const u='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(id)+
+  '/events?key='+firebaseConfig.apiKey+'&singleEvents=true&orderBy=startTime&maxResults=250'+
+  '&timeMin='+from.toISOString();
+ const r=await fetch(u);
+ if(!r.ok){
+  const t=await r.text().catch(()=>'');
+  if(r.status===404)throw new Error('היומן לא נמצא או שאינו ציבורי');
+  if(r.status===403)throw new Error('Calendar API לא מופעל בפרויקט, או שהמפתח מוגבל');
+  throw new Error('שגיאה '+r.status+' '+t.slice(0,80));
+ }
+ const d=await r.json();
+ return (d.items||[]).map(e=>({
+  title:(e.summary||'').trim(),
+  date:(e.start&&(e.start.date||(e.start.dateTime||'').slice(0,10)))||''
+ })).filter(e=>e.title&&e.date);
+};
+/* המודל מתייג את האירועים: מקצוע, סוג, ולאילו כיתות */
+window.aiCatalog=async(events)=>{
+ const {m}=await aiInit();
+ const prompt=
+  'לפניך אירועים מיומן שכבתי של בית ספר ישראלי. לכל אירוע החזר תיוג.\n'+
+  'type: bagrut אם זו בגרות, matkonet אם מתכונת, hagbara אם מבחן הגברה/מגמה, '+
+  'bochan אם בוחן, mivchan אם מבחן רגיל, event אם זה לא מבחן בכלל (טיול, יום זיכרון, הרצאה, סמינר).\n'+
+  'subject: שם המקצוע בעברית. אם כתוב "הגברות בית ספרי" או "מקבץ בית ספרי" החזר בדיוק @S. '+
+  'אם כתוב "הגברות קמפוסי" החזר בדיוק @C. אם זה event החזר מחרוזת ריקה.\n'+
+  'classes: מערך מספרי כיתה אם האירוע מיועד לכיתות מסוימות. '+
+  '"יא3 יא4" או "יא 3+4" הוא [3,4]. "יא 1256" הוא [1,2,5,6]. "מלבד 3+4" הוא [1,2,5,6]. '+
+  'אם לכל השכבה — מערך ריק.\n'+
+  'days: מספר הימים של האירוע אם הוא רב-יומי, אחרת 1.\n'+
+  'החזר JSON בלבד לפי הסכימה, בדיוק אותו מספר פריטים ובאותו סדר.\n\n'+
+  JSON.stringify(events);
+ const r=await m.generateContent(prompt);
+ const txt=r.response.text().replace(/```json|```/g,'').trim();
+ let out;try{out=JSON.parse(txt)}catch(e){throw new Error('התשובה לא הייתה JSON תקין')}
+ const arr=Array.isArray(out)?out:(out.items||out.events||[]);
+ return arr.map((x,i)=>({
+  date:(events[i]&&events[i].date)||x.date||'',
+  title:(events[i]&&events[i].title)||'',
+  subject:x.subject||'',
+  type:x.type||'mivchan',
+  classes:Array.isArray(x.classes)?x.classes:[],
+  days:+x.days||1
+ })).filter(x=>x.date);
+};
+/* אותו תיוג, אבל מתמונה של לוח מבחנים מודפס */
+window.aiCatalogPhoto=async(b64,mime)=>{
+ const {m}=await aiInit();
+ const yr=new Date().getFullYear();
+ const prompt=
+  'בתמונה לוח מבחנים או לוח מועדים של בית ספר ישראלי. חלץ כל שורה והחזר מערך JSON.\n'+
+  'לכל פריט: date בפורמט YYYY-MM-DD (אם כתובה רק תאריך בלי שנה, הסק אותה: חודשים 9-12 הם '+yr+
+  ' וחודשים 1-8 הם '+(yr+1)+'), '+
+  'title הטקסט המקורי, subject שם המקצוע, '+
+  'type אחד מ: bagrut / matkonet / hagbara / bochan / mivchan / event, '+
+  'classes מערך מספרי כיתה אם מצוין אחרת מערך ריק, days מספר ימים.\n'+
+  'אם כתוב "הגברות בית ספרי" החזר subject בדיוק @S, אם "הגברות קמפוסי" אז @C.\n'+
+  'החזר JSON בלבד, בלי טקסט נוסף.';
+ const r=await m.generateContent([prompt,{inlineData:{mimeType:mime,data:b64}}]);
+ const txt=r.response.text().replace(/```json|```/g,'').trim();
+ let out;try{out=JSON.parse(txt)}catch(e){throw new Error('התשובה לא הייתה JSON תקין')}
+ const arr=Array.isArray(out)?out:(out.items||out.events||[]);
+ return arr.map(x=>({date:x.date||'',title:x.title||'',subject:x.subject||'',
+  type:x.type||'mivchan',classes:Array.isArray(x.classes)?x.classes:[],days:+x.days||1}))
+  .filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.date));
+};
+/* שיתוף הקטלוג לשכבה, באותה תבנית של המערכות */
+const catCol=collection(db,'lomed','app','catalogs');
+window.catPublish=async(gradeKey,cat)=>{
+ if(!F.user||!gradeKey)return;
+ try{
+  await setDoc(doc(catCol,gradeKey+'_'+F.user.uid),
+   {gk:String(gradeKey),cat:JSON.stringify(cat),count:cat.length|0,
+    by:F.user.uid,name:F.user.displayName||'תלמיד',updatedAt:Date.now()},{merge:true});
+ }catch(e){}
+};
+window.catFetch=async(gradeKey)=>{
+ if(!F.user||!gradeKey)return [];
+ try{
+  const s=await getDocs(query(catCol,where('gk','==',String(gradeKey))));
+  return s.docs.map(d=>d.data()).filter(x=>x.cat)
    .sort((a,b)=>(b.count||0)-(a.count||0)||(b.updatedAt||0)-(a.updatedAt||0));
  }catch(e){return []}
 };
