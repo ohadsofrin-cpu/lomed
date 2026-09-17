@@ -392,6 +392,16 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
 .inbTx{font-size:14px;margin-top:6px;line-height:1.5}
 .inbCtx{font-size:11px;color:var(--dim);background:var(--pn2);border-radius:8px;padding:8px;
  margin-top:8px;word-break:break-all;font-family:ui-monospace,monospace}
+
+.addList{border-top:1px solid var(--ln)}
+.addIt{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--ln);cursor:pointer}
+.addIt:last-child{border-bottom:0}
+.addIt:active{opacity:.6}
+.addIt b{display:block;font-size:15.5px;margin-bottom:1px}
+.addIc{width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:var(--pn2);border:1px solid var(--ln);
+ display:grid;place-items:center;font-size:17px;color:var(--mut)}
+.addIt.pri .addIc{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.addGo{color:var(--dim);font-size:19px}
 </style>
 </head>
 <body>
@@ -491,7 +501,8 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
  <div class="card">
   <div class="sub" style="margin:0 0 10px">שינית מערכת, כיתה או הגברה? הרצה מחדש של האשף תבנה את רשימת המבחנים מחדש מהיומן השכבתי.</div>
   <div class="btnrow"><button class="btn sm" onclick="setupPhoto()">עדכון מערכת מצילום</button>
-  <button class="btn sm ghost" onclick="setupAgain()">אשף ההתאמה</button></div>
+  <button class="btn sm ghost" onclick="setupAgain()">אשף ההתאמה</button>
+  <button class="btn sm ghost" onclick="dgOpen()">אבחון קריאת תמונות</button></div>
   <div class="btnrow" style="margin-top:8px"><button class="btn sm ghost" onclick="tourStart()">הסיור מחדש</button>
   <button class="btn sm ghost" onclick="newsAgain()">מה חדש</button></div>
  </div>
@@ -1005,6 +1016,30 @@ function shareLoad(i){
  toast("נטענה המערכת של "+SHARE.loaded);
 }
 
+
+/* ---- אבחון ה-AI ---- */
+var DG={busy:false,txt:""};
+function dgOpen(){
+ if(!window.aiDiag){toast("אין חיבור לענן");return}
+ DG={busy:true,txt:""};dgRender();
+ window.aiDiag().then(function(t){DG.busy=false;DG.txt=t;dgRender()})
+  .catch(function(e){DG.busy=false;DG.txt="האבחון נכשל: "+((e&&e.message)||"");dgRender()});
+}
+function dgRender(){
+ openS('<h3>אבחון קריאת תמונות</h3>'+
+  (DG.busy?'<div class="scanRow"><div class="scanSpin"></div><span class="sub" style="margin:0">בודק שלב-שלב...</span></div>':
+   '<div class="inbCtx" style="max-height:44vh;overflow:auto;white-space:pre-wrap">'+esc(DG.txt||"—")+'</div>'+
+   '<div class="sub" style="margin-top:10px">אם שלב 1 נכשל — בעיית רשת או CSP. אם שלב 2 נכשל עם 403 — '+
+   'צריך להפעיל AI Logic בפיירבייס. אם שלב 3 נכשל גם — צריך להפעיל Generative Language API.</div>'+
+   '<div class="btnrow" style="margin-top:12px"><button class="btn sm" onclick="dgCopy()">העתקה</button>'+
+   '<button class="btn sm ghost" onclick="dgOpen()">בדיקה חוזרת</button></div>')+
+  '<div class="btnrow" style="margin-top:12px"><button class="btn grow ghost" onclick="closeS()">סגירה</button></div>');
+}
+function dgCopy(){
+ var t=DG.txt||"";
+ try{navigator.clipboard.writeText(t).then(function(){toast("הועתק")},function(){fbFall(t)})}catch(e){fbFall(t)}
+}
+
 /* ---- מילוי המערכת מצילום ---- */
 var SCAN={busy:false,img:"",msg:"",model:""};
 function scanPick(){document.getElementById("ttPhoto").click()}
@@ -1021,7 +1056,9 @@ function scanFile(inp){
    SCAN.msg=n?("זוהו "+n+" שיעורים. עבור עליהם ותקן מה שצריך."):"לא זוהו שיעורים. נסה תמונה חדה יותר.";
    wizRender();
   }).catch(function(e){
-   SCAN.busy=false;SCAN.msg="לא הצלחתי: "+(e&&e.message?e.message:"שגיאה")+". אפשר למלא ידנית.";wizRender();
+   SCAN.busy=false;
+   SCAN.msg="לא הצלחתי: "+(e&&e.message?e.message:"שגיאה")+". נסה 'אבחון' בהגדרות, או מלא ידנית.";
+   wizRender();
   });
  };
  fr.readAsDataURL(f);
@@ -2533,12 +2570,23 @@ var edit=null;
 function openS(html){document.getElementById("shBody").innerHTML=html;
  document.getElementById("veil").classList.add("on");document.getElementById("sheet").classList.add("on")}
 function closeS(){document.getElementById("sheet").classList.remove("on");document.getElementById("veil").classList.remove("on")}
+/* תפריט הפעולות. זמין מכל מסך — הפעולות התכופות למעלה, ובלי לקבור אותן בהגדרות. */
+var ADD=[
+ {i:"✎",t:"שיעורי בית",s:"מטלה עם דדליין",f:"openHw()",pri:true},
+ {i:"⏱",t:"משמרת עבודה",s:"תבנית שבועית או משמרת בתאריך",f:"workOpen()"},
+ {i:"◷",t:"אירוע",s:"חוג, אימון, משפחה",f:"openEv()"},
+ {i:"✦",t:"מבחן",s:"מבחן או בגרות שלא ביומן",f:"openEx()"},
+ {i:"⊘",t:"ביטול שיעור",s:"יום חופש או שיעור שבוטל",f:"openOv(viewK)"},
+ {i:"✱",t:"חוות דעת",s:"מה עובד, מה מעצבן, מה חסר",f:"fbOpen()"}
+];
 function openAdd(){
  openS('<h3>מה להוסיף</h3>'+
-  '<div class="btnrow"><button class="btn pri grow" onclick="closeS();setTimeout(openHw,240)">מטלה / שיעורי בית</button></div>'+
-  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openEv()},240)">אירוע (חוג, עבודה, משפחה)</button></div>'+
-  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openOv(viewK)},240)">ביטול שיעור / יום חופש</button></div>'+
-  '<div class="btnrow" style="margin-top:9px"><button class="btn grow" onclick="closeS();setTimeout(function(){openEx()},240)">מבחן</button></div>');
+  '<div class="addList">'+ADD.map(function(a){
+   return '<div class="addIt'+(a.pri?" pri":"")+'" onclick="closeS();setTimeout(function(){'+a.f+'},240)">'+
+    '<span class="addIc">'+a.i+'</span>'+
+    '<span class="grow"><b>'+a.t+'</b><span class="sub" style="margin:0">'+a.s+'</span></span>'+
+    '<span class="addGo">›</span></div>'}).join("")+'</div>'+
+  '<div class="btnrow" style="margin-top:14px"><button class="btn grow ghost" onclick="closeS()">ביטול</button></div>');
 }
 function openHw(id){
  edit=id||null;var x=id?hw.filter(function(y){return y.id===id})[0]:null;
@@ -2792,7 +2840,7 @@ function esc2(s){return String(s)}
 var PTITLE={today:"היום",week:"14 הימים הקרובים",hw:"מטלות ואירועים",ex:"מבחנים",set:"הגדרות"};
 function go(p){["today","week","hw","ex","set"].forEach(function(x){document.getElementById("p-"+x).classList.toggle("on",x===p)});
  Array.prototype.forEach.call(document.querySelectorAll("nav button"),function(b){b.classList.toggle("on",b.dataset.p===p)});
- document.getElementById("fab").classList.toggle("on",p==="hw"||p==="today");
+ document.getElementById("fab").classList.toggle("on",p!=="set");
  document.getElementById("tbTitle").textContent=PTITLE[p]||"לומד";
  document.getElementById("tbSub").textContent=p==="today"?heb(key(tod())):"";
  window.scrollTo(0,0)}
@@ -3047,8 +3095,11 @@ function streakStart(){
    ה-SDK כאן הוא 10.12.2 שקדם למודול firebase/ai, ולכן טוענים עותק נפרד
    ומאתחלים אפליקציה שנייה עם אותה תצורה. שני עותקים חיים בשלום. */
 let AIM=null,AIERR='';
-const AI_SDK=['https://esm.sh/firebase@11/','https://www.gstatic.com/firebasejs/11.10.0/firebase-'];
-const AI_MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.5-flash','gemini-2.5-flash'];
+const AI_SDK=['https://esm.sh/firebase@11/','https://www.gstatic.com/firebasejs/11.10.0/firebase-',
+ 'https://www.gstatic.com/firebasejs/11.6.0/firebase-','https://cdn.jsdelivr.net/npm/firebase@11/'];
+const AI_MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.5-flash','gemini-2.5-flash','gemini-flash-latest'];
+window.AI_LOG=[];
+function aiLog(s){window.AI_LOG.push(s);if(window.AI_LOG.length>40)window.AI_LOG.shift()}
 async function aiInit(){
  if(AIM)return AIM;
  let mods=null;
@@ -3060,7 +3111,8 @@ async function aiInit(){
     import(isEsm?base+'ai':base+'ai.js')
    ]);
    mods={app:a,ai:b};break;
-  }catch(e){AIERR=e.message}
+   aiLog('SDK נטען מ-'+base);
+  }catch(e){AIERR=e.message;aiLog('SDK נכשל: '+base+' — '+e.message)}
  }
  if(!mods)throw new Error('לא הצלחתי לטעון את מודול ה-AI. '+AIERR);
  const app2=mods.app.getApps?.().find(x=>x.name==='ai')||mods.app.initializeApp(firebaseConfig,'ai');
@@ -3073,19 +3125,56 @@ async function aiInit(){
      subject:Schema.string({description:'שם המקצוע בעברית, או מחרוזת ריקה אם התא ריק'})
    }})})
  }})})}});
+ /* לא בודקים את המודל מראש. countTokens שינה חתימה בין גרסאות, וכשהוא נכשל
+    דחינו מודלים שדווקא עובדים. במקום זה מנסים את הבקשה האמיתית ונופלים למודל הבא. */
+ AIM={mods:mods,ai:ai,schema:schema,models:AI_MODELS.slice()};
+ aiLog('getAI הצליח');
+ return AIM;
+}
+/* מריץ בקשה על רשימת המודלים עד שאחד עונה */
+async function aiRun(parts){
+ const A=await aiInit();
  let last='';
- for(const name of AI_MODELS){
+ for(const name of A.models){
   try{
-   const m=mods.ai.getGenerativeModel(ai,{model:name,
-     generationConfig:{responseMimeType:'application/json',responseSchema:schema}});
-   await m.countTokens('בדיקה');   /* מאמת שהמודל קיים ושיש הרשאה, לפני שמעלים תמונה */
-   AIM={m:m,name:name};return AIM;
-  }catch(e){last=e.message||String(e)}
+   const m=A.mods.ai.getGenerativeModel(A.ai,{model:name,
+     generationConfig:{responseMimeType:'application/json',responseSchema:A.schema}});
+   const r=await m.generateContent(parts);
+   aiLog('הצליח עם '+name);
+   A.models=[name].concat(A.models.filter(x=>x!==name));   /* מקדמים את המודל שעבד */
+   return r.response.text();
+  }catch(e){last=(e&&e.message)||String(e);aiLog(name+' נכשל: '+last.slice(0,90))}
  }
+ /* גיבוי: קריאה ישירה ל-REST עם מפתח ה-Firebase. דורש הפעלת Generative Language API. */
+ try{
+  const t=await aiRest(parts);aiLog('גיבוי REST הצליח');return t;
+ }catch(e){aiLog('גיבוי REST נכשל: '+((e&&e.message)||''));}
  throw new Error(last||'אין מודל זמין');
 }
+async function aiRest(parts){
+ const content=[];
+ for(const p of parts){
+  if(typeof p==='string')content.push({text:p});
+  else if(p&&p.inlineData)content.push({inline_data:{mime_type:p.inlineData.mimeType,data:p.inlineData.data}});
+ }
+ for(const name of AI_MODELS){
+  const u='https://generativelanguage.googleapis.com/v1beta/models/'+name+
+   ':generateContent?key='+firebaseConfig.apiKey;
+  const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({contents:[{parts:content}],
+    generationConfig:{responseMimeType:'application/json'}})});
+  if(r.ok){
+   const d=await r.json();
+   const t=((d.candidates||[])[0]||{}).content;
+   if(t&&t.parts&&t.parts[0])return t.parts[0].text;
+  }else{
+   const e=await r.text().catch(()=>'');
+   if(r.status!==404)throw new Error('REST '+r.status+' '+e.slice(0,120));
+  }
+ }
+ throw new Error('אף מודל לא נמצא ב-REST');
+}
 window.aiTimetable=async(b64,mime)=>{
- const {m,name}=await aiInit();
  const prompt=
   'בתמונה מערכת שעות של בית ספר ישראלי. הטבלה בכתיב מימין לשמאל: העמודה הימנית ביותר היא יום א, ואחריה ב, ג, ד, ה. '+
   'השורות הן מספרי שיעור. החזר לכל יום את רשימת השיעורים עם מספר השיעור ושם המקצוע. '+
@@ -3096,11 +3185,36 @@ window.aiTimetable=async(b64,mime)=>{
   'אם כתוב "הגברות קמפוסי" החזר בדיוק: הגברה קמפוסית. '+
   'אם בתא יש כמה מקצועות מופרדים בפלוס, החזר את כולם מופרדים בפלוס. '+
   'החזר JSON בלבד לפי הסכימה.';
- const r=await m.generateContent([prompt,{inlineData:{mimeType:mime,data:b64}}]);
- const txt=r.response.text().replace(/```json|```/g,'').trim();
- return {data:JSON.parse(txt),model:name};
+ const raw=await aiRun([prompt,{inlineData:{mimeType:mime,data:b64}}]);
+ const txt=String(raw).replace(/```json|```/g,'').trim();
+ return {data:JSON.parse(txt),model:(AIM&&AIM.models&&AIM.models[0])||''};
 };
 window.aiReady=()=>!!AIM;
+window.aiLogGet=()=>window.AI_LOG.slice();
+/* אבחון: בודק שלב-שלב ומחזיר דוח, כדי שלא נצטרך לנחש איפה זה נשבר */
+window.aiDiag=async()=>{
+ const out=[];
+ out.push('מחובר: '+(F.user?('כן ('+F.role+')'):'לא'));
+ out.push('apiKey: '+(firebaseConfig.apiKey?firebaseConfig.apiKey.slice(0,12)+'…':'חסר'));
+ out.push('מקור: '+location.origin);
+ window.AI_LOG=[];
+ let A=null;
+ try{A=await aiInit();out.push('1. טעינת SDK + getAI: תקין')}
+ catch(e){out.push('1. טעינת SDK + getAI: נכשל — '+e.message);return out.concat(window.AI_LOG).join('\n')}
+ for(const name of AI_MODELS){
+  try{
+   const m=A.mods.ai.getGenerativeModel(A.ai,{model:name});
+   const r=await m.generateContent(['החזר את המילה תקין ובלי שום דבר נוסף']);
+   out.push('2. מודל '+name+': תקין → '+String(r.response.text()).trim().slice(0,20));
+   break;
+  }catch(e){out.push('2. מודל '+name+': '+((e&&e.message)||'').slice(0,140))}
+ }
+ try{
+  const t=await aiRest(['החזר את המילה תקין']);
+  out.push('3. גיבוי REST: תקין');
+ }catch(e){out.push('3. גיבוי REST: '+((e&&e.message)||'').slice(0,140))}
+ return out.concat('---',window.AI_LOG).join('\n');
+};
 
 /* ---- מערכות משותפות לפי כיתה ----
    כל תלמיד כותב רק למסמך שלו (cls_uid), אז אף אחד לא יכול לדרוס לאחר.
@@ -3156,7 +3270,6 @@ window.calFetch=async(raw)=>{
 };
 /* המודל מתייג את האירועים: מקצוע, סוג, ולאילו כיתות */
 window.aiCatalog=async(events)=>{
- const {m}=await aiInit();
  const prompt=
   'לפניך אירועים מיומן שכבתי של בית ספר ישראלי. לכל אירוע החזר תיוג.\n'+
   'type: bagrut אם זו בגרות, matkonet אם מתכונת, hagbara אם מבחן הגברה/מגמה, '+
@@ -3169,8 +3282,8 @@ window.aiCatalog=async(events)=>{
   'days: מספר הימים של האירוע אם הוא רב-יומי, אחרת 1.\n'+
   'החזר JSON בלבד לפי הסכימה, בדיוק אותו מספר פריטים ובאותו סדר.\n\n'+
   JSON.stringify(events);
- const r=await m.generateContent(prompt);
- const txt=r.response.text().replace(/```json|```/g,'').trim();
+ const raw=await aiRun([prompt]);
+ const txt=String(raw).replace(/```json|```/g,'').trim();
  let out;try{out=JSON.parse(txt)}catch(e){throw new Error('התשובה לא הייתה JSON תקין')}
  const arr=Array.isArray(out)?out:(out.items||out.events||[]);
  return arr.map((x,i)=>({
@@ -3184,7 +3297,6 @@ window.aiCatalog=async(events)=>{
 };
 /* אותו תיוג, אבל מתמונה של לוח מבחנים מודפס */
 window.aiCatalogPhoto=async(b64,mime)=>{
- const {m}=await aiInit();
  const yr=new Date().getFullYear();
  const prompt=
   'בתמונה לוח מבחנים או לוח מועדים של בית ספר ישראלי. חלץ כל שורה והחזר מערך JSON.\n'+
@@ -3195,8 +3307,8 @@ window.aiCatalogPhoto=async(b64,mime)=>{
   'classes מערך מספרי כיתה אם מצוין אחרת מערך ריק, days מספר ימים.\n'+
   'אם כתוב "הגברות בית ספרי" החזר subject בדיוק @S, אם "הגברות קמפוסי" אז @C.\n'+
   'החזר JSON בלבד, בלי טקסט נוסף.';
- const r=await m.generateContent([prompt,{inlineData:{mimeType:mime,data:b64}}]);
- const txt=r.response.text().replace(/```json|```/g,'').trim();
+ const raw=await aiRun([prompt,{inlineData:{mimeType:mime,data:b64}}]);
+ const txt=String(raw).replace(/```json|```/g,'').trim();
  let out;try{out=JSON.parse(txt)}catch(e){throw new Error('התשובה לא הייתה JSON תקין')}
  const arr=Array.isArray(out)?out:(out.items||out.events||[]);
  return arr.map(x=>({date:x.date||'',title:x.title||'',subject:x.subject||'',
