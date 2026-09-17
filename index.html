@@ -495,6 +495,14 @@ nav button.tourLit{color:var(--bg);background:var(--cool);border-radius:12px}
   <div class="btnrow" style="margin-top:8px"><button class="btn sm ghost" onclick="tourStart()">הסיור מחדש</button>
   <button class="btn sm ghost" onclick="newsAgain()">מה חדש</button></div>
  </div>
+ <h2 class="sec">חופשות</h2>
+ <div class="card">
+  <div class="sub" style="margin:0 0 10px">בחופשות אין לימודים, אבל יש זמן לימוד מלא. כך נראה הזמן שהוקצה לכל יום חופשה:</div>
+  <div class="dayline"><div class="dn">זמן לימוד<small>ביום חופשה</small></div>
+   <input type="range" min="0" max="360" step="15" value="150" id="vacR" oninput="setVacCap(this.value)">
+   <div class="mins" id="vacM">—</div></div>
+  <div id="vacList"></div>
+ </div>
  <h2 class="sec">טבלת הרצפים</h2>
  <div class="card">
   <div class="sub" style="margin:0 0 10px">הטבלה פתוחה לכל מי שמשתמש באפליקציה. כברירת מחדל מוצג השם הפרטי שלך בלבד.</div>
@@ -1708,7 +1716,7 @@ function recipe(e,left,min,topic){
 
 /* ---------- state ---------- */
 var S,exams,hw,done,plan,over,evts,ovr,prog,seen,calib,heat,pull,filter="all",viewK=null;
-function defs(){return{cap:[60,150,180,60,120,90,120],len:50,hor:21,same:true,hard:true,
+function defs(){return{cap:[60,150,180,60,120,90,120],vacCap:150,len:50,hor:21,same:true,hard:true,
  resAuto:true,res:[30,50,50,30,40,0,0],endH:19,lateH:21,travel:60,energy:"none",
  w:{bagrut:14,matkonet:9,hagbara:6,mivchan:4,bochan:2}}}
 function load(){
@@ -1755,9 +1763,30 @@ function nowMin(){var n=new Date();return n.getHours()*60+n.getMinutes()}
 
 /* ---------- מערכת, ביטולים, אירועים ---------- */
 /* השיעורים שבאמת מתקיימים בתאריך הזה, אחרי ביטולים */
+/* ---- חופשות משרד החינוך תשפ"ז ----
+   [מתאריך, עד תאריך כולל, שם]. אלה ימים בלי לימודים אבל עם זמן לימוד מלא —
+   בדיוק התקופות שבהן נופלות ההכנות לבגרויות. תאריכי התיכונים, לא היסודי. */
+var VAC=[
+["2026-09-11","2026-09-13","ראש השנה"],
+["2026-09-20","2026-09-21","יום כיפור"],
+["2026-09-25","2026-10-04","סוכות"],
+["2026-12-06","2026-12-12","חנוכה"],
+["2027-03-23","2027-03-24","פורים"],
+["2027-04-13","2027-04-28","פסח"],
+["2027-05-12","2027-05-12","יום העצמאות"],
+["2027-05-25","2027-05-25","ל\"ג בעומר"],
+["2027-06-10","2027-06-12","שבועות"],
+["2027-06-21","2027-08-31","סוף שנה"]
+];
+function vacOn(k){
+ for(var i=0;i<VAC.length;i++)if(k>=VAC[i][0]&&k<=VAC[i][1])return VAC[i][2];
+ return "";
+}
+function isVac(k){return !!vacOn(k)}
 function lessonsOn(d){
- var o=ovr[key(d)]||{},base=(TT[d.getDay()]||{l:[]}).l;
+ var k=key(d),o=ovr[k]||{},base=(TT[d.getDay()]||{l:[]}).l;
  if(o.off)return[];
+ if(isVac(k)&&!o.on)return[];        /* חופשה = אין לימודים, אלא אם סימנת אחרת */
  var cx=o.cx||[];
  return base.filter(function(x){return cx.indexOf(x[0])<0});
 }
@@ -1798,8 +1827,14 @@ function busyMin(d){
  }
  return t+(ce-cs);
 }
-function capOfD(d){if(isRest(key(d)))return 0;
- var w=winFor(d);return Math.max(0,Math.min(S.cap[d.getDay()],Math.max(0,w.e-w.s)-busyMin(d)))}
+function capOfD(d){
+ var k=key(d);
+ if(isRest(k))return 0;
+ var w=winFor(d);
+ /* בחופשה הקיבולת היומית של יום לימודים לא רלוונטית — היום פנוי */
+ var base=isVac(k)?(S.vacCap||150):S.cap[d.getDay()];
+ return Math.max(0,Math.min(base,Math.max(0,w.e-w.s)-busyMin(d)));
+}
 function lateCapD(d){var w=winFor(d);return Math.max(0,S.lateH*60-w.s-busyMin(d))}
 /* קטעי הזמן הפנויים באמת ביום — החלון פחות האירועים */
 function gapsFor(d){
@@ -2097,8 +2132,9 @@ function dayView(){
  document.getElementById("dLab").textContent=lab+(g<=2?" · "+heb(k):"");
  var w=winFor(d),cap=capOfD(d),rs=resFor(d),used=(plan[k]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
  var o=ovr[k]||{};
+ var vn=vacOn(k);
  document.getElementById("dInfo").textContent=
-  (o.off?"אין לימודים · ":"")+hhmm(w.s)+"–"+hhmm(w.e)+" · "+fm(cap)+" פנוי"+(rs?" · "+fm(rs)+" לשי\"ב":"")+" · "+fm(used)+" מתוכנן"+(pull[k]?" · "+pull[k]+" מוקדמות":"");
+  (vn?vn+" · ":(o.off?"אין לימודים · ":""))+hhmm(w.s)+"–"+hhmm(w.e)+" · "+fm(cap)+" פנוי"+(rs?" · "+fm(rs)+" לשי\"ב":"")+" · "+fm(used)+" מתוכנן"+(pull[k]?" · "+pull[k]+" מוקדמות":"");
  document.getElementById("dQuick").innerHTML=[0,1,2,3,4,5,6].map(function(i){
   var dd=ad(t,i),kk=key(dd),lb=i===0?"היום":(i===1?"מחר":DAYS[dd.getDay()].slice(0,3)+" "+dd.getDate()+"."+(dd.getMonth()+1));
   var mm=(plan[kk]||[]).reduce(function(a,s){return a+(s.min||S.len)},0);
@@ -2391,6 +2427,15 @@ function setView(){
  document.getElementById("tSame").className="tgl"+(S.same?" on":"");
  document.getElementById("tHard").className="tgl"+(S.hard?" on":"");
  document.getElementById("tRes").className="tgl"+(S.resAuto?" on":"");
+ var vr=document.getElementById("vacR");if(vr)vr.value=S.vacCap||150;
+ var vm=document.getElementById("vacM");if(vm)vm.textContent=fm(S.vacCap||150);
+ var vl=document.getElementById("vacList");
+ if(vl){var t0=key(tod());
+  vl.innerHTML=VAC.filter(function(v){return v[1]>=t0}).slice(0,6).map(function(v){
+   var days=Math.round((pr(v[1])-pr(v[0]))/864e5)+1;
+   return '<div class="dayline"><div class="grow"><b style="font-size:14px">'+esc(v[2])+'</b>'+
+    '<div class="sub">'+v[0].slice(5).replace("-",".")+' – '+v[1].slice(5).replace("-",".")+' · '+days+' ימים</div></div>'+
+    '<div class="mins">'+(days*(S.vacCap||150)/60).toFixed(1)+' ש\'</div></div>'}).join("");}
  var hl=document.getElementById("hardLbl");if(hl)hl.textContent=hardList().join(", ");
  var nk=document.getElementById("nickI");if(nk)nk.value=S.nick||"";
  var th=document.getElementById("tHide");if(th)th.className="tgl"+(S.stkHide?" on":"");
@@ -2466,6 +2511,7 @@ function evImpact(){
 }
 function fm(m){return m===0?"—":(m>=60?Math.floor(m/60)+"ש'"+(m%60?" "+m%60+"ד'":""):m+" ד'")}
 function cp(i,v){S.cap[i]=+v;document.getElementById("m"+i).textContent=fm(+v);clearTimeout(window._t);window._t=setTimeout(render,260)}
+function setVacCap(v){S.vacCap=+v;document.getElementById("vacM").textContent=fm(+v);clearTimeout(window._v);window._v=setTimeout(render,260)}
 function setNick(v){S.nick=(v||"").trim().slice(0,20);save();render()}
 function rs(i,v){S.res[i]=+v;document.getElementById("r"+i).textContent=fm(+v);clearTimeout(window._r);window._r=setTimeout(render,260)}
 function wc(t,v){S.w[t]=+v;render()}
